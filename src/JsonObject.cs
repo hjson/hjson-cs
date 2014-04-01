@@ -5,11 +5,10 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-using JsonPair=System.Collections.Generic.KeyValuePair<string, Hjson.JsonValue>;
-using JsonPairEnumerable=System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, Hjson.JsonValue>>;
-
 namespace Hjson
 {
+  using JsonPair=KeyValuePair<string, JsonValue>;
+
   public class JsonObject : JsonValue, IDictionary<string, JsonValue>, ICollection<JsonPair>
   {
     Dictionary<string, JsonValue> map;
@@ -20,7 +19,7 @@ namespace Hjson
       if (items!=null) AddRange(items);
     }
 
-    public JsonObject(JsonPairEnumerable items)
+    public JsonObject(IEnumerable<JsonPair> items)
     {
       if (items==null) throw new ArgumentNullException("items");
       map=new Dictionary<string, JsonValue>();
@@ -74,7 +73,7 @@ namespace Hjson
       Add(pair.Key, pair.Value);
     }
 
-    public void AddRange(JsonPairEnumerable items)
+    public void AddRange(IEnumerable<JsonPair> items)
     {
       if (items==null) throw new ArgumentNullException("items");
       foreach (var pair in items)
@@ -83,7 +82,7 @@ namespace Hjson
 
     public void AddRange(params JsonPair[] items)
     {
-      AddRange((JsonPairEnumerable)items);
+      AddRange((IEnumerable<JsonPair>)items);
     }
 
     public void Clear()

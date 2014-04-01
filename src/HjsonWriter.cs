@@ -6,10 +6,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-using JsonPair=System.Collections.Generic.KeyValuePair<string, Hjson.JsonValue>;
-
 namespace Hjson
 {
+  using JsonPair=KeyValuePair<string, JsonValue>;
+
   internal class HjsonWriter
   {
     public HjsonWriter()

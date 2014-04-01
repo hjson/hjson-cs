@@ -7,6 +7,8 @@ using System.Text;
 
 namespace Hjson
 {
+  using JsonPair=KeyValuePair<string, JsonValue>;
+
   public abstract class JsonValue : IEnumerable
   {
     public virtual int Count
@@ -95,10 +97,10 @@ namespace Hjson
       return ToJsonValue(ret);
     }
 
-    static IEnumerable<KeyValuePair<string, JsonValue>> ToJsonPairEnumerable(IEnumerable<KeyValuePair<string, object>> kvpc)
+    static IEnumerable<JsonPair> ToJsonPairEnumerable(IEnumerable<KeyValuePair<string, object>> kvpc)
     {
       foreach (var kvp in kvpc)
-        yield return new KeyValuePair<string, JsonValue>(kvp.Key, ToJsonValue(kvp.Value));
+        yield return new JsonPair(kvp.Key, ToJsonValue(kvp.Value));
     }
 
     static IEnumerable<JsonValue> ToJsonValueEnumerable(IEnumerable<object> arr)
