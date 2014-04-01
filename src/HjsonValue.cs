@@ -12,7 +12,7 @@ namespace Hjson
   {
     public static JsonValue Load(string path)
     {
-      if (Path.GetExtension(path)=="json") return JsonValue.Load(path);
+      if (Path.GetExtension(path).ToLower()==".json") return JsonValue.Load(path);
       using (var s=File.OpenRead(path))
         return Load(s);
     }
@@ -38,7 +38,7 @@ namespace Hjson
 
     public static void Save(JsonValue json, string path)
     {
-      if (Path.GetExtension(path)=="json") { json.Save(path, true); return; }
+      if (Path.GetExtension(path).ToLower()==".json") { json.Save(path, true); return; }
       using (var s=File.CreateText(path))
         Save(json, s);
     }
