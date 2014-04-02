@@ -15,7 +15,10 @@ namespace HjsonSample
       Console.WriteLine((string)data["hello"]);
 
       Console.WriteLine("Saving as json...");
-      data.Save("readme.json", true);
+      HjsonValue.Save(data, "readme.json");
+
+      Console.WriteLine("Saving as hjson...");
+      HjsonValue.Save(data, "readme2.hjson");
     }
   }
 }

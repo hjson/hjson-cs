@@ -32,6 +32,12 @@ namespace Hjson
       return peek;
     }
 
+    public virtual int SkipPeekChar()
+    {
+      SkipWhite();
+      return PeekChar();
+    }
+
     public int ReadChar()
     {
       int v=has_peek?peek:r.Read();

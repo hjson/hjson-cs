@@ -52,7 +52,8 @@ namespace Hjson
           foreach (JsonValue v in ((JsonArray)value))
           {
             if (following) tw.Write(",");
-            nl(tw, level+1);
+            if (v.JsonType!=JsonType.Array && v.JsonType!=JsonType.Object)
+              nl(tw, level+1);
             if (v!=null) Save(v, tw, level+1);
             else tw.Write("null");
             following=true;

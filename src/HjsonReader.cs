@@ -43,18 +43,22 @@ namespace Hjson
       }
     }
 
-    object ReadCore()
+    public override int SkipPeekChar()
     {
       skipWhite2();
-      int c=PeekChar();
+      return PeekChar();
+    }
+
+    object ReadCore()
+    {
+      int c=SkipPeekChar();
       if (c<0) throw ParseError("Incomplete input");
       switch (c)
       {
         case '[':
           ReadChar();
           var list=new List<object>();
-          skipWhite2();
-          if (PeekChar()==']')
+          if (SkipPeekChar()==']')
           {
             ReadChar();
             return list;
@@ -62,30 +66,26 @@ namespace Hjson
           for (; ; )
           {
             list.Add(ReadCore());
-            skipWhite2();
-            c=PeekChar();
-            if (c==',') ReadChar();
-            else if (c==']') { ReadChar(); break; }
+            c=SkipPeekChar();
+            if (c==',') { ReadChar(); c=SkipPeekChar(); }
+            if (c==']') { ReadChar(); break; }
           }
           return list.ToArray();
         case '{':
           ReadChar();
           var obj=new Dictionary<string, object>();
-          skipWhite2();
-          if (PeekChar()=='}') { ReadChar(); return obj; }
+          if (SkipPeekChar()=='}') { ReadChar(); return obj; }
           for (; ; )
           {
-            skipWhite2();
-            if (PeekChar()=='}') { ReadChar(); break; }
+            if (SkipPeekChar()=='}') { ReadChar(); break; }
             string name=readName();
             skipWhite2();
             Expect(':');
             skipWhite2();
             obj[name]=ReadCore(); // it does not reject duplicate names.
-            skipWhite2();
-            c=PeekChar();
-            if (c==',') ReadChar();
-            else if (c=='}') { ReadChar(); break; }
+            c=SkipPeekChar();
+            if (c==',') { ReadChar(); c=SkipPeekChar(); }
+            if (c=='}') { ReadChar(); break; }
           }
           return obj;
         case '-': return ReadNumericLiteral();

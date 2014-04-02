@@ -25,16 +25,14 @@ namespace Hjson
 
     object ReadCore()
     {
-      SkipWhite();
-      int c=PeekChar();
+      int c=SkipPeekChar();
       if (c<0) throw ParseError("Incomplete JSON input");
       switch (c)
       {
         case '[':
           ReadChar();
           var list=new List<object>();
-          SkipWhite();
-          if (PeekChar()==']')
+          if (SkipPeekChar()==']')
           {
             ReadChar();
             return list;
@@ -42,8 +40,7 @@ namespace Hjson
           for (; ; )
           {
             list.Add(ReadCore());
-            SkipWhite();
-            c=PeekChar();
+            c=SkipPeekChar();
             if (c!=',') break;
             ReadChar();
           }
@@ -53,16 +50,14 @@ namespace Hjson
         case '{':
           ReadChar();
           var obj=new Dictionary<string, object>();
-          SkipWhite();
-          if (PeekChar()=='}')
+          if (SkipPeekChar()=='}')
           {
             ReadChar();
             return obj;
           }
           for (; ; )
           {
-            SkipWhite();
-            if (PeekChar()=='}') { ReadChar(); break; }
+            if (SkipPeekChar()=='}') { ReadChar(); break; }
             string name=ReadStringLiteral();
             SkipWhite();
             Expect(':');
