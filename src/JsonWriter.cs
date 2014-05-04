@@ -119,9 +119,6 @@ namespace Hjson
         case '\f': return "\\f";
         case '\b': return "\\b";
         case '\\': return "\\\\";
-        case '\u0085': return "\\u0085"; // Next Line
-        case '\u2028': return "\\u2028"; // Line Separator
-        case '\u2029': return "\\u2029"; // Paragraph Separator
         default: return null;
       }
     }

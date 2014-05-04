@@ -130,11 +130,6 @@ namespace Hjson
       if (ret is uint) return new JsonPrimitive((uint)ret);
       if (ret is ulong) return new JsonPrimitive((ulong)ret);
       if (ret is ushort) return new JsonPrimitive((ushort)ret);
-      if (ret is DateTime) return new JsonPrimitive((DateTime)ret);
-      if (ret is DateTimeOffset) return new JsonPrimitive((DateTimeOffset)ret);
-      if (ret is Guid) return new JsonPrimitive((Guid)ret);
-      if (ret is TimeSpan) return new JsonPrimitive((TimeSpan)ret);
-      if (ret is Uri) return new JsonPrimitive((Uri)ret);
       throw new NotSupportedException(String.Format("Unexpected parser return type: {0}", ret.GetType()));
     }
 
@@ -161,11 +156,6 @@ namespace Hjson
     public static implicit operator JsonValue(uint value) { return new JsonPrimitive(value); }
     public static implicit operator JsonValue(ulong value) { return new JsonPrimitive(value); }
     public static implicit operator JsonValue(ushort value) { return new JsonPrimitive(value); }
-    public static implicit operator JsonValue(DateTime value) { return new JsonPrimitive(value); }
-    public static implicit operator JsonValue(DateTimeOffset value) { return new JsonPrimitive(value); }
-    public static implicit operator JsonValue(Guid value) { return new JsonPrimitive(value); }
-    public static implicit operator JsonValue(TimeSpan value) { return new JsonPrimitive(value); }
-    public static implicit operator JsonValue(Uri value) { return new JsonPrimitive(value); }
 
     // JsonValue -> CLI
 
@@ -231,8 +221,7 @@ namespace Hjson
 
     public static implicit operator string(JsonValue value)
     {
-      if (value==null)
-        return null;
+      if (value==null) return null;
       return (string)((JsonPrimitive)value).Value;
     }
 
@@ -252,36 +241,6 @@ namespace Hjson
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToUInt16(((JsonPrimitive)value).Value);
-    }
-
-    public static implicit operator DateTime(JsonValue value)
-    {
-      if (value==null) throw new ArgumentNullException("value");
-      return (DateTime)((JsonPrimitive)value).Value;
-    }
-
-    public static implicit operator DateTimeOffset(JsonValue value)
-    {
-      if (value==null) throw new ArgumentNullException("value");
-      return (DateTimeOffset)((JsonPrimitive)value).Value;
-    }
-
-    public static implicit operator TimeSpan(JsonValue value)
-    {
-      if (value==null) throw new ArgumentNullException("value");
-      return (TimeSpan)((JsonPrimitive)value).Value;
-    }
-
-    public static implicit operator Guid(JsonValue value)
-    {
-      if (value==null) throw new ArgumentNullException("value");
-      return (Guid)((JsonPrimitive)value).Value;
-    }
-
-    public static implicit operator Uri(JsonValue value)
-    {
-      if (value==null) throw new ArgumentNullException("value");
-      return (Uri)((JsonPrimitive)value).Value;
     }
   }
 }
