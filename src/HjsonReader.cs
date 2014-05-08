@@ -117,6 +117,65 @@ namespace Hjson
       else return readMore();
     }
 
+    void skipIndent(int indent)
+    {
+      while (indent-->0)
+      {
+        char c=(char)PeekChar();
+        if (IsWhite(c) && c!='\n') ReadChar();
+        else break;
+      }
+    }
+
+    object readMlString()
+    {
+      // Parse a multiline string value.
+      int triple=0;
+      sb.Length=0;
+
+      // we are at '''
+      var indent=Column-3;
+
+      // skip white/to (newline)
+      for (; ; )
+      {
+        char c=(char)PeekChar();
+        if (IsWhite(c) && c!='\n') ReadChar();
+        else break;
+      }
+      if (PeekChar()=='\n') { ReadChar(); skipIndent(indent); }
+
+      // When parsing for string values, we must look for " and \ characters.
+      while (true)
+      {
+        int ch=PeekChar();
+        if (ch<0) throw ParseError("Bad multiline string");
+        else if (ch=='\'')
+        {
+          triple++;
+          ReadChar();
+          if (triple==3) return sb.ToString();
+          else continue;
+        }
+        else while (triple>0)
+        {
+          sb.Append('\'');
+          triple--;
+        }
+        if (ch=='\n')
+        {
+          sb.Append('\n');
+          ReadChar();
+          skipIndent(indent);
+        }
+        else
+        {
+          sb.Append((char)ch);
+          ReadChar();
+        }
+      }
+    }
+
     object readMore()
     {
       sb.Length=0;
@@ -126,7 +185,8 @@ namespace Hjson
         if (c<0) throw ParseError("String did not end");
         if (c=='\r' || c=='\n') return sb.ToString();
         sb.Append((char)c);
-        if (sb.Length==4)
+        if (sb.Length==3 && sb.ToString()=="'''") return readMlString();
+        else if (sb.Length==4)
         {
           string v=sb.ToString();
           if (v=="true") return true;

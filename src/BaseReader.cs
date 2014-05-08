@@ -11,15 +11,18 @@ namespace Hjson
   internal class BaseReader
   {
     TextReader r;
-    int line=1, column=0;
     StringBuilder sb=new StringBuilder();
     int peek;
     bool has_peek, prev_lf;
+
+    public int Line { get; private set; }
+    public int Column { get; private set; }
 
     public BaseReader(TextReader reader)
     {
       if (reader==null) throw new ArgumentNullException("reader");
       this.r=reader;
+      Line=1;
     }
 
     public int PeekChar()
@@ -46,13 +49,13 @@ namespace Hjson
 
       if (prev_lf)
       {
-        line++;
-        column=0;
+        Line++;
+        Column=0;
         prev_lf=false;
       }
 
       if (v=='\n') prev_lf=true;
-      column++;
+      Column++;
 
       return v;
     }
@@ -230,7 +233,7 @@ namespace Hjson
 
     public Exception ParseError(string msg)
     {
-      return new ArgumentException(String.Format("{0}. At line {1}, column {2}", msg, line, column));
+      return new ArgumentException(String.Format("{0}. At line {1}, column {2}", msg, Line, Column));
     }
   }
 }

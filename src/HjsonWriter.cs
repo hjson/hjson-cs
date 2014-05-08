@@ -57,7 +57,7 @@ namespace Hjson
           tw.Write((bool)value?"true":"false");
           break;
         case JsonType.String:
-          tw.Write(escapeString(((JsonPrimitive)value).GetFormattedString()));
+          writeString(((JsonPrimitive)value).GetFormattedString(), tw, level);
           break;
         default:
           tw.Write(((JsonPrimitive)value).GetFormattedString());
@@ -71,9 +71,10 @@ namespace Hjson
       else return name;
     }
 
-    static string escapeString(string value)
+    void writeString(string value, TextWriter tw, int level)
     {
-      if (value=="") return "\"\"";
+      if (value=="") { tw.Write("\"\""); return; }
+
       char first=value[0], last=value[value.Length-1];
       if (BaseReader.IsWhite(first) ||
         char.IsDigit(first) ||
@@ -83,8 +84,26 @@ namespace Hjson
         first=='[' ||
         BaseReader.IsWhite(last) ||
         value.Any(c => shouldEscapeChar(c)) ||
-        isKeyword(value)) return "\""+JsonWriter.EscapeString(value)+"\"";
-      else return value;
+        isKeyword(value))
+      {
+        if (!value.Any(c => shouldEscapeCharExceptLF(c))) writeMLString(value, tw, level);
+        else tw.Write("\""+JsonWriter.EscapeString(value)+"\"");
+      }
+      else tw.Write(value);
+    }
+
+    void writeMLString(string value, TextWriter tw, int level)
+    {
+      level++;
+      nl(tw, level);
+      tw.Write("'''");
+
+      foreach(var line in value.Replace("\r", "").Split('\n'))
+      {
+        nl(tw, level);
+        tw.Write(line);
+      }
+      tw.Write("'''");
     }
 
     static bool isKeyword(string value)
@@ -92,14 +111,12 @@ namespace Hjson
       return value=="true" || value=="false" || value=="null";
     }
 
-    static bool shouldEscapeChar(char c)
+    static bool shouldEscapeCharExceptLF(char c)
     {
       switch (c)
       {
         case '\"':
         case '\t':
-        case '\n':
-        case '\r':
         case '\f':
         case '\b':
         case '\u0085':
@@ -108,6 +125,18 @@ namespace Hjson
           return true;
         default:
           return false;
+      }
+    }
+
+    static bool shouldEscapeChar(char c)
+    {
+      switch (c)
+      {
+        case '\n':
+        case '\r':
+          return true;
+        default:
+          return shouldEscapeCharExceptLF(c);
       }
     }
   }
