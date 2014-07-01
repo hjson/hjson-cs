@@ -76,6 +76,8 @@ namespace Hjson
       if (value=="") { tw.Write("\"\""); return; }
 
       char first=value[0], last=value[value.Length-1];
+      bool doEscape=value.Any(c => shouldEscapeChar(c));
+
       if (BaseReader.IsWhite(first) ||
         char.IsDigit(first) ||
         first=='#' ||
@@ -83,10 +85,10 @@ namespace Hjson
         first=='{' ||
         first=='[' ||
         BaseReader.IsWhite(last) ||
-        value.Any(c => shouldEscapeChar(c)) ||
+        doEscape ||
         isKeyword(value))
       {
-        if (!value.Any(c => shouldEscapeCharExceptLF(c))) writeMLString(value, tw, level);
+        if (doEscape && !value.Any(c => shouldEscapeCharExceptLF(c))) writeMLString(value, tw, level);
         else tw.Write("\""+JsonWriter.EscapeString(value)+"\"");
       }
       else tw.Write(value);
