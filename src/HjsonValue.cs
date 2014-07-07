@@ -13,8 +13,12 @@ namespace Hjson
     public static JsonValue Load(string path)
     {
       if (Path.GetExtension(path).ToLower()==".json") return JsonValue.Load(path);
-      using (var s=File.OpenRead(path))
-        return Load(s);
+      try
+      {
+        using (var s=File.OpenRead(path))
+          return Load(s);
+      }
+      catch (Exception e) { throw new Exception(e.Message+" (in "+path+")", e); }
     }
 
     public static JsonValue Load(Stream stream)
