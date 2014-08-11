@@ -90,10 +90,10 @@ namespace Hjson
       return Load(new StreamReader(stream, true));
     }
 
-    public static JsonValue Load(TextReader textReader)
+    public static JsonValue Load(TextReader textReader, IJsonReader jsonReader=null)
     {
       if (textReader==null) throw new ArgumentNullException("textReader");
-      var ret=new JsonReader(textReader).Read();
+      var ret=new JsonReader(textReader, jsonReader).Read();
       return ToJsonValue(ret);
     }
 

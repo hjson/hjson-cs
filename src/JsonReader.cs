@@ -10,8 +10,8 @@ namespace Hjson
 {
   internal class JsonReader : BaseReader
   {
-    public JsonReader(TextReader reader)
-      : base(reader)
+    public JsonReader(TextReader reader, IJsonReader jsonReader)
+      : base(reader, jsonReader)
     {
     }
 
@@ -37,9 +37,12 @@ namespace Hjson
             ReadChar();
             return list;
           }
-          for (; ; )
+          for (int i=0; ; i++)
           {
-            list.Add(ReadCore());
+            if (HasReader) Reader.Index(i);
+            var value=ReadCore();
+            if (HasReader) Reader.Value(JsonValue.ToJsonValue(value));
+            list.Add(value);
             c=SkipPeekChar();
             if (c!=',') break;
             ReadChar();
@@ -62,7 +65,10 @@ namespace Hjson
             SkipWhite();
             Expect(':');
             SkipWhite();
-            obj[name]=ReadCore(); // it does not reject duplicate names.
+            if (HasReader) Reader.Key(name);
+            var value=ReadCore();
+            if (HasReader) Reader.Value(JsonValue.ToJsonValue(value));
+            obj[name]=value; // it does not reject duplicate names.
             SkipWhite();
             c=ReadChar();
             if (c=='}') break;

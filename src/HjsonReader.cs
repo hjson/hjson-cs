@@ -12,8 +12,8 @@ namespace Hjson
   {
     StringBuilder sb=new StringBuilder();
 
-    public HjsonReader(TextReader reader)
-      : base(reader)
+    public HjsonReader(TextReader reader, IJsonReader jsonReader)
+      : base(reader, jsonReader)
     {
     }
 
@@ -63,9 +63,12 @@ namespace Hjson
             ReadChar();
             return list;
           }
-          for (; ; )
+          for (int i=0; ; i++)
           {
-            list.Add(ReadCore());
+            if (HasReader) Reader.Index(i);
+            var value=ReadCore();
+            if (HasReader) Reader.Value(JsonValue.ToJsonValue(value));
+            list.Add(value);
             c=SkipPeekChar();
             if (c==',') { ReadChar(); c=SkipPeekChar(); }
             if (c==']') { ReadChar(); break; }
@@ -82,7 +85,10 @@ namespace Hjson
             skipWhite2();
             Expect(':');
             skipWhite2();
-            obj[name]=ReadCore(); // it does not reject duplicate names.
+            if (HasReader) Reader.Key(name);
+            var value=ReadCore();
+            if (HasReader) Reader.Value(JsonValue.ToJsonValue(value));
+            obj[name]=value; // it does not reject duplicate names.
             c=SkipPeekChar();
             if (c==',') { ReadChar(); c=SkipPeekChar(); }
             if (c=='}') { ReadChar(); break; }
@@ -158,10 +164,10 @@ namespace Hjson
           else continue;
         }
         else while (triple>0)
-        {
-          sb.Append('\'');
-          triple--;
-        }
+          {
+            sb.Append('\'');
+            triple--;
+          }
         if (ch=='\n')
         {
           sb.Append('\n');

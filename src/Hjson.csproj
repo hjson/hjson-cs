@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HjsonValue.cs" />
+    <Compile Include="IJsonReader.cs" />
     <Compile Include="JsonArray.cs" />
     <Compile Include="JsonObject.cs" />
     <Compile Include="JsonPrimitive.cs" />

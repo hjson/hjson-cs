@@ -8,7 +8,7 @@ using System.Text;
 
 namespace Hjson
 {
-  internal class BaseReader
+  internal abstract class BaseReader
   {
     TextReader r;
     StringBuilder sb=new StringBuilder();
@@ -18,10 +18,14 @@ namespace Hjson
     public int Line { get; private set; }
     public int Column { get; private set; }
 
-    public BaseReader(TextReader reader)
+    protected IJsonReader Reader { get; private set; }
+    protected bool HasReader { get { return Reader!=null; } }
+
+    public BaseReader(TextReader reader, IJsonReader jsonReader)
     {
       if (reader==null) throw new ArgumentNullException("reader");
       this.r=reader;
+      this.Reader=jsonReader;
       Line=1;
     }
 
@@ -109,7 +113,7 @@ namespace Hjson
         ReadChar();
         if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; extra dot");
         decimal d=10;
-        for (;;)
+        for (; ; )
         {
           c=PeekChar();
           if (c<'0' || '9'<c) break;
