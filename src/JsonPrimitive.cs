@@ -7,23 +7,38 @@ using System.Text;
 
 namespace Hjson
 {
+  /// <summary>Implements an primitive value.</summary>
   public class JsonPrimitive : JsonValue
   {
     object value;
 
+    /// <summary>Initializes a new string.</summary>
     public JsonPrimitive(string value) { this.value=value; }
+    /// <summary>Initializes a new char.</summary>
     public JsonPrimitive(char value) { this.value=value.ToString(); }
+    /// <summary>Initializes a new bool.</summary>
     public JsonPrimitive(bool value) { this.value=value; }
+    /// <summary>Initializes a new decimal.</summary>
     public JsonPrimitive(decimal value) { this.value=value; }
+    /// <summary>Initializes a new double.</summary>
     public JsonPrimitive(double value) { this.value=value; }
+    /// <summary>Initializes a new float.</summary>
     public JsonPrimitive(float value) { this.value=(double)value; }
+    /// <summary>Initializes a new long.</summary>
     public JsonPrimitive(long value) { this.value=value; }
+    /// <summary>Initializes a new int.</summary>
     public JsonPrimitive(int value) { this.value=(long)value; }
+    /// <summary>Initializes a new byte.</summary>
     public JsonPrimitive(byte value) { this.value=(long)value; }
+    /// <summary>Initializes a new sbyte.</summary>
     public JsonPrimitive(sbyte value) { this.value=(long)value; }
+    /// <summary>Initializes a new short.</summary>
     public JsonPrimitive(short value) { this.value=(long)value; }
+    /// <summary>Initializes a new uint.</summary>
     public JsonPrimitive(uint value) { this.value=(long)value; }
+    /// <summary>Initializes a new ulong.</summary>
     public JsonPrimitive(ulong value) { this.value=(long)value; }
+    /// <summary>Initializes a new ushort.</summary>
     public JsonPrimitive(ushort value) { this.value=(long)value; }
 
     internal object Value
@@ -31,6 +46,7 @@ namespace Hjson
       get { return value; }
     }
 
+    /// <summary>The type of this value.</summary>
     public override JsonType JsonType
     {
       get

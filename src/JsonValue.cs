@@ -9,44 +9,55 @@ namespace Hjson
 {
   using JsonPair=KeyValuePair<string, JsonValue>;
 
+  /// <summary>
+  /// JsonValue is the abstract base class for all values (string, number, true, false, null, object or array).
+  /// </summary>
   public abstract class JsonValue : IEnumerable
   {
+    /// <summary>Gets the count of the contained items for arrays/objects.</summary>
     public virtual int Count
     {
       get { throw new InvalidOperationException(); }
     }
 
+    /// <summary>The type of this value.</summary>
     public abstract JsonType JsonType { get; }
 
+    /// <summary>Gets or sets the value for the specified index.</summary>
     public virtual JsonValue this[int index]
     {
       get { throw new InvalidOperationException(); }
       set { throw new InvalidOperationException(); }
     }
 
+    /// <summary>Gets or sets the value for the specified key.</summary>
     public virtual JsonValue this[string key]
     {
       get { throw new InvalidOperationException(); }
       set { throw new InvalidOperationException(); }
     }
 
+    /// <summary>Returns true if the object contains the specified key.</summary>
     public virtual bool ContainsKey(string key)
     {
       throw new InvalidOperationException();
     }
 
+    /// <summary>Saves the JSON to a file.</summary>
     public void Save(string path, bool formatted=false)
     {
       using (var s=File.CreateText(path))
         Save(s, formatted);
     }
 
+    /// <summary>Saves the JSON to a stream.</summary>
     public void Save(Stream stream, bool formatted=false)
     {
       if (stream==null) throw new ArgumentNullException("stream");
       Save(new StreamWriter(stream), formatted);
     }
 
+    /// <summary>Saves the JSON to a TextWriter.</summary>
     public void Save(TextWriter textWriter, bool formatted=false)
     {
       if (textWriter==null) throw new ArgumentNullException("textWriter");
@@ -54,6 +65,7 @@ namespace Hjson
       textWriter.Flush();
     }
 
+    /// <summary>Saves the JSON to a string.</summary>
     public string SaveAsString(bool formatted=false)
     {
       var sw=new StringWriter();
@@ -61,6 +73,7 @@ namespace Hjson
       return sw.ToString();
     }
 
+    /// <summary>Saves the JSON to a string.</summary>
     public override string ToString()
     {
       StringWriter sw=new StringWriter();
@@ -68,6 +81,7 @@ namespace Hjson
       return sw.ToString();
     }
 
+    /// <summary>Returns the contained primitive value.</summary>
     public object ToValue()
     {
       return ((JsonPrimitive)this).Value;
@@ -78,18 +92,21 @@ namespace Hjson
       throw new InvalidOperationException();
     }
 
+    /// <summary>Loads JSON from a file.</summary>
     public static JsonValue Load(string path)
     {
       using (var s=File.OpenRead(path))
         return Load(s);
     }
 
+    /// <summary>Loads JSON from a stream.</summary>
     public static JsonValue Load(Stream stream)
     {
       if (stream==null) throw new ArgumentNullException("stream");
       return Load(new StreamReader(stream, true));
     }
 
+    /// <summary>Loads JSON from a TextReader.</summary>
     public static JsonValue Load(TextReader textReader, IJsonReader jsonReader=null)
     {
       if (textReader==null) throw new ArgumentNullException("textReader");
@@ -133,6 +150,7 @@ namespace Hjson
       throw new NotSupportedException(String.Format("Unexpected parser return type: {0}", ret.GetType()));
     }
 
+    /// <summary>Parses the specified JSON string.</summary>
     public static JsonValue Parse(string jsonString)
     {
       if (jsonString==null)
@@ -142,101 +160,129 @@ namespace Hjson
 
     // CLI -> JsonValue
 
+    /// <summary>Converts from bool.</summary>
     public static implicit operator JsonValue(bool value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from byte.</summary>
     public static implicit operator JsonValue(byte value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from char.</summary>
     public static implicit operator JsonValue(char value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from decimal.</summary>
     public static implicit operator JsonValue(decimal value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from double.</summary>
     public static implicit operator JsonValue(double value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from float.</summary>
     public static implicit operator JsonValue(float value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from int.</summary>
     public static implicit operator JsonValue(int value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from long.</summary>
     public static implicit operator JsonValue(long value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from sbyte.</summary>
     public static implicit operator JsonValue(sbyte value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from short.</summary>
     public static implicit operator JsonValue(short value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from string.</summary>
     public static implicit operator JsonValue(string value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from uint.</summary>
     public static implicit operator JsonValue(uint value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from ulong.</summary>
     public static implicit operator JsonValue(ulong value) { return new JsonPrimitive(value); }
+    /// <summary>Converts from ushort.</summary>
     public static implicit operator JsonValue(ushort value) { return new JsonPrimitive(value); }
 
     // JsonValue -> CLI
 
+    /// <summary>Converts to bool.</summary>
     public static implicit operator bool(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToBoolean(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to byte.</summary>
     public static implicit operator byte(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToByte(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to char.</summary>
     public static implicit operator char(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToChar(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to decimal.</summary>
     public static implicit operator decimal(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToDecimal(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to double.</summary>
     public static implicit operator double(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToDouble(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to float.</summary>
     public static implicit operator float(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToSingle(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to int.</summary>
     public static implicit operator int(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToInt32(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to long.</summary>
     public static implicit operator long(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToInt64(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to sbyte.</summary>
     public static implicit operator sbyte(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToSByte(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to short.</summary>
     public static implicit operator short(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToInt16(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to string.</summary>
     public static implicit operator string(JsonValue value)
     {
       if (value==null) return null;
       return (string)((JsonPrimitive)value).Value;
     }
 
+    /// <summary>Converts to uint.</summary>
     public static implicit operator uint(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToUInt16(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to ulong.</summary>
     public static implicit operator ulong(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToUInt64(((JsonPrimitive)value).Value);
     }
 
+    /// <summary>Converts to ushort.</summary>
     public static implicit operator ushort(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
