@@ -141,12 +141,8 @@ namespace Hjson
       if (ret is float) return new JsonPrimitive((float)ret);
       if (ret is int) return new JsonPrimitive((int)ret);
       if (ret is long) return new JsonPrimitive((long)ret);
-      if (ret is sbyte) return new JsonPrimitive((sbyte)ret);
       if (ret is short) return new JsonPrimitive((short)ret);
       if (ret is string) return new JsonPrimitive((string)ret);
-      if (ret is uint) return new JsonPrimitive((uint)ret);
-      if (ret is ulong) return new JsonPrimitive((ulong)ret);
-      if (ret is ushort) return new JsonPrimitive((ushort)ret);
       throw new NotSupportedException(String.Format("Unexpected parser return type: {0}", ret.GetType()));
     }
 
@@ -176,18 +172,10 @@ namespace Hjson
     public static implicit operator JsonValue(int value) { return new JsonPrimitive(value); }
     /// <summary>Converts from long.</summary>
     public static implicit operator JsonValue(long value) { return new JsonPrimitive(value); }
-    /// <summary>Converts from sbyte.</summary>
-    public static implicit operator JsonValue(sbyte value) { return new JsonPrimitive(value); }
     /// <summary>Converts from short.</summary>
     public static implicit operator JsonValue(short value) { return new JsonPrimitive(value); }
     /// <summary>Converts from string.</summary>
     public static implicit operator JsonValue(string value) { return new JsonPrimitive(value); }
-    /// <summary>Converts from uint.</summary>
-    public static implicit operator JsonValue(uint value) { return new JsonPrimitive(value); }
-    /// <summary>Converts from ulong.</summary>
-    public static implicit operator JsonValue(ulong value) { return new JsonPrimitive(value); }
-    /// <summary>Converts from ushort.</summary>
-    public static implicit operator JsonValue(ushort value) { return new JsonPrimitive(value); }
 
     // JsonValue -> CLI
 
@@ -247,13 +235,6 @@ namespace Hjson
       return Convert.ToInt64(((JsonPrimitive)value).Value);
     }
 
-    /// <summary>Converts to sbyte.</summary>
-    public static implicit operator sbyte(JsonValue value)
-    {
-      if (value==null) throw new ArgumentNullException("value");
-      return Convert.ToSByte(((JsonPrimitive)value).Value);
-    }
-
     /// <summary>Converts to short.</summary>
     public static implicit operator short(JsonValue value)
     {
@@ -266,27 +247,6 @@ namespace Hjson
     {
       if (value==null) return null;
       return (string)((JsonPrimitive)value).Value;
-    }
-
-    /// <summary>Converts to uint.</summary>
-    public static implicit operator uint(JsonValue value)
-    {
-      if (value==null) throw new ArgumentNullException("value");
-      return Convert.ToUInt16(((JsonPrimitive)value).Value);
-    }
-
-    /// <summary>Converts to ulong.</summary>
-    public static implicit operator ulong(JsonValue value)
-    {
-      if (value==null) throw new ArgumentNullException("value");
-      return Convert.ToUInt64(((JsonPrimitive)value).Value);
-    }
-
-    /// <summary>Converts to ushort.</summary>
-    public static implicit operator ushort(JsonValue value)
-    {
-      if (value==null) throw new ArgumentNullException("value");
-      return Convert.ToUInt16(((JsonPrimitive)value).Value);
     }
   }
 }

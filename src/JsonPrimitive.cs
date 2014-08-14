@@ -30,16 +30,8 @@ namespace Hjson
     public JsonPrimitive(int value) { this.value=(long)value; }
     /// <summary>Initializes a new byte.</summary>
     public JsonPrimitive(byte value) { this.value=(long)value; }
-    /// <summary>Initializes a new sbyte.</summary>
-    public JsonPrimitive(sbyte value) { this.value=(long)value; }
     /// <summary>Initializes a new short.</summary>
     public JsonPrimitive(short value) { this.value=(long)value; }
-    /// <summary>Initializes a new uint.</summary>
-    public JsonPrimitive(uint value) { this.value=(long)value; }
-    /// <summary>Initializes a new ulong.</summary>
-    public JsonPrimitive(ulong value) { this.value=(long)value; }
-    /// <summary>Initializes a new ushort.</summary>
-    public JsonPrimitive(ushort value) { this.value=(long)value; }
 
     internal object Value
     {
