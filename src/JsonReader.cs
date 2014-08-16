@@ -8,6 +8,8 @@ using System.Text;
 
 namespace Hjson
 {
+  using JsonPair=KeyValuePair<string, JsonValue>;
+
   internal class JsonReader : BaseReader
   {
     public JsonReader(TextReader reader, IJsonReader jsonReader)
@@ -15,15 +17,15 @@ namespace Hjson
     {
     }
 
-    public object Read()
+    public JsonValue Read()
     {
-      object v=ReadCore();
+      JsonValue v=ReadCore();
       SkipWhite();
       if (ReadChar()>=0) throw ParseError("Extra characters in JSON input");
       return v;
     }
 
-    object ReadCore()
+    JsonValue ReadCore()
     {
       int c=SkipPeekChar();
       if (c<0) throw ParseError("Incomplete JSON input");
@@ -31,17 +33,17 @@ namespace Hjson
       {
         case '[':
           ReadChar();
-          var list=new List<object>();
           if (SkipPeekChar()==']')
           {
             ReadChar();
-            return list;
+            return new JsonArray();
           }
+          var list=new List<JsonValue>();
           for (int i=0; ; i++)
           {
             if (HasReader) Reader.Index(i);
             var value=ReadCore();
-            if (HasReader) Reader.Value(JsonValue.ToJsonValue(value));
+            if (HasReader) Reader.Value(value);
             list.Add(value);
             c=SkipPeekChar();
             if (c!=',') break;
@@ -49,15 +51,15 @@ namespace Hjson
           }
           if (ReadChar()!=']')
             throw ParseError("Array must end with ']'");
-          return list.ToArray();
+          return new JsonArray(list);
         case '{':
           ReadChar();
-          var obj=new Dictionary<string, object>();
           if (SkipPeekChar()=='}')
           {
             ReadChar();
-            return obj;
+            return new JsonObject();
           }
+          var obj=new List<JsonPair>();
           for (; ; )
           {
             if (SkipPeekChar()=='}') { ReadChar(); break; }
@@ -67,14 +69,14 @@ namespace Hjson
             SkipWhite();
             if (HasReader) Reader.Key(name);
             var value=ReadCore();
-            if (HasReader) Reader.Value(JsonValue.ToJsonValue(value));
-            obj[name]=value; // it does not reject duplicate names.
+            if (HasReader) Reader.Value(value);
+            obj.Add(new JsonPair(name, value));
             SkipWhite();
             c=ReadChar();
             if (c=='}') break;
             //if (c==',') continue;
           }
-          return obj;
+          return new JsonObject(obj);
         case 't':
           Expect("true");
           return true;

@@ -79,7 +79,7 @@ namespace Hjson
     }
 
     // It could return either int, long or decimal, depending on the parsed value.
-    public object ReadNumericLiteral()
+    public JsonValue ReadNumericLiteral()
     {
       bool negative=false;
       if (PeekChar()=='-')

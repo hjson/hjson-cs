@@ -111,39 +111,7 @@ namespace Hjson
     {
       if (textReader==null) throw new ArgumentNullException("textReader");
       var ret=new JsonReader(textReader, jsonReader).Read();
-      return ToJsonValue(ret);
-    }
-
-    static IEnumerable<JsonPair> ToJsonPairEnumerable(IEnumerable<KeyValuePair<string, object>> kvpc)
-    {
-      foreach (var kvp in kvpc)
-        yield return new JsonPair(kvp.Key, ToJsonValue(kvp.Value));
-    }
-
-    static IEnumerable<JsonValue> ToJsonValueEnumerable(IEnumerable<object> arr)
-    {
-      foreach (var obj in arr)
-        yield return ToJsonValue(obj);
-    }
-
-    internal static JsonValue ToJsonValue(object ret)
-    {
-      if (ret==null) return null;
-      var kvpc=ret as IEnumerable<KeyValuePair<string, object>>;
-      if (kvpc!=null) return new JsonObject(ToJsonPairEnumerable(kvpc));
-      var arr=ret as IEnumerable<object>;
-      if (arr!=null) return new JsonArray(ToJsonValueEnumerable(arr));
-      if (ret is bool) return new JsonPrimitive((bool)ret);
-      if (ret is byte) return new JsonPrimitive((byte)ret);
-      if (ret is char) return new JsonPrimitive((char)ret);
-      if (ret is decimal) return new JsonPrimitive((decimal)ret);
-      if (ret is double) return new JsonPrimitive((double)ret);
-      if (ret is float) return new JsonPrimitive((float)ret);
-      if (ret is int) return new JsonPrimitive((int)ret);
-      if (ret is long) return new JsonPrimitive((long)ret);
-      if (ret is short) return new JsonPrimitive((short)ret);
-      if (ret is string) return new JsonPrimitive((string)ret);
-      throw new NotSupportedException(String.Format("Unexpected parser return type: {0}", ret.GetType()));
+      return ret;
     }
 
     /// <summary>Parses the specified JSON string.</summary>

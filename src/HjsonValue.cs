@@ -35,7 +35,7 @@ namespace Hjson
     {
       if (textReader==null) throw new ArgumentNullException("textReader");
       var ret=new HjsonReader(textReader, jsonReader).Read();
-      return JsonValue.ToJsonValue(ret);
+      return ret;
     }
 
     /// <summary>Parses the specified Hjson/JSON string.</summary>

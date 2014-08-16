@@ -8,6 +8,8 @@ using System.Text;
 
 namespace Hjson
 {
+  using JsonPair=KeyValuePair<string, JsonValue>;
+
   internal class HjsonReader : BaseReader
   {
     StringBuilder sb=new StringBuilder();
@@ -17,9 +19,9 @@ namespace Hjson
     {
     }
 
-    public object Read()
+    public JsonValue Read()
     {
-      object v=ReadCore();
+      JsonValue v=ReadCore();
       skipWhite2();
       if (ReadChar()>=0) throw ParseError("Extra characters in input");
       return v;
@@ -49,7 +51,7 @@ namespace Hjson
       return PeekChar();
     }
 
-    object ReadCore()
+    JsonValue ReadCore()
     {
       int c=SkipPeekChar();
       if (c<0) throw ParseError("Incomplete input");
@@ -57,27 +59,27 @@ namespace Hjson
       {
         case '[':
           ReadChar();
-          var list=new List<object>();
           if (SkipPeekChar()==']')
           {
             ReadChar();
-            return list;
+            return new JsonArray();
           }
+          var list=new List<JsonValue>();
           for (int i=0; ; i++)
           {
             if (HasReader) Reader.Index(i);
             var value=ReadCore();
-            if (HasReader) Reader.Value(JsonValue.ToJsonValue(value));
+            if (HasReader) Reader.Value(value);
             list.Add(value);
             c=SkipPeekChar();
             if (c==',') { ReadChar(); c=SkipPeekChar(); }
             if (c==']') { ReadChar(); break; }
           }
-          return list.ToArray();
+          return new JsonArray(list);
         case '{':
           ReadChar();
-          var obj=new Dictionary<string, object>();
-          if (SkipPeekChar()=='}') { ReadChar(); return obj; }
+          if (SkipPeekChar()=='}') { ReadChar(); return new JsonObject(); }
+          var obj=new List<JsonPair>();
           for (; ; )
           {
             if (SkipPeekChar()=='}') { ReadChar(); break; }
@@ -87,13 +89,13 @@ namespace Hjson
             skipWhite2();
             if (HasReader) Reader.Key(name);
             var value=ReadCore();
-            if (HasReader) Reader.Value(JsonValue.ToJsonValue(value));
-            obj[name]=value; // it does not reject duplicate names.
+            if (HasReader) Reader.Value(value);
+            obj.Add(new JsonPair(name, value));
             c=SkipPeekChar();
             if (c==',') { ReadChar(); c=SkipPeekChar(); }
             if (c=='}') { ReadChar(); break; }
           }
-          return obj;
+          return new JsonObject(obj);
         case '-': return ReadNumericLiteral();
         default: return readPrimitive(c);
       }
@@ -116,7 +118,7 @@ namespace Hjson
       }
     }
 
-    object readPrimitive(int c)
+    JsonValue readPrimitive(int c)
     {
       if (c=='"') return ReadStringLiteral();
       else if (c>='0' && c<='9') return ReadNumericLiteral();
@@ -133,7 +135,7 @@ namespace Hjson
       }
     }
 
-    object readMlString()
+    JsonValue readMlString()
     {
       // Parse a multiline string value.
       int triple=0;
@@ -182,7 +184,7 @@ namespace Hjson
       }
     }
 
-    object readMore()
+    JsonValue readMore()
     {
       sb.Length=0;
       for (; ; )
