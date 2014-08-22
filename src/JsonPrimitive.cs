@@ -7,8 +7,8 @@ using System.Text;
 
 namespace Hjson
 {
-  /// <summary>Implements an primitive value.</summary>
-  public class JsonPrimitive : JsonValue
+  /// <summary>Implements a primitive value.</summary>
+  internal class JsonPrimitive : JsonValue
   {
     object value;
 
@@ -54,12 +54,12 @@ namespace Hjson
       }
     }
 
-    internal string GetFormattedString()
+    internal string GetRawString()
     {
       switch (JsonType)
       {
         case JsonType.String:
-          return (string)value;
+          return ((string)value)??"";
         case JsonType.Number:
           return ((IFormattable)value).ToString("G", NumberFormatInfo.InvariantInfo);
         default:

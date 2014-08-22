@@ -38,6 +38,14 @@ namespace Hjson
       return ret;
     }
 
+    /// <summary>Loads Hjson/JSON from a TextReader, preserving whitespace and comments.</summary>
+    public static JsonValue LoadWsc(TextReader textReader)
+    {
+      if (textReader==null) throw new ArgumentNullException("textReader");
+      var ret=new HjsonReader(textReader, null) { ReadWsc=true }.Read();
+      return ret;
+    }
+
     /// <summary>Parses the specified Hjson/JSON string.</summary>
     public static JsonValue Parse(string hjsonString)
     {
@@ -64,7 +72,15 @@ namespace Hjson
     public static void Save(JsonValue json, TextWriter textWriter)
     {
       if (textWriter==null) throw new ArgumentNullException("textWriter");
-      new HjsonWriter().Save(json, textWriter, 0);
+      new HjsonWriter().Save(json, textWriter, 0, false);
+      textWriter.Flush();
+    }
+
+    /// <summary>Saves Hjson to a string, adding whitespace and comments.</summary>
+    public static void SaveWsc(JsonValue json, TextWriter textWriter)
+    {
+      if (textWriter==null) throw new ArgumentNullException("textWriter");
+      new HjsonWriter() { WriteWsc=true }.Save(json, textWriter, 0, false);
       textWriter.Flush();
     }
 

@@ -12,6 +12,7 @@ namespace Hjson
   {
     TextReader r;
     StringBuilder sb=new StringBuilder();
+    StringBuilder white=new StringBuilder();
     int peek;
     bool has_peek, prev_lf;
 
@@ -20,6 +21,8 @@ namespace Hjson
 
     protected IJsonReader Reader { get; private set; }
     protected bool HasReader { get { return Reader!=null; } }
+
+    public bool ReadWsc { get; set; }
 
     public BaseReader(TextReader reader, IJsonReader jsonReader)
     {
@@ -51,6 +54,8 @@ namespace Hjson
 
       has_peek=false;
 
+      if (ReadWsc && v!='\r') white.Append((char)v);
+
       if (prev_lf)
       {
         Line++;
@@ -62,6 +67,17 @@ namespace Hjson
       Column++;
 
       return v;
+    }
+
+    protected void ResetWhite()
+    {
+      if (ReadWsc) white.Length=0;
+    }
+
+    protected virtual string GetWhite()
+    {
+      if (!ReadWsc) throw new InvalidOperationException();
+      return white.ToString();
     }
 
     public static bool IsWhite(char c)

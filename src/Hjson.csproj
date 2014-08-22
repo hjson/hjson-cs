@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HjsonValue.cs" />
+    <Compile Include="HjsonWsc.cs" />
     <Compile Include="IJsonReader.cs" />
     <Compile Include="JsonArray.cs" />
     <Compile Include="JsonObject.cs" />
@@ -48,6 +49,7 @@
     <Compile Include="HjsonReader.cs" />
     <Compile Include="BaseReader.cs" />
     <Compile Include="HjsonWriter.cs" />
+    <Compile Include="JsonUtil.cs" />
     <Compile Include="JsonWriter.cs" />
     <Compile Include="JsonType.cs" />
     <Compile Include="JsonValue.cs" />

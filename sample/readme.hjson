@@ -7,6 +7,7 @@
   text:        This is a valid string value.
   quote:       "You need quotes\tfor escapes"
   otherwise:   a \ is just a \
+  withComment: "needs quotes" # or place the comment on its own line
 
   # keys
   abc123:      no quotes for keys that contain only a-z, A-Z and 0-9
@@ -33,7 +34,12 @@
   null:        null
   array:       [ 1, 2 ]
   array2:      [
+    # a
     1
+    # b
     2
+    # x
   ]
+  empty: {}
+  empty2: [] #end
 }

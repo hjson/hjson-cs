@@ -45,6 +45,23 @@ namespace Hjson
       }
     }
 
+    protected override string GetWhite()
+    {
+      var res=base.GetWhite();
+      int to=res.Length-1;
+      if (to>=0)
+      {
+        // remove trailing whitespace
+        for (; to>0 && res[to]<=' ' && res[to]!='\n'; to--) ;
+        // but only up to EOL
+        if (res[to]=='\n') to--;
+        if (to>=0 && res[to]=='\r') to--;
+        res=res.Substring(0, to+1);
+        foreach (char c in res) if (c>' ') return res;
+      }
+      return "";
+    }
+
     public override int SkipPeekChar()
     {
       skipWhite2();
@@ -53,33 +70,47 @@ namespace Hjson
 
     JsonValue ReadCore()
     {
-      int c=SkipPeekChar();
+      int c=SkipPeekChar(), next;
       if (c<0) throw ParseError("Incomplete input");
       switch (c)
       {
         case '[':
+          JsonArray list;
+          WscJsonArray wscL=null;
           ReadChar();
-          if (SkipPeekChar()==']')
+          ResetWhite();
+          if (ReadWsc) list=wscL=new WscJsonArray();
+          else list=new JsonArray();
+          next=SkipPeekChar();
+          if (ReadWsc) wscL.Comments.Add(GetWhite());
+          if (next==']')
           {
             ReadChar();
-            return new JsonArray();
+            return list;
           }
-          var list=new List<JsonValue>();
           for (int i=0; ; i++)
           {
             if (HasReader) Reader.Index(i);
             var value=ReadCore();
             if (HasReader) Reader.Value(value);
             list.Add(value);
+            ResetWhite();
             c=SkipPeekChar();
-            if (c==',') { ReadChar(); c=SkipPeekChar(); }
+            if (c==',') { ReadChar(); ResetWhite(); c=SkipPeekChar(); }
+            if (ReadWsc) wscL.Comments.Add(GetWhite());
             if (c==']') { ReadChar(); break; }
           }
-          return new JsonArray(list);
+          return list;
         case '{':
+          JsonObject obj;
+          WscJsonObject wsc=null;
           ReadChar();
-          if (SkipPeekChar()=='}') { ReadChar(); return new JsonObject(); }
-          var obj=new List<JsonPair>();
+          ResetWhite();
+          if (ReadWsc) obj=wsc=new WscJsonObject();
+          else obj=new JsonObject();
+          next=SkipPeekChar();
+          if (ReadWsc) wsc.Comments[""]=GetWhite();
+          if (next=='}') { ReadChar(); return obj; }
           for (; ; )
           {
             if (SkipPeekChar()=='}') { ReadChar(); break; }
@@ -91,11 +122,13 @@ namespace Hjson
             var value=ReadCore();
             if (HasReader) Reader.Value(value);
             obj.Add(new JsonPair(name, value));
+            ResetWhite();
             c=SkipPeekChar();
-            if (c==',') { ReadChar(); c=SkipPeekChar(); }
+            if (c==',') { ReadChar(); ResetWhite(); c=SkipPeekChar(); }
+            if (ReadWsc) { wsc.Comments[name]=GetWhite(); wsc.Order.Add(name); }
             if (c=='}') { ReadChar(); break; }
           }
-          return new JsonObject(obj);
+          return obj;
         case '-': return ReadNumericLiteral();
         default: return readPrimitive(c);
       }
@@ -189,9 +222,11 @@ namespace Hjson
       sb.Length=0;
       for (; ; )
       {
-        int c=ReadChar();
+        int c=PeekChar();
         if (c<0) throw ParseError("String did not end");
-        if (c=='\r' || c=='\n') return sb.ToString();
+        if (c=='\n') return sb.ToString();
+        ReadChar();
+        if (c=='\r') continue; // ignore
         sb.Append((char)c);
         if (sb.Length==3 && sb.ToString()=="'''") return readMlString();
         else if (sb.Length==4)

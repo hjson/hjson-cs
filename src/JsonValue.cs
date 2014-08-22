@@ -147,70 +147,70 @@ namespace Hjson
 
     // JsonValue -> CLI
 
-    /// <summary>Converts to bool.</summary>
+    /// <summary>Converts to bool. Also see <see cref="JsonUtil"/>.</summary>
     public static implicit operator bool(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToBoolean(((JsonPrimitive)value).Value);
     }
 
-    /// <summary>Converts to byte.</summary>
+    /// <summary>Converts to byte. Also see <see cref="JsonUtil"/>.</summary>
     public static implicit operator byte(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToByte(((JsonPrimitive)value).Value);
     }
 
-    /// <summary>Converts to char.</summary>
+    /// <summary>Converts to char. Also see <see cref="JsonUtil"/>.</summary>
     public static implicit operator char(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToChar(((JsonPrimitive)value).Value);
     }
 
-    /// <summary>Converts to decimal.</summary>
+    /// <summary>Converts to decimal. Also see <see cref="JsonUtil"/>.</summary>
     public static implicit operator decimal(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToDecimal(((JsonPrimitive)value).Value);
     }
 
-    /// <summary>Converts to double.</summary>
+    /// <summary>Converts to double. Also see <see cref="JsonUtil"/>.</summary>
     public static implicit operator double(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToDouble(((JsonPrimitive)value).Value);
     }
 
-    /// <summary>Converts to float.</summary>
+    /// <summary>Converts to float. Also see <see cref="JsonUtil"/>.</summary>
     public static implicit operator float(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToSingle(((JsonPrimitive)value).Value);
     }
 
-    /// <summary>Converts to int.</summary>
+    /// <summary>Converts to int. Also see <see cref="JsonUtil"/>.</summary>
     public static implicit operator int(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToInt32(((JsonPrimitive)value).Value);
     }
 
-    /// <summary>Converts to long.</summary>
+    /// <summary>Converts to long. Also see <see cref="JsonUtil"/>.</summary>
     public static implicit operator long(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToInt64(((JsonPrimitive)value).Value);
     }
 
-    /// <summary>Converts to short.</summary>
+    /// <summary>Converts to short. Also see <see cref="JsonUtil"/>.</summary>
     public static implicit operator short(JsonValue value)
     {
       if (value==null) throw new ArgumentNullException("value");
       return Convert.ToInt16(((JsonPrimitive)value).Value);
     }
 
-    /// <summary>Converts to string.</summary>
+    /// <summary>Converts to string. Also see <see cref="JsonUtil"/>.</summary>
     public static implicit operator string(JsonValue value)
     {
       if (value==null) return null;

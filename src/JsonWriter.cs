@@ -66,11 +66,11 @@ namespace Hjson
           break;
         case JsonType.String:
           tw.Write('"');
-          tw.Write(EscapeString(((JsonPrimitive)value).GetFormattedString()));
+          tw.Write(EscapeString(((JsonPrimitive)value).GetRawString()));
           tw.Write('"');
           break;
         default:
-          tw.Write(((JsonPrimitive)value).GetFormattedString());
+          tw.Write(((JsonPrimitive)value).GetRawString());
           break;
       }
     }
