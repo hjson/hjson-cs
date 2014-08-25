@@ -77,7 +77,7 @@ namespace Hjson
     public void Add(string key, JsonValue value)
     {
       if (key==null) throw new ArgumentNullException("key");
-      map.Add(key, value);
+      map[key]=value; // json allows duplicate keys
     }
 
     /// <summary>Adds a new item.</summary>
@@ -90,8 +90,7 @@ namespace Hjson
     public void AddRange(IEnumerable<JsonPair> items)
     {
       if (items==null) throw new ArgumentNullException("items");
-      foreach (var pair in items)
-        map.Add(pair.Key, pair.Value);
+      foreach (var pair in items) Add(pair);
     }
 
     /// <summary>Adds a range of items.</summary>
