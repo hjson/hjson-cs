@@ -20,7 +20,7 @@ namespace Hjson
 
     void nl(TextWriter tw, int level)
     {
-      tw.Write("\n");
+      tw.Write(System.Environment.NewLine);
       tw.Write(new string(' ', level*2));
     }
 
@@ -60,7 +60,9 @@ namespace Hjson
               kwl=getWsc(kw.Comments, key);
 
               tw.Write(escapeName(key));
-              tw.Write(": ");
+              tw.Write(":");
+              var nextType=val!=null?(JsonType?)val.JsonType:null;
+              if (nextType!=JsonType.Array && nextType!=JsonType.Object) tw.Write(" ");
               if (val==null) tw.Write("null");
               else Save(val, tw, level+1, testWsc(kwl));
             }
@@ -73,7 +75,9 @@ namespace Hjson
             {
               nl(tw, level+1);
               tw.Write(escapeName(pair.Key));
-              tw.Write(": ");
+              tw.Write(":");
+              var nextType=pair.Value!=null?(JsonType?)pair.Value.JsonType:null;
+              if (nextType!=JsonType.Array && nextType!=JsonType.Object) tw.Write(" ");
               if (pair.Value==null) tw.Write("null");
               else Save(pair.Value, tw, level+1, false);
             }

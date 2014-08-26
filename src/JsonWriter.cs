@@ -21,7 +21,11 @@ namespace Hjson
 
     void nl(TextWriter tw, int level)
     {
-      if (format) { tw.Write("\n"); tw.Write(new string(' ', level*2)); }
+      if (format)
+      {
+        tw.Write(System.Environment.NewLine);
+        tw.Write(new string(' ', level*2));
+      }
     }
 
     public void Save(JsonValue value, TextWriter tw, int level)
@@ -38,7 +42,9 @@ namespace Hjson
             nl(tw, level+1);
             tw.Write('\"');
             tw.Write(EscapeString(pair.Key));
-            if (!format) tw.Write("\":"); else tw.Write("\": ");
+            tw.Write("\":");
+            var nextType=pair.Value!=null?(JsonType?)pair.Value.JsonType:null;
+            if (format && nextType!=JsonType.Array && nextType!=JsonType.Object) tw.Write(" ");
             if (pair.Value==null) tw.Write("null");
             else Save(pair.Value, tw, level+1);
             following=true;
