@@ -93,12 +93,6 @@ namespace Hjson
       foreach (var pair in items) Add(pair);
     }
 
-    /// <summary>Adds a range of items.</summary>
-    public void AddRange(params JsonPair[] items)
-    {
-      AddRange((IEnumerable<JsonPair>)items);
-    }
-
     /// <summary>Clears the object.</summary>
     public void Clear()
     {

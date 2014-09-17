@@ -65,13 +65,6 @@ namespace Hjson
       list.AddRange(items);
     }
 
-    /// <summary>Adds a range of items.</summary>
-    public void AddRange(params JsonValue[] items)
-    {
-      if (items==null) return;
-      list.AddRange(items);
-    }
-
     /// <summary>Clears the array.</summary>
     public void Clear()
     {
