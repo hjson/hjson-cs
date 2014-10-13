@@ -39,8 +39,14 @@ namespace Hjson
     string getWsc(List<string> white, int index) { return white.Count>index?getWsc(white[index]):""; }
     bool testWsc(string str) { return str.Length>0 && str[str[0]=='\r' && str.Length>1?1:0]!='\n'; }
 
-    public void Save(JsonValue value, TextWriter tw, int level, bool hasComment)
+    public void Save(JsonValue value, TextWriter tw, int level, bool hasComment, string separator)
     {
+      if (value==null)
+      {
+        tw.Write(separator);
+        tw.Write("null");
+        return;
+      }
       switch (value.JsonType)
       {
         case JsonType.Object:
@@ -62,9 +68,7 @@ namespace Hjson
               tw.Write(escapeName(key));
               tw.Write(":");
               var nextType=val!=null?(JsonType?)val.JsonType:null;
-              if (nextType!=JsonType.Array && nextType!=JsonType.Object) tw.Write(" ");
-              if (val==null) tw.Write("null");
-              else Save(val, tw, level+1, testWsc(kwl));
+              Save(val, tw, level+1, testWsc(kwl), separator);
             }
             tw.Write(kwl);
             nl(tw, level);
@@ -77,9 +81,7 @@ namespace Hjson
               tw.Write(escapeName(pair.Key));
               tw.Write(":");
               var nextType=pair.Value!=null?(JsonType?)pair.Value.JsonType:null;
-              if (nextType!=JsonType.Array && nextType!=JsonType.Object) tw.Write(" ");
-              if (pair.Value==null) tw.Write("null");
-              else Save(pair.Value, tw, level+1, false);
+              Save(pair.Value, tw, level+1, false, " ");
             }
             nl(tw, level);
           }
@@ -105,20 +107,21 @@ namespace Hjson
               wsl=getWsc(whiteL.Comments, i+1);
             }
             if (v.JsonType!=JsonType.Array && v.JsonType!=JsonType.Object) nl(tw, level+1);
-            if (v!=null) Save(v, tw, level+1, wsl!=null && testWsc(wsl));
-            else tw.Write("null");
+            Save(v, tw, level+1, wsl!=null && testWsc(wsl), "");
           }
           if (whiteL!=null) tw.Write(wsl);
           nl(tw, level);
           tw.Write(']');
           break;
         case JsonType.Boolean:
+          tw.Write(separator);
           tw.Write((bool)value?"true":"false");
           break;
         case JsonType.String:
-          writeString(((JsonPrimitive)value).GetRawString(), tw, level, hasComment);
+          writeString(((JsonPrimitive)value).GetRawString(), tw, level, hasComment, separator);
           break;
         default:
+          tw.Write(separator);
           tw.Write(((JsonPrimitive)value).GetRawString());
           break;
       }
@@ -130,42 +133,60 @@ namespace Hjson
       else return name;
     }
 
-    void writeString(string value, TextWriter tw, int level, bool hasComment)
+    void writeString(string value, TextWriter tw, int level, bool hasComment, string separator)
     {
-      if (value=="") { tw.Write("\"\""); return; }
+      if (value=="") { tw.Write(separator+"\"\""); return; }
 
       char first=value[0], last=value[value.Length-1];
-      bool doEscape=value.Any(c => shouldEscapeChar(c));
+      bool doEscape=hasComment || value.Any(c => needsQuotes(c));
 
-      if (hasComment ||
+      if (doEscape ||
         BaseReader.IsWhite(first) ||
         char.IsDigit(first) ||
+        first=='"' ||
         first=='#' ||
         first=='-' ||
         first=='{' ||
         first=='[' ||
         BaseReader.IsWhite(last) ||
-        doEscape ||
         isKeyword(value))
       {
-        if (doEscape && !value.Any(c => shouldEscapeCharExceptLF(c))) writeMLString(value, tw, level);
-        else tw.Write("\""+JsonWriter.EscapeString(value)+"\"");
+        // If the string contains no control characters, no quote characters, and no
+        // backslash characters, then we can safely slap some quotes around it.
+        // Otherwise we first check if the string can be expressed in multiline
+        // format or we must replace the offending characters with safe escape
+        // sequences.
+
+        if (!value.Any(c => needsEscape(c))) tw.Write(separator+"\""+value+"\"");
+        else if (!value.Any(c => needsEscapeML(c)) && !value.Contains("'''")) writeMLString(value, tw, level, separator);
+        else tw.Write(separator+"\""+JsonWriter.EscapeString(value)+"\"");
       }
-      else tw.Write(value);
+      else tw.Write(separator+value);
     }
 
-    void writeMLString(string value, TextWriter tw, int level)
+    void writeMLString(string value, TextWriter tw, int level, string separator)
     {
-      level++;
-      nl(tw, level);
-      tw.Write("'''");
+      var lines=value.Replace("\r", "").Split('\n');
 
-      foreach (var line in value.Replace("\r", "").Split('\n'))
+      if (lines.Length==1)
       {
-        nl(tw, level);
-        tw.Write(line);
+        tw.Write(separator+"'''");
+        tw.Write(lines[0]);
+        tw.Write("'''");
       }
-      tw.Write("'''");
+      else
+      {
+        level++;
+        nl(tw, level);
+        tw.Write("'''");
+
+        foreach (var line in lines)
+        {
+          nl(tw, level);
+          tw.Write(line);
+        }
+        tw.Write("'''");
+      }
     }
 
     static bool isKeyword(string value)
@@ -173,32 +194,42 @@ namespace Hjson
       return value=="true" || value=="false" || value=="null";
     }
 
-    static bool shouldEscapeCharExceptLF(char c)
+    static bool needsQuotes(char c)
     {
       switch (c)
       {
-        case '\"':
         case '\t':
         case '\f':
         case '\b':
-        case '\u0085':
-        case '\u2028':
-        case '\u2029':
+        case '\n':
+        case '\r':
           return true;
         default:
           return false;
       }
     }
 
-    static bool shouldEscapeChar(char c)
+    static bool needsEscape(char c)
+    {
+      switch (c)
+      {
+        case '\"':
+        case '\\':
+          return true;
+        default:
+          return needsQuotes(c);
+      }
+    }
+
+    static bool needsEscapeML(char c)
     {
       switch (c)
       {
         case '\n':
         case '\r':
-          return true;
+          return false;
         default:
-          return shouldEscapeCharExceptLF(c);
+          return needsQuotes(c);
       }
     }
   }

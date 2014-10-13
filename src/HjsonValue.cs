@@ -72,7 +72,7 @@ namespace Hjson
     public static void Save(JsonValue json, TextWriter textWriter)
     {
       if (textWriter==null) throw new ArgumentNullException("textWriter");
-      new HjsonWriter().Save(json, textWriter, 0, false);
+      new HjsonWriter().Save(json, textWriter, 0, false, "");
       textWriter.Flush();
     }
 
@@ -80,7 +80,7 @@ namespace Hjson
     public static void SaveWsc(JsonValue json, TextWriter textWriter)
     {
       if (textWriter==null) throw new ArgumentNullException("textWriter");
-      new HjsonWriter() { WriteWsc=true }.Save(json, textWriter, 0, false);
+      new HjsonWriter() { WriteWsc=true }.Save(json, textWriter, 0, false, "");
       textWriter.Flush();
     }
 
