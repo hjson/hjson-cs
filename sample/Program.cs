@@ -12,17 +12,17 @@ namespace HjsonSample
   {
     static void Main(string[] args)
     {
-      var data=HjsonValue.Load("readme.hjson").Qo();
+      var data=HjsonValue.Load("test.hjson").Qo();
       Console.WriteLine(data.Qs("hello"));
 
       Console.WriteLine("Saving as json...");
-      HjsonValue.Save(data, "readme.json");
+      HjsonValue.Save(data, "test.json");
 
       Console.WriteLine("Saving as hjson...");
-      HjsonValue.Save(data, "readme2.hjson");
+      HjsonValue.Save(data, "test2.hjson");
 
       // edit (preserve whitespace and comments)
-      var wdata=(WscJsonObject)HjsonValue.LoadWsc(new StreamReader("readme.hjson")).Qo();
+      var wdata=(WscJsonObject)HjsonValue.LoadWsc(new StreamReader("test.hjson")).Qo();
 
       // edit like you normally would
       wdata["hugo"]="value";
