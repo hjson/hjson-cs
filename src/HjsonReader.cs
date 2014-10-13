@@ -233,7 +233,7 @@ namespace Hjson
         {
           string v=sb.ToString();
           if (v=="true") return true;
-          else if (v=="null") return (string)null;
+          else if (v=="null") return (JsonValue)null;
         }
         else if (sb.Length==5 && sb.ToString()=="false") return false;
       }

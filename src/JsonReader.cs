@@ -85,7 +85,7 @@ namespace Hjson
           return false;
         case 'n':
           Expect("null");
-          return (string)null;
+          return (JsonValue)null;
         case '"':
           return ReadStringLiteral();
         default:
