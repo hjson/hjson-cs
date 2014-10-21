@@ -56,7 +56,7 @@ namespace Hjson
     /// <summary>Saves Hjson to a file.</summary>
     public static void Save(JsonValue json, string path)
     {
-      if (Path.GetExtension(path).ToLower()==".json") { json.Save(path, true); return; }
+      if (Path.GetExtension(path).ToLower()==".json") { json.Save(path, Stringify.Formatted); return; }
       using (var s=File.CreateText(path))
         Save(json, s);
     }
@@ -85,11 +85,10 @@ namespace Hjson
     }
 
     /// <summary>Saves Hjson to a string.</summary>
+    [Obsolete("Use json.ToString(Stringify.Hjson);")]
     public static string SaveAsString(JsonValue json)
     {
-      var sw=new StringWriter();
-      Save(json, sw);
-      return sw.ToString();
+      return json.ToString(Stringify.Hjson);
     }
   }
 }

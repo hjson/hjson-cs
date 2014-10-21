@@ -90,25 +90,31 @@ Returns true if the object contains the specified key.
 
 
 
-##### M:Hjson.JsonValue.Save(System.String,System.Boolean)
+##### M:Hjson.JsonValue.Save(System.String,Hjson.Stringify)
 
 Saves the JSON to a file.
 
 
 
-##### M:Hjson.JsonValue.Save(System.IO.Stream,System.Boolean)
+##### M:Hjson.JsonValue.Save(System.IO.Stream,Hjson.Stringify)
 
 Saves the JSON to a stream.
 
 
 
-##### M:Hjson.JsonValue.Save(System.IO.TextWriter,System.Boolean)
+##### M:Hjson.JsonValue.Save(System.IO.TextWriter,Hjson.Stringify)
 
 Saves the JSON to a TextWriter.
 
 
 
 ##### M:Hjson.JsonValue.SaveAsString(System.Boolean)
+
+Saves the JSON to a string.
+
+
+
+##### M:Hjson.JsonValue.ToString(Hjson.Stringify)
 
 Saves the JSON to a string.
 
@@ -336,12 +342,6 @@ Adds a range of items.
 
 
 
-##### M:Hjson.JsonObject.AddRange(System.Collections.Generic.KeyValuePair{System.String,Hjson.JsonValue}[])
-
-Adds a range of items.
-
-
-
 ##### M:Hjson.JsonObject.Clear
 
 Clears the object.
@@ -451,12 +451,6 @@ Adds a new item.
 
 
 ##### M:Hjson.JsonArray.AddRange(System.Collections.Generic.IEnumerable{Hjson.JsonValue})
-
-Adds a range of items.
-
-
-
-##### M:Hjson.JsonArray.AddRange(Hjson.JsonValue[])
 
 Adds a range of items.
 
@@ -726,6 +720,10 @@ Defines the known json types.
 
 
 
+>There is no null type as the primitive will be null instead of the JsonPrimitive containing null.
+
+
+
 ##### F:Hjson.JsonType.String
 
 Json value of type string.
@@ -753,6 +751,30 @@ Json value of type array.
 ##### F:Hjson.JsonType.Boolean
 
 Json value of type boolean.
+
+
+
+# T:Hjson.Stringify
+
+The ToString format.
+
+
+
+##### F:Hjson.Stringify.Plain
+
+JSON (no whitespace).
+
+
+
+##### F:Hjson.Stringify.Formatted
+
+Formatted JSON.
+
+
+
+##### F:Hjson.Stringify.Hjson
+
+Hjson.
 
 
 

@@ -9,6 +9,17 @@ namespace Hjson
 {
   using JsonPair=KeyValuePair<string, JsonValue>;
 
+  /// <summary>The ToString format.</summary>
+  public enum Stringify
+  {
+    /// <summary>JSON (no whitespace).</summary>
+    Plain,
+    /// <summary>Formatted JSON.</summary>
+    Formatted,
+    /// <summary>Hjson.</summary>
+    Hjson,
+  }
+
   /// <summary>
   /// JsonValue is the abstract base class for all values (string, number, true, false, null, object or array).
   /// </summary>
@@ -44,41 +55,47 @@ namespace Hjson
     }
 
     /// <summary>Saves the JSON to a file.</summary>
-    public void Save(string path, bool formatted=false)
+    public void Save(string path, Stringify format=Stringify.Plain)
     {
       using (var s=File.CreateText(path))
-        Save(s, formatted);
+        Save(s, format);
     }
 
     /// <summary>Saves the JSON to a stream.</summary>
-    public void Save(Stream stream, bool formatted=false)
+    public void Save(Stream stream, Stringify format=Stringify.Plain)
     {
       if (stream==null) throw new ArgumentNullException("stream");
-      Save(new StreamWriter(stream), formatted);
+      Save(new StreamWriter(stream), format);
     }
 
     /// <summary>Saves the JSON to a TextWriter.</summary>
-    public void Save(TextWriter textWriter, bool formatted=false)
+    public void Save(TextWriter textWriter, Stringify format=Stringify.Plain)
     {
       if (textWriter==null) throw new ArgumentNullException("textWriter");
-      new JsonWriter(formatted).Save(this, textWriter, 0);
+      if (format==Stringify.Hjson) HjsonValue.Save(this, textWriter);
+      else new JsonWriter(format==Stringify.Formatted).Save(this, textWriter, 0);
       textWriter.Flush();
     }
 
     /// <summary>Saves the JSON to a string.</summary>
+    [Obsolete("Use ToString();")]
     public string SaveAsString(bool formatted=false)
     {
+      return ToString(formatted?Stringify.Formatted:Stringify.Plain);
+    }
+
+    /// <summary>Saves the JSON to a string.</summary>
+    public string ToString(Stringify format)
+    {
       var sw=new StringWriter();
-      Save(sw, formatted);
+      Save(sw, format);
       return sw.ToString();
     }
 
     /// <summary>Saves the JSON to a string.</summary>
     public override string ToString()
     {
-      StringWriter sw=new StringWriter();
-      new JsonWriter(true).Save(this, sw, 0);
-      return sw.ToString();
+      return ToString(Stringify.Plain);
     }
 
     /// <summary>Returns the contained primitive value.</summary>
