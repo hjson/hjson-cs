@@ -21,6 +21,20 @@ namespace Hjson
       else return defaultValue;
     }
 
+    /// <summary>Gets the int from a JsonValue.</summary>
+    public static int Qi(this JsonValue json)
+    {
+      if (json!=null && json.JsonType==JsonType.Number) return Convert.ToInt32(json.ToValue());
+      else throw new Exception("Missing JsonType.Number!");
+    }
+
+    /// <summary>Gets the int value of a key in a JsonObject.</summary>
+    public static int Qi(this JsonObject json, string key, int defaultValue=0)
+    {
+      if (json.ContainsKey(key)) return json[key].Qi();
+      else return defaultValue;
+    }
+
     /// <summary>Gets the long from a JsonValue.</summary>
     public static long Ql(this JsonValue json)
     {
@@ -99,6 +113,22 @@ namespace Hjson
     public static IEnumerable<KeyValuePair<string, JsonObject>> Qqo(this JsonObject json)
     {
       return json.Select(x => new KeyValuePair<string, JsonObject>(x.Key, (JsonObject)x.Value));
+    }
+
+    static readonly DateTime UnixEpochUtc=new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+    /// <summary>Convert the date to json (unix epoch date offset).</summary>
+    public static long ToJsonDate(this DateTime dt)
+    {
+      if (dt==DateTime.MinValue) return 0;
+      else return (long)(dt.ToUniversalTime()-UnixEpochUtc).TotalMilliseconds;
+    }
+
+    /// <summary>Convert the json date (unix epoch date offset) to a DateTime.</summary>
+    public static DateTime ToDateTime(long unixEpochDateOffset)
+    {
+      if (unixEpochDateOffset>0) return UnixEpochUtc.AddMilliseconds(unixEpochDateOffset);
+      else return DateTime.MinValue;
     }
   }
 }
