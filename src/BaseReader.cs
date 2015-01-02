@@ -13,8 +13,9 @@ namespace Hjson
     TextReader r;
     StringBuilder sb=new StringBuilder();
     StringBuilder white=new StringBuilder();
-    int peek;
-    bool has_peek, prev_lf;
+    int[] peek=new int[2];
+    int hasPeek;
+    bool prevLf;
 
     public int Line { get; private set; }
     public int Column { get; private set; }
@@ -32,14 +33,12 @@ namespace Hjson
       Line=1;
     }
 
-    public int PeekChar()
+    public int PeekChar(int idx=0)
     {
-      if (!has_peek)
-      {
-        peek=r.Read();
-        has_peek=true;
-      }
-      return peek;
+      if (idx<0 || idx>1) throw new ArgumentOutOfRangeException();
+      if (idx>=hasPeek)
+        peek[hasPeek++]=r.Read();
+      return peek[idx];
     }
 
     public virtual int SkipPeekChar()
@@ -50,20 +49,18 @@ namespace Hjson
 
     public int ReadChar()
     {
-      int v=has_peek?peek:r.Read();
-
-      has_peek=false;
+      int v=hasPeek>0?peek[--hasPeek]:r.Read();
 
       if (ReadWsc && v!='\r') white.Append((char)v);
 
-      if (prev_lf)
+      if (prevLf)
       {
         Line++;
         Column=0;
-        prev_lf=false;
+        prevLf=false;
       }
 
-      if (v=='\n') prev_lf=true;
+      if (v=='\n') prevLf=true;
       Column++;
 
       return v;

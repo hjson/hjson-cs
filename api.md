@@ -642,6 +642,18 @@ Gets the bool value of a key in a JsonObject.
 
 
 
+##### M:Hjson.JsonUtil.Qi(Hjson.JsonValue)
+
+Gets the int from a JsonValue.
+
+
+
+##### M:Hjson.JsonUtil.Qi(Hjson.JsonObject,System.String,System.Int32)
+
+Gets the int value of a key in a JsonObject.
+
+
+
 ##### M:Hjson.JsonUtil.Ql(Hjson.JsonValue)
 
 Gets the long from a JsonValue.
@@ -711,6 +723,18 @@ Gets the JsonArray from a JsonValue.
 ##### M:Hjson.JsonUtil.Qqo(Hjson.JsonObject)
 
 Enumerates JsonObjects from a JsonObject.
+
+
+
+##### M:Hjson.JsonUtil.ToJsonDate(System.DateTime)
+
+Convert the date to json (unix epoch date offset).
+
+
+
+##### M:Hjson.JsonUtil.ToDateTime(System.Int64)
+
+Convert the json date (unix epoch date offset) to a DateTime.
 
 
 

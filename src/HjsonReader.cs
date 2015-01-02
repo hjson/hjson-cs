@@ -32,7 +32,8 @@ namespace Hjson
       while (PeekChar()>=0)
       {
         while (IsWhite((char)PeekChar())) ReadChar();
-        if (PeekChar()=='#')
+        int p=PeekChar();
+        if (p=='#' || p=='/' && PeekChar(1)=='/')
         {
           for (; ; )
           {

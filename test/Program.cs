@@ -24,9 +24,9 @@ namespace Test
         try
         {
           var data=HjsonValue.Parse(text);
-          var data1=data.SaveAsString(true);
-          var data2=result["data"].SaveAsString(true);
-          var hjson1=HjsonValue.SaveAsString(data).Replace("\r\n", "\n");
+          var data1=data.ToString(Stringify.Formatted);
+          var data2=result["data"].ToString(Stringify.Formatted);
+          var hjson1=data.ToString(Stringify.Hjson).Replace("\r\n", "\n");
           var hjson2=File.ReadAllText(Path.Combine(asset, name+"_result.txt")).Replace("\r\n", "\n"); ;
 
           if (data1!=data2) return showErr(name+" parse", data1, data2);

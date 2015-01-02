@@ -34,7 +34,7 @@
   <ItemGroup>
     <Reference Include="Hjson, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>packages\Hjson.1.4.3\lib\net40\Hjson.dll</HintPath>
+      <HintPath>packages\Hjson.1.6.0\lib\net40\Hjson.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
