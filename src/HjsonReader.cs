@@ -42,6 +42,17 @@ namespace Hjson
             ReadChar();
           }
         }
+        else if (p=='/' && PeekChar(1)=='*')
+        {
+          ReadChar(); ReadChar();
+          for (; ; )
+          {
+            var ch=PeekChar();
+            if (ch<0 || ch=='*' && PeekChar(1)=='/') break;
+            ReadChar();
+          }
+          if (PeekChar()>=0) { ReadChar(); ReadChar(); }
+        }
         else break;
       }
     }

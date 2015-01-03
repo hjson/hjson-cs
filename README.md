@@ -2,7 +2,7 @@
 
 Hjson, the Human JSON. A data format that caters to humans and helps reduce the errors they make.
 
-It supports `#` and `//` style comments as well as avoiding trailing comma and other mistakes. For details and syntax see http://laktak.github.io/hjson.
+It supports `#`, `//` and `/**/` style comments as well as avoiding trailing/missing comma and other mistakes. For details and syntax see http://laktak.github.io/hjson.
 
 # Install from nuget
 
@@ -13,11 +13,11 @@ Install-Package Hjson
 # Usage
 
 ```
-var data=(JsonObject)HjsonValue.Load("readme.hjson");
+var data=(JsonObject)HjsonValue.Load("test.hjson");
 Console.WriteLine((string)data["hello"]);
 
 // or
-var data=HjsonValue.Load("readme.hjson").Qo();
+var data=HjsonValue.Load("test.hjson").Qo();
 Console.WriteLine(data.Qs("hello"));
 ```
 
