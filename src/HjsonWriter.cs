@@ -67,7 +67,6 @@ namespace Hjson
 
               tw.Write(escapeName(key));
               tw.Write(":");
-              var nextType=val!=null?(JsonType?)val.JsonType:null;
               Save(val, tw, level+1, testWsc(kwl), separator);
             }
             tw.Write(kwl);
@@ -80,7 +79,6 @@ namespace Hjson
               nl(tw, level+1);
               tw.Write(escapeName(pair.Key));
               tw.Write(":");
-              var nextType=pair.Value!=null?(JsonType?)pair.Value.JsonType:null;
               Save(pair.Value, tw, level+1, false, " ");
             }
             nl(tw, level);

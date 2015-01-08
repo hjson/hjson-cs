@@ -13,7 +13,7 @@ namespace Test
   {
     static int Main(string[] args)
     {
-      var asset=Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"..\..\assets"));
+      var asset=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "../../assets");
       foreach (var file in Directory.GetFiles(asset, "*_test.hjson"))
       {
         string name=Path.GetFileNameWithoutExtension(file);
