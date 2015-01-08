@@ -61,6 +61,15 @@ namespace Hjson
         case JsonType.String:
           return ((string)value)??"";
         case JsonType.Number:
+#if __MonoCS__ // mono bug ca 2014
+          if (value is decimal)
+          {
+            var res=((IFormattable)value).ToString("G", NumberFormatInfo.InvariantInfo);
+            while (res.EndsWith("0")) res=res.Substring(0, res.Length-1);
+            if (res.EndsWith(".") || res.EndsWith("e", StringComparison.OrdinalIgnoreCase)) res=res.Substring(0, res.Length-1);
+            return res;
+          }
+#endif
           return ((IFormattable)value).ToString("G", NumberFormatInfo.InvariantInfo);
         default:
           throw new InvalidOperationException();

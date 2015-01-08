@@ -4,6 +4,8 @@ Hjson, the Human JSON. A data format that caters to humans and helps reduce the 
 
 It supports `#`, `//` and `/**/` style comments as well as avoiding trailing/missing comma and other mistakes. For details and syntax see http://laktak.github.io/hjson.
 
+Tested on .net & Mono.
+
 # Install from nuget
 
 ```
@@ -30,3 +32,4 @@ See [api.md](api.md).
 ## From the Commandline
 
 A commandline tool to convert from/to Hjson is available at https://github.com/laktak/hjson-js.
+
