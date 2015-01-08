@@ -141,8 +141,8 @@ namespace Hjson
             if (c=='}') { ReadChar(); break; }
           }
           return obj;
-        case '-': return ReadNumericLiteral();
-        default: return readPrimitive(c);
+        case '"': return ReadStringLiteral();
+        default: return readTfnns(c);
       }
     }
 
@@ -161,13 +161,6 @@ namespace Hjson
         ReadChar();
         sb.Append(ch);
       }
-    }
-
-    JsonValue readPrimitive(int c)
-    {
-      if (c=='"') return ReadStringLiteral();
-      else if (c>='0' && c<='9') return ReadNumericLiteral();
-      else return readMore();
     }
 
     void skipIndent(int indent)
@@ -229,25 +222,124 @@ namespace Hjson
       }
     }
 
-    JsonValue readMore()
+    internal static bool TryParseNumericLiteral(string text, out JsonValue value)
+    {
+      int c, p=0;
+      decimal val=0;
+      bool negative=false;
+      text+='\0';
+      value=null;
+
+      if (text[p]=='-')
+      {
+        negative=true;
+        p++;
+        if (text[p]==0) return false;
+      }
+
+      bool zeroStart=text[p]=='0';
+      for (int x=0; ; x++)
+      {
+        c=text[p];
+        if (c<'0' || c>'9') break;
+        val=val*10+(c-'0');
+        p++;
+        if (zeroStart && x==1 && c=='0') return false;
+      }
+
+      // fraction
+      if (text[p]=='.')
+      {
+        int fdigits=0;
+        decimal frac=0;
+        p++;
+        if (text[p]==0) return false;
+        decimal d=10;
+        for (; ; )
+        {
+          c=text[p];
+          if (c<'0' || '9'<c) break;
+          p++;
+          frac+=(c-'0')/d;
+          d*=10;
+          fdigits++;
+        }
+        if (fdigits==0) return false;
+        val+=frac;
+      }
+
+      c=text[p];
+      if (c=='e' || c=='E')
+      {
+        // exponent
+        int exp=0, expSign=1;
+
+        p++;
+        if (text[p]==0) return false;
+
+        c=text[p];
+        if (c=='-')
+        {
+          p++;
+          expSign=-1;
+        }
+        else if (c=='+') p++;
+
+        if (text[p]==0) return false;
+
+        for (; ; )
+        {
+          c=text[p];
+          if (c<'0' || c>'9') break;
+          exp=exp*10+(c-'0');
+          p++;
+        }
+
+        if (exp!=0)
+          val*=(decimal)Math.Pow(10, exp*expSign);
+      }
+
+      if (p+1!=text.Length) return false;
+
+      if (negative) val*=-1;
+      long lval=(long)val;
+      if (lval==val) value=lval;
+      else value=val;
+      return true;
+    }
+
+    JsonValue readTfnns(int c)
     {
       sb.Length=0;
       for (; ; )
       {
-        int c=PeekChar();
         if (c<0) throw ParseError("String did not end");
-        if (c=='\n') return sb.ToString();
+        if (c=='\n' || c==',' || c=='}' || c==']')
+        {
+          if (sb.Length>0)
+          {
+            char ch=sb[0];
+            switch (ch)
+            {
+              case 'f': if (sb.ToString().Trim()=="false") return false; break;
+              case 'n': if (sb.ToString().Trim()=="null") return null; break;
+              case 't': if (sb.ToString().Trim()=="true") return true; break;
+              default:
+                if (ch=='-' || ch>='0' && ch<='9')
+                {
+                  JsonValue res;
+                  if (TryParseNumericLiteral(sb.ToString().Trim(), out res)) return res;
+                }
+                break;
+            }
+          }
+          if (c=='\n') return sb.ToString();
+        }
         ReadChar();
         if (c=='\r') continue; // ignore
         sb.Append((char)c);
-        if (sb.Length==3 && sb.ToString()=="'''") return readMlString();
-        else if (sb.Length==4)
-        {
-          string v=sb.ToString();
-          if (v=="true") return true;
-          else if (v=="null") return (JsonValue)null;
-        }
-        else if (sb.Length==5 && sb.ToString()=="false") return false;
+        if (sb.Length==3 && sb[0]=='\'' && sb[1]=='\'' && sb[2]=='\'') return readMlString();
+        c=PeekChar();
       }
     }
   }

@@ -1,0 +1,6 @@
+language: csharp
+solution: Hjson.sln
+script:
+  - xbuild /p:Configuration=Release Hjson.sln
+  - xbuild /p:Configuration=Release test/Test.sln
+  - mono ./test/bin/Release/Test.exe

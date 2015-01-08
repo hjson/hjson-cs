@@ -106,7 +106,7 @@ namespace Hjson
               tw.Write(wsl);
               wsl=getWsc(whiteL.Comments, i+1);
             }
-            if (v.JsonType!=JsonType.Array && v.JsonType!=JsonType.Object) nl(tw, level+1);
+            if (v==null || v.JsonType!=JsonType.Array && v.JsonType!=JsonType.Object) nl(tw, level+1);
             Save(v, tw, level+1, wsl!=null && testWsc(wsl), "");
           }
           if (whiteL!=null) tw.Write(wsl);
@@ -139,16 +139,16 @@ namespace Hjson
 
       char first=value[0], last=value[value.Length-1];
       bool doEscape=hasComment || value.Any(c => needsQuotes(c));
+      JsonValue dummy;
 
       if (doEscape ||
         BaseReader.IsWhite(first) ||
-        char.IsDigit(first) ||
         first=='"' ||
         first=='#' ||
-        first=='-' ||
         first=='{' ||
         first=='[' ||
         BaseReader.IsWhite(last) ||
+        HjsonReader.TryParseNumericLiteral(value, out dummy) ||
         isKeyword(value))
       {
         // If the string contains no control characters, no quote characters, and no

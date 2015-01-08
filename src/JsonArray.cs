@@ -23,7 +23,6 @@ namespace Hjson
     public JsonArray(IEnumerable<JsonValue> items)
     {
       if (items==null) throw new ArgumentNullException("items");
-
       list=new List<JsonValue>(items);
     }
 
@@ -54,7 +53,6 @@ namespace Hjson
     /// <summary>Adds a new item.</summary>
     public void Add(JsonValue item)
     {
-      if (item==null) throw new ArgumentNullException("item");
       list.Add(item);
     }
 

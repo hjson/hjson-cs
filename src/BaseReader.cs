@@ -91,10 +91,13 @@ namespace Hjson
       }
     }
 
-    // It could return either int, long or decimal, depending on the parsed value.
+    // It could return either long or decimal, depending on the parsed value.
     public JsonValue ReadNumericLiteral()
     {
+      int c;
+      decimal val=0;
       bool negative=false;
+
       if (PeekChar()=='-')
       {
         negative=true;
@@ -102,11 +105,8 @@ namespace Hjson
         if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; extra negation");
       }
 
-      int c;
-      decimal val=0;
-      int x=0;
       bool zeroStart=PeekChar()=='0';
-      for (; ; x++)
+      for (int x=0; ; x++)
       {
         c=PeekChar();
         if (c<'0' || c>'9') break;
@@ -116,13 +116,10 @@ namespace Hjson
       }
 
       // fraction
-
-      bool hasFrac=false;
-      decimal frac=0;
-      int fdigits=0;
       if (PeekChar()=='.')
       {
-        hasFrac=true;
+        int fdigits=0;
+        decimal frac=0;
         ReadChar();
         if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; extra dot");
         decimal d=10;
@@ -136,52 +133,44 @@ namespace Hjson
           fdigits++;
         }
         if (fdigits==0) throw ParseError("Invalid JSON numeric literal; extra dot");
-      }
-      frac=Decimal.Round(frac, fdigits);
-
-      c=PeekChar();
-      if (c!='e' && c!='E')
-      {
-        if (!hasFrac)
-        {
-          if (negative && int.MinValue<=-val || !negative && val<=int.MaxValue)
-            return (int)(negative?-val:val);
-          if (negative && long.MinValue<=-val || !negative && val<=long.MaxValue)
-            return (long)(negative?-val:val);
-        }
-        var v=val+frac;
-        return negative?-v:v;
+        val+=frac;
       }
 
-      // exponent
-
-      ReadChar();
-
-      int exp=0;
-      if (PeekChar()<0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
-
-      bool negexp=false;
       c=PeekChar();
-      if (c=='-')
+      if (c=='e' || c=='E')
       {
+        // exponent
+        int exp=0, expSign=1;
+
         ReadChar();
-        negexp=true;
-      }
-      else if (c=='+') ReadChar();
+        if (PeekChar()<0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
 
-      if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; incomplete exponent");
-
-      for (; ; )
-      {
         c=PeekChar();
-        if (c<'0' || c>'9') break;
-        exp=exp*10+(c-'0');
-        ReadChar();
+        if (c=='-')
+        {
+          ReadChar();
+          expSign=-1;
+        }
+        else if (c=='+') ReadChar();
+
+        if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; incomplete exponent");
+
+        for (; ; )
+        {
+          c=PeekChar();
+          if (c<'0' || c>'9') break;
+          exp=exp*10+(c-'0');
+          ReadChar();
+        }
+
+        if (exp!=0)
+          val*=(decimal)Math.Pow(10, exp*expSign);
       }
-      // it is messy to handle exponent, so I just use Decimal.Parse() with assured JSON format.
-      if (negexp) return new Decimal((double)(val+frac) / Math.Pow(10, exp));
-      int[] bits=Decimal.GetBits(val+frac);
-      return new Decimal(bits[0], bits[1], bits[2], negative, (byte)exp);
+
+      if (negative) val*=-1;
+      long lval=(long)val;
+      if (lval==val) return lval;
+      else return val;
     }
 
     public string ReadStringLiteral()

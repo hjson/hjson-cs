@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Hjson;
@@ -12,7 +13,7 @@ namespace Test
   {
     static int Main(string[] args)
     {
-      var asset=Path.GetFullPath(@"..\..\asset");
+      var asset=Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"..\..\assets"));
       foreach (var file in Directory.GetFiles(asset, "*_test.hjson"))
       {
         string name=Path.GetFileNameWithoutExtension(file);
@@ -45,10 +46,10 @@ namespace Test
     static int showErr(string cap, string s1, string s2)
     {
       Console.WriteLine(cap+" FAILED!");
-      Console.WriteLine("--- actual:");
-      Console.WriteLine(s1);
-      Console.WriteLine("--- expected:");
-      Console.WriteLine(s2);
+      Console.WriteLine("--- actual ({0}):", s1.Length);
+      Console.WriteLine(s1+"---");
+      Console.WriteLine("--- expected ({0}):", s2.Length);
+      Console.WriteLine(s2+"---");
       return 1;
     }
   }
