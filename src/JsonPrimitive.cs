@@ -67,10 +67,11 @@ namespace Hjson
             var res=((IFormattable)value).ToString("G", NumberFormatInfo.InvariantInfo);
             while (res.EndsWith("0")) res=res.Substring(0, res.Length-1);
             if (res.EndsWith(".") || res.EndsWith("e", StringComparison.OrdinalIgnoreCase)) res=res.Substring(0, res.Length-1);
-            return res;
+            return res.ToLowerInvariant();
           }
 #endif
-          return ((IFormattable)value).ToString("G", NumberFormatInfo.InvariantInfo);
+          // use ToLowerInvariant() to convert E to e
+          return ((IFormattable)value).ToString("G", NumberFormatInfo.InvariantInfo).ToLowerInvariant();
         default:
           throw new InvalidOperationException();
       }

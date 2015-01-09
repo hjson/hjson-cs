@@ -49,7 +49,7 @@ namespace Hjson
             else Save(pair.Value, tw, level+1);
             following=true;
           }
-          nl(tw, level);
+          if (following) nl(tw, level);
           tw.Write('}');
           break;
         case JsonType.Array:
@@ -70,7 +70,7 @@ namespace Hjson
             }
             following=true;
           }
-          nl(tw, level);
+          if (following) nl(tw, level);
           tw.Write(']');
           break;
         case JsonType.Boolean:

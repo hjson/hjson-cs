@@ -39,7 +39,7 @@ namespace Hjson
     string getWsc(List<string> white, int index) { return white.Count>index?getWsc(white[index]):""; }
     bool testWsc(string str) { return str.Length>0 && str[str[0]=='\r' && str.Length>1?1:0]!='\n'; }
 
-    public void Save(JsonValue value, TextWriter tw, int level, bool hasComment, string separator)
+    public void Save(JsonValue value, TextWriter tw, int level, bool hasComment, string separator, bool isRoot=false)
     {
       if (value==null)
       {
@@ -52,7 +52,7 @@ namespace Hjson
         case JsonType.Object:
           var obj=value.Qo();
           WscJsonObject kw=WriteWsc?obj as WscJsonObject:null;
-          if (level>0) nl(tw, level);
+          if (!isRoot) { if (obj.Count>0) nl(tw, level); else tw.Write(separator); }
           tw.Write('{');
           if (kw!=null)
           {
@@ -74,21 +74,21 @@ namespace Hjson
           }
           else
           {
-            foreach (JsonPair pair in ((JsonObject)value))
+            foreach (JsonPair pair in obj)
             {
               nl(tw, level+1);
               tw.Write(escapeName(pair.Key));
               tw.Write(":");
               Save(pair.Value, tw, level+1, false, " ");
             }
-            nl(tw, level);
+            if (obj.Any()) nl(tw, level);
           }
           tw.Write('}');
           break;
         case JsonType.Array:
-          if (level>0) nl(tw, level);
-          tw.Write('[');
           int i=0, n=value.Count;
+          if (!isRoot) { if (n>0) nl(tw, level); else tw.Write(separator); }
+          tw.Write('[');
           WscJsonArray whiteL=null;
           string wsl=null;
           if (WriteWsc)
@@ -104,11 +104,11 @@ namespace Hjson
               tw.Write(wsl);
               wsl=getWsc(whiteL.Comments, i+1);
             }
-            if (v==null || v.JsonType!=JsonType.Array && v.JsonType!=JsonType.Object) nl(tw, level+1);
-            Save(v, tw, level+1, wsl!=null && testWsc(wsl), "");
+            nl(tw, level+1);
+            Save(v, tw, level+1, wsl!=null && testWsc(wsl), "", true);
           }
           if (whiteL!=null) tw.Write(wsl);
-          nl(tw, level);
+          if (n>0) nl(tw, level);
           tw.Write(']');
           break;
         case JsonType.Boolean:
@@ -127,7 +127,7 @@ namespace Hjson
 
     static string escapeName(string name)
     {
-      if (name.Any(c => !char.IsLetterOrDigit(c))) return "\""+JsonWriter.EscapeString(name)+"\"";
+      if (name.Length==0 || name.Any(c => !char.IsLetterOrDigit(c))) return "\""+JsonWriter.EscapeString(name)+"\"";
       else return name;
     }
 
@@ -135,7 +135,7 @@ namespace Hjson
     {
       if (value=="") { tw.Write(separator+"\"\""); return; }
 
-      char first=value[0], last=value[value.Length-1];
+      char first=value[0], second=value.Length>1?value[1]:'\0', last=value[value.Length-1];
       bool doEscape=hasComment || value.Any(c => needsQuotes(c));
       JsonValue dummy;
 
@@ -143,6 +143,7 @@ namespace Hjson
         BaseReader.IsWhite(first) ||
         first=='"' ||
         first=='#' ||
+        first=='/' && (second=='*' || second=='/') ||
         first=='{' ||
         first=='[' ||
         BaseReader.IsWhite(last) ||

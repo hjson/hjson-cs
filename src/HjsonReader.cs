@@ -224,9 +224,9 @@ namespace Hjson
 
     internal static bool TryParseNumericLiteral(string text, out JsonValue value)
     {
-      int c, p=0;
-      decimal val=0;
-      bool negative=false;
+      int c, leadingZeros=0, p=0;
+      double val=0;
+      bool negative=false, testLeading=true;
       text+='\0';
       value=null;
 
@@ -237,24 +237,29 @@ namespace Hjson
         if (text[p]==0) return false;
       }
 
-      bool zeroStart=text[p]=='0';
       for (int x=0; ; x++)
       {
         c=text[p];
         if (c<'0' || c>'9') break;
+        if (testLeading)
+        {
+          if (c=='0') leadingZeros++;
+          else testLeading = false;
+        }
         val=val*10+(c-'0');
         p++;
-        if (zeroStart && x==1 && c=='0') return false;
       }
+      if (testLeading) leadingZeros--; // single 0 is allowed
+      if (leadingZeros>0) return false;
 
       // fraction
       if (text[p]=='.')
       {
         int fdigits=0;
-        decimal frac=0;
+        double frac=0;
         p++;
         if (text[p]==0) return false;
-        decimal d=10;
+        double d=10;
         for (; ; )
         {
           c=text[p];
@@ -296,7 +301,7 @@ namespace Hjson
         }
 
         if (exp!=0)
-          val*=(decimal)Math.Pow(10, exp*expSign);
+          val*=Math.Pow(10, exp*expSign);
       }
 
       if (p+1!=text.Length) return false;
@@ -314,7 +319,10 @@ namespace Hjson
       for (; ; )
       {
         if (c<0) throw ParseError("String did not end");
-        if (c=='\n' || c==',' || c=='}' || c==']')
+        if (c=='\n' || c==',' ||
+          c=='}' || c==']' ||
+          c=='#' ||
+          c=='/' && (PeekChar(1)=='/' || PeekChar(1)=='*'))
         {
           if (sb.Length>0)
           {

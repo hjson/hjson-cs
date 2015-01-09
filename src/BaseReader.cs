@@ -49,7 +49,13 @@ namespace Hjson
 
     public int ReadChar()
     {
-      int v=hasPeek>0?peek[--hasPeek]:r.Read();
+      int v;
+      if (hasPeek>0)
+      {
+        v=peek[0];
+        if (--hasPeek>0) peek[0]=peek[1]; // limited to 2
+      }
+      else v=r.Read();
 
       if (ReadWsc && v!='\r') white.Append((char)v);
 
@@ -91,12 +97,12 @@ namespace Hjson
       }
     }
 
-    // It could return either long or decimal, depending on the parsed value.
+    // It could return either long or double, depending on the parsed value.
     public JsonValue ReadNumericLiteral()
     {
-      int c;
-      decimal val=0;
-      bool negative=false;
+      int c, leadingZeros=0;
+      double val=0;
+      bool negative=false, testLeading=true;
 
       if (PeekChar()=='-')
       {
@@ -105,24 +111,29 @@ namespace Hjson
         if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; extra negation");
       }
 
-      bool zeroStart=PeekChar()=='0';
       for (int x=0; ; x++)
       {
         c=PeekChar();
         if (c<'0' || c>'9') break;
+        if (testLeading)
+        {
+          if (c=='0') leadingZeros++;
+          else testLeading = false;
+        }
         val=val*10+(c-'0');
         ReadChar();
-        if (zeroStart && x==1 && c=='0') throw ParseError("leading multiple zeros are not allowed");
       }
+      if (testLeading) leadingZeros--; // single 0 is allowed
+      if (leadingZeros>0) throw ParseError("leading multiple zeros are not allowed");
 
       // fraction
       if (PeekChar()=='.')
       {
         int fdigits=0;
-        decimal frac=0;
+        double frac=0;
         ReadChar();
         if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; extra dot");
-        decimal d=10;
+        double d=10;
         for (; ; )
         {
           c=PeekChar();
@@ -164,7 +175,7 @@ namespace Hjson
         }
 
         if (exp!=0)
-          val*=(decimal)Math.Pow(10, exp*expSign);
+          val*=Math.Pow(10, exp*expSign);
       }
 
       if (negative) val*=-1;
