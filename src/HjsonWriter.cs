@@ -81,7 +81,7 @@ namespace Hjson
               tw.Write(":");
               Save(pair.Value, tw, level+1, false, " ");
             }
-            if (obj.Any()) nl(tw, level);
+            if (obj.Count>0) nl(tw, level);
           }
           tw.Write('}');
           break;
