@@ -156,8 +156,13 @@ namespace Hjson
         int c=PeekChar();
         if (c<0) throw ParseError("Name is not closed");
         char ch=(char)c;
-        if (ch==':') return sb.ToString();
-        if (!char.IsLetterOrDigit(ch)) throw ParseError("Unquoted keyname may only contain letters and digits");
+        if (ch==':')
+        {
+          if (sb.Length==0) throw ParseError("Empty key name requires quotes");
+          return sb.ToString();
+        }
+        if (!char.IsLetterOrDigit(ch))
+          throw ParseError("Key names that are not alphanumeric require quotes");
         ReadChar();
         sb.Append(ch);
       }
