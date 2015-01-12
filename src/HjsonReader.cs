@@ -359,9 +359,11 @@ namespace Hjson
           if (c=='\n') return sb.ToString();
         }
         ReadChar();
-        if (c=='\r') continue; // ignore
-        sb.Append((char)c);
-        if (sb.Length==3 && sb[0]=='\'' && sb[1]=='\'' && sb[2]=='\'') return readMlString();
+        if (c!='\r')
+        {
+          sb.Append((char)c);
+          if (sb.Length==3 && sb[0]=='\'' && sb[1]=='\'' && sb[2]=='\'') return readMlString();
+        }
         c=PeekChar();
       }
     }

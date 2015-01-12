@@ -3,15 +3,20 @@
 
   hello:       Hello Human!
 
+  // js style comment
+
+  /*
+  multiline comment
+  multiline comment
+  */
+
   # text
   text:        This is a valid string value.
   quote:       "You need quotes\tfor escapes"
-  otherwise:   a \ is just a \
-  withComment: "needs quotes" # or place the comment on its own line
+  otherwise:   <div class="cool">life without escapes is bliss!</div>
 
   # keys
-  abc123:      no quotes for keys that contain only a-z, A-Z and 0-9
-  "a/b.c ":    a key with any other characters still needs quotes
+  abc-123:      no quotes for keys
 
   # comma
   commas:      "can be omitted at the end of the line"
@@ -34,12 +39,7 @@
   null:        null
   array:       [ 1, 2 ]
   array2:      [
-    # a
     1
-    # b
     2
-    # x
   ]
-  empty: {}
-  empty2: [] #end
 }
