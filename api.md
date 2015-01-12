@@ -738,6 +738,12 @@ Convert the json date (unix epoch date offset) to a DateTime.
 
 
 
+##### M:Hjson.JsonUtil.ToJson(System.DateTime)
+
+Convert the date to JSON/ISO 8601, compatible with ES5 Date.toJSON().
+
+
+
 # T:Hjson.JsonType
 
 Defines the known json types.

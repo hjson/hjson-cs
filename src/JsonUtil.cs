@@ -130,5 +130,12 @@ namespace Hjson
       if (unixEpochDateOffset>0) return UnixEpochUtc.AddMilliseconds(unixEpochDateOffset);
       else return DateTime.MinValue;
     }
+
+    /// <summary>Convert the date to JSON/ISO 8601, compatible with ES5 Date.toJSON().</summary>
+    public static string ToJson(this DateTime dt)
+    {
+      if (dt==DateTime.MinValue) return "";
+      else return dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+    }
   }
 }

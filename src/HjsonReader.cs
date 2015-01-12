@@ -126,7 +126,7 @@ namespace Hjson
           for (; ; )
           {
             if (SkipPeekChar()=='}') { ReadChar(); break; }
-            string name=readName();
+            string name=readKeyName();
             skipWhite2();
             Expect(':');
             skipWhite2();
@@ -146,8 +146,11 @@ namespace Hjson
       }
     }
 
-    string readName()
+    string readKeyName()
     {
+      // quotes for keys are optional in Hjson
+      // unless they include {}[],: or whitespace.
+
       if (PeekChar()=='"') return ReadStringLiteral();
 
       sb.Length=0;
@@ -161,8 +164,8 @@ namespace Hjson
           if (sb.Length==0) throw ParseError("Empty key name requires quotes");
           return sb.ToString();
         }
-        if (!char.IsLetterOrDigit(ch))
-          throw ParseError("Key names that are not alphanumeric require quotes");
+        else if (IsWhite(ch) || ch=='{' || ch=='}' || ch=='[' || ch==']' || ch==',')
+          throw ParseError("Key names that include {}[],: or whitespace require quotes");
         ReadChar();
         sb.Append(ch);
       }
@@ -205,14 +208,21 @@ namespace Hjson
         {
           triple++;
           ReadChar();
-          if (triple==3) return sb.ToString();
+          if (triple==3)
+          {
+            if (sb[sb.Length-1]=='\n') sb.Length--;
+            return sb.ToString();
+          }
           else continue;
         }
-        else while (triple>0)
+        else
+        {
+          while (triple>0)
           {
             sb.Append('\'');
             triple--;
           }
+        }
         if (ch=='\n')
         {
           sb.Append('\n');
@@ -221,7 +231,7 @@ namespace Hjson
         }
         else
         {
-          sb.Append((char)ch);
+          if (ch!='\r') sb.Append((char)ch);
           ReadChar();
         }
       }

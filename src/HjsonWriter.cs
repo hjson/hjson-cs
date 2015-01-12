@@ -127,8 +127,10 @@ namespace Hjson
 
     static string escapeName(string name)
     {
-      if (name.Length==0 || name.Any(c => !char.IsLetterOrDigit(c))) return "\""+JsonWriter.EscapeString(name)+"\"";
-      else return name;
+      if (name.Length==0 || name.Any(ch => BaseReader.IsWhite(ch) || ch=='{' || ch=='}' || ch=='[' || ch==']' || ch==','))
+        return "\""+JsonWriter.EscapeString(name)+"\"";
+      else
+        return name;
     }
 
     void writeString(string value, TextWriter tw, int level, bool hasComment, string separator)
@@ -181,9 +183,10 @@ namespace Hjson
 
         foreach (var line in lines)
         {
-          nl(tw, level);
+          nl(tw, !string.IsNullOrEmpty(line)?level:0);
           tw.Write(line);
         }
+        nl(tw, level);
         tw.Write("'''");
       }
     }
