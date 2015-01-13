@@ -23,7 +23,7 @@ namespace Hjson
     {
       if (format)
       {
-        tw.Write(System.Environment.NewLine);
+        tw.Write(JsonValue.eol);
         tw.Write(new string(' ', level*2));
       }
     }

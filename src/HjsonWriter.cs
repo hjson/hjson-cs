@@ -20,7 +20,7 @@ namespace Hjson
 
     void nl(TextWriter tw, int level)
     {
-      tw.Write(System.Environment.NewLine);
+      tw.Write(JsonValue.eol);
       tw.Write(new string(' ', level*2));
     }
 

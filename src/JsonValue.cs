@@ -25,6 +25,16 @@ namespace Hjson
   /// </summary>
   public abstract class JsonValue : IEnumerable
   {
+    internal static string eol=Environment.NewLine;
+
+    /// <summary>Gets or sets the newline charater(s).</summary>
+    /// <remarks>Defaults to Environment.NewLine.</remarks>
+    public static string Eol
+    {
+      get { return eol; }
+      set { if (value=="\r\n" || value=="\n") eol=value; }
+    }
+
     /// <summary>Gets the count of the contained items for arrays/objects.</summary>
     public virtual int Count
     {
