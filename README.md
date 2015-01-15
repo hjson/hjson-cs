@@ -3,9 +3,9 @@
 [![Build Status](https://img.shields.io/travis/laktak/hjson-cs.svg?style=flat-square)](http://travis-ci.org/laktak/hjson-cs)
 [![nuget version](https://img.shields.io/nuget/v/Hjson.svg?style=flat-square)](https://www.nuget.org/packages/Hjson/)
 
-Hjson, the Human JSON. A data format that caters to humans and helps reduce the errors they make.
+[Hjson](http://hjson.org), the Human JSON. A data format that caters to humans and helps reduce the errors they make.
 
-It supports `#`, `//` and `/**/` style comments as well as avoiding trailing/missing comma and other mistakes. For details and syntax see http://laktak.github.io/hjson.
+It supports `#`, `//` and `/**/` style comments as well as avoiding trailing/missing comma and other mistakes. For details and syntax see [hjson.org](http://hjson.org).
 
 Tested on .net & Mono.
 
