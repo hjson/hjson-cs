@@ -34,5 +34,6 @@ See [api.md](api.md).
 
 ## From the Commandline
 
-A commandline tool to convert from/to Hjson is available at https://github.com/laktak/hjson-js.
+A commandline tool to convert from/to Hjson is available in the cli folder.
 
+For other tools see [hjson.org](http://hjson.org).
