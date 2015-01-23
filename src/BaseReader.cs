@@ -36,7 +36,7 @@ namespace Hjson
     public int PeekChar(int idx=0)
     {
       if (idx<0 || idx>1) throw new ArgumentOutOfRangeException();
-      if (idx>=hasPeek)
+      while (idx>=hasPeek)
         peek[hasPeek++]=r.Read();
       return peek[idx];
     }

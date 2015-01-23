@@ -127,7 +127,7 @@ namespace Hjson
 
     static string escapeName(string name)
     {
-      if (name.Length==0 || name.Any(ch => BaseReader.IsWhite(ch) || ch=='{' || ch=='}' || ch=='[' || ch==']' || ch==','))
+      if (name.Length==0 || name.Any(ch => BaseReader.IsWhite(ch) || ch=='{' || ch=='}' || ch=='[' || ch==']' || ch==',' || ch==':'))
         return "\""+JsonWriter.EscapeString(name)+"\"";
       else
         return name;
