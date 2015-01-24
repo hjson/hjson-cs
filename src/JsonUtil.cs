@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text;
 
 namespace Hjson
 {
@@ -136,6 +138,25 @@ namespace Hjson
     {
       if (dt==DateTime.MinValue) return "";
       else return dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
+    }
+
+    /// <summary>Convert the timespan to JSON/ISO 8601.</summary>
+    public static string ToJson(this TimeSpan ts)
+    {
+      StringBuilder rc=new StringBuilder(), rct=new StringBuilder();
+      if (ts<TimeSpan.Zero) { rc.Append('-'); ts=ts.Negate(); }
+      rc.Append('P');
+      if (ts.Days>0) rc.Append(ts.Days.ToString(CultureInfo.InvariantCulture)+'D');
+      if (ts.Hours>0) rct.Append(ts.Hours.ToString(CultureInfo.InvariantCulture)+'H');
+      if (ts.Minutes>0) rct.Append(ts.Minutes.ToString(CultureInfo.InvariantCulture)+'M');
+      if (ts.Seconds>0 || ts.Milliseconds>0)
+      {
+        rct.Append(ts.Seconds.ToString(CultureInfo.InvariantCulture));
+        if (ts.Milliseconds>0) rct.Append("."+ts.Milliseconds.ToString(CultureInfo.InvariantCulture));
+        rct.Append('S');
+      }
+      if (rct.Length>0) { rc.Append('T'); rc.Append(rct.ToString()); }
+      return rc.ToString();
     }
   }
 }
