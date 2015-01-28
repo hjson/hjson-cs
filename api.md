@@ -276,6 +276,16 @@ Converts to string. Also see [[|T:Hjson.JsonUtil]].
 
 
 
+##### P:Hjson.JsonValue.Eol
+
+Gets or sets the newline charater(s).
+
+
+
+>Defaults to Environment.NewLine.
+
+
+
 ##### P:Hjson.JsonValue.Count
 
 Gets the count of the contained items for arrays/objects.
@@ -741,6 +751,12 @@ Convert the json date (unix epoch date offset) to a DateTime.
 ##### M:Hjson.JsonUtil.ToJson(System.DateTime)
 
 Convert the date to JSON/ISO 8601, compatible with ES5 Date.toJSON().
+
+
+
+##### M:Hjson.JsonUtil.ToJson(System.TimeSpan)
+
+Convert the timespan to JSON/ISO 8601.
 
 
 
