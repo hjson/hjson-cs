@@ -137,6 +137,7 @@ namespace Hjson
     public static string ToJson(this DateTime dt)
     {
       if (dt==DateTime.MinValue) return "";
+      else if (dt.Kind==DateTimeKind.Unspecified) return dt.ToString("yyyy-MM-ddTHH:mm:ss.fff");
       else return dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
     }
 
