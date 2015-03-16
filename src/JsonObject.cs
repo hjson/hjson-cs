@@ -142,22 +142,22 @@ namespace Hjson
 
     void ICollection<JsonPair>.Add(JsonPair item)
     {
-      throw new NotImplementedException();
+      this.Add(item);
     }
 
     void ICollection<JsonPair>.Clear()
     {
-      throw new NotImplementedException();
+      this.Clear();
     }
 
     void ICollection<JsonPair>.CopyTo(JsonPair[] array, int arrayIndex)
     {
-      throw new NotImplementedException();
+      this.CopyTo(array, arrayIndex);
     }
 
     int ICollection<JsonPair>.Count
     {
-      get { throw new NotImplementedException(); }
+      get { return this.Count; }
     }
   }
 }
