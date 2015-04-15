@@ -9,60 +9,89 @@ namespace Hjson
   /// <summary>Provides Json extension methods.</summary>
   public static class JsonUtil
   {
+    static Exception failQ(JsonValue forObject, string op)
+    {
+      string type=forObject!=null?forObject.JsonType.ToString().ToLower():"null";
+      return new Exception("JsonUtil."+op+" not supported for type "+type+"!");
+    }
+
+    static Exception failM(Exception e, string key)
+    {
+      string msg=e.Message;
+      if (msg.EndsWith("!")) msg=msg.Substring(0, msg.Length-1);
+      return new Exception(msg+" [key:"+key+"]!");
+    }
+
     /// <summary>Gets the bool from a JsonValue.</summary>
     public static bool Qb(this JsonValue json)
     {
       if (json!=null && json.JsonType==JsonType.Boolean) return (bool)json.ToValue();
-      else throw new Exception("Missing JsonType.Boolean!");
+      else throw failQ(json, "Qb");
     }
 
     /// <summary>Gets the bool value of a key in a JsonObject.</summary>
     public static bool Qb(this JsonObject json, string key, bool defaultValue=false)
     {
-      if (json.ContainsKey(key)) return json[key].Qb();
-      else return defaultValue;
+      try
+      {
+        if (json.ContainsKey(key)) return json[key].Qb();
+        else return defaultValue;
+      }
+      catch (Exception e) { throw failM(e, key); }
     }
 
     /// <summary>Gets the int from a JsonValue.</summary>
     public static int Qi(this JsonValue json)
     {
       if (json!=null && json.JsonType==JsonType.Number) return Convert.ToInt32(json.ToValue());
-      else throw new Exception("Missing JsonType.Number!");
+      else throw failQ(json, "Qi");
     }
 
     /// <summary>Gets the int value of a key in a JsonObject.</summary>
     public static int Qi(this JsonObject json, string key, int defaultValue=0)
     {
-      if (json.ContainsKey(key)) return json[key].Qi();
-      else return defaultValue;
+      try
+      {
+        if (json.ContainsKey(key)) return json[key].Qi();
+        else return defaultValue;
+      }
+      catch (Exception e) { throw failM(e, key); }
     }
 
     /// <summary>Gets the long from a JsonValue.</summary>
     public static long Ql(this JsonValue json)
     {
       if (json!=null && json.JsonType==JsonType.Number) return Convert.ToInt64(json.ToValue());
-      else throw new Exception("Missing JsonType.Number!");
+      else throw failQ(json, "Ql");
     }
 
     /// <summary>Gets the long value of a key in a JsonObject.</summary>
     public static long Ql(this JsonObject json, string key, long defaultValue=0)
     {
-      if (json.ContainsKey(key)) return json[key].Ql();
-      else return defaultValue;
+      try
+      {
+        if (json.ContainsKey(key)) return json[key].Ql();
+        else return defaultValue;
+      }
+      catch (Exception e) { throw failM(e, key); }
     }
 
     /// <summary>Gets the double from a JsonValue.</summary>
     public static double Qd(this JsonValue json)
     {
       if (json!=null && json.JsonType==JsonType.Number) return Convert.ToDouble(json.ToValue());
-      else throw new Exception("Missing JsonType.Number!");
+      else throw failQ(json, "Qd");
     }
 
     /// <summary>Gets the double value of a key in a JsonObject.</summary>
     public static double Qd(this JsonObject json, string key, double defaultValue=0)
     {
-      if (json.ContainsKey(key)) return json[key].Qd();
-      else return defaultValue;
+      try
+      {
+        if (json.ContainsKey(key)) return json[key].Qd();
+        else return defaultValue;
+      }
+      catch (Exception e) { throw failM(e, key); }
     }
 
     /// <summary>Gets the string from a JsonValue.</summary>
@@ -70,14 +99,18 @@ namespace Hjson
     {
       if (json==null) return null;
       else if (json.JsonType==JsonType.String) return (string)json;
-      else throw new Exception("Missing JsonType.String!");
+      else throw failQ(json, "Qs");
     }
 
     /// <summary>Gets the string value of a key in a JsonObject.</summary>
     public static string Qs(this JsonObject json, string key, string defaultValue="")
     {
-      if (json.ContainsKey(key)) return json[key].Qs();
-      else return defaultValue;
+      try
+      {
+        if (json.ContainsKey(key)) return json[key].Qs();
+        else return defaultValue;
+      }
+      catch (Exception e) { throw failM(e, key); }
     }
 
     /// <summary>Gets the JsonValue of a key in a JsonObject.</summary>
@@ -90,31 +123,35 @@ namespace Hjson
     /// <summary>Gets a JsonObject from a JsonObject.</summary>
     public static JsonObject Qo(this JsonObject json, string key)
     {
-      return (JsonObject)json.Qv(key);
+      try { return (JsonObject)json.Qv(key); }
+      catch (Exception e) { throw failM(e, key); }
     }
 
     /// <summary>Gets the JsonObject from a JsonValue.</summary>
     public static JsonObject Qo(this JsonValue json)
     {
-      return (JsonObject)json;
+      try { return (JsonObject)json; }
+      catch { throw failQ(json, "Qo"); }
     }
 
     /// <summary>Gets a JsonArray from a JsonObject.</summary>
     public static JsonArray Qa(this JsonObject json, string key)
     {
-      return (JsonArray)json.Qv(key);
+      try { return (JsonArray)json.Qv(key); }
+      catch (Exception e) { throw failM(e, key); }
     }
 
     /// <summary>Gets the JsonArray from a JsonValue.</summary>
     public static JsonArray Qa(this JsonValue json)
     {
-      return (JsonArray)json;
+      try { return (JsonArray)json; }
+      catch { throw failQ(json, "Qo"); }
     }
 
     /// <summary>Enumerates JsonObjects from a JsonObject.</summary>
     public static IEnumerable<KeyValuePair<string, JsonObject>> Qqo(this JsonObject json)
     {
-      return json.Select(x => new KeyValuePair<string, JsonObject>(x.Key, (JsonObject)x.Value));
+      return json.Select(x => new KeyValuePair<string, JsonObject>(x.Key, x.Value.Qo()));
     }
 
     static readonly DateTime UnixEpochUtc=new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
