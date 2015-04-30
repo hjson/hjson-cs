@@ -36,19 +36,19 @@ Parses the specified Hjson/JSON string.
 
 
 
-##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.String)
+##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.String,Hjson.HjsonValue.SaveOptions)
 
 Saves Hjson to a file.
 
 
 
-##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.IO.Stream)
+##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.IO.Stream,Hjson.HjsonValue.SaveOptions)
 
 Saves Hjson to a stream.
 
 
 
-##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.IO.TextWriter)
+##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.IO.TextWriter,Hjson.HjsonValue.SaveOptions)
 
 Saves Hjson to a TextWriter.
 
@@ -60,9 +60,21 @@ Saves Hjson to a string, adding whitespace and comments.
 
 
 
-##### M:Hjson.HjsonValue.SaveAsString(Hjson.JsonValue)
+# T:Hjson.HjsonValue.SaveOptions
 
-Saves Hjson to a string.
+Options for Save.
+
+
+
+##### P:Hjson.HjsonValue.SaveOptions.KeepWsc
+
+Keep white space and comments.
+
+
+
+##### P:Hjson.HjsonValue.SaveOptions.EmitRootBraces
+
+Show braces at the root level.
 
 
 
@@ -415,6 +427,12 @@ Gets the values of this object.
 ##### M:Hjson.WscJsonObject.#ctor
 
 Initializes a new instance of this class.
+
+
+
+##### P:Hjson.WscJsonObject.RootBraces
+
+Defines if braces are shown (root object only).
 
 
 

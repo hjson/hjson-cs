@@ -11,6 +11,16 @@ namespace Hjson
   /// <summary>Contains functions to load and save in the Hjson format.</summary>
   public static class HjsonValue
   {
+    /// <summary>Options for Save.</summary>
+    public class SaveOptions
+    {
+      /// <summary>Keep white space and comments.</summary>
+      public bool KeepWsc { get; set; }
+
+      /// <summary>Show braces at the root level.</summary>
+      public bool EmitRootBraces { get; set; }
+    }
+
     /// <summary>Loads Hjson/JSON from a file.</summary>
     public static JsonValue Load(string path)
     {
@@ -54,41 +64,35 @@ namespace Hjson
     }
 
     /// <summary>Saves Hjson to a file.</summary>
-    public static void Save(JsonValue json, string path)
+    public static void Save(JsonValue json, string path, SaveOptions options=null)
     {
       if (Path.GetExtension(path).ToLower()==".json") { json.Save(path, Stringify.Formatted); return; }
       using (var s=File.CreateText(path))
-        Save(json, s);
+        Save(json, s, options);
     }
 
     /// <summary>Saves Hjson to a stream.</summary>
-    public static void Save(JsonValue json, Stream stream)
+    public static void Save(JsonValue json, Stream stream, SaveOptions options=null)
     {
       if (stream==null) throw new ArgumentNullException("stream");
-      Save(json, new StreamWriter(stream));
+      Save(json, new StreamWriter(stream), options);
     }
 
     /// <summary>Saves Hjson to a TextWriter.</summary>
-    public static void Save(JsonValue json, TextWriter textWriter)
+    public static void Save(JsonValue json, TextWriter textWriter, SaveOptions options=null)
     {
       if (textWriter==null) throw new ArgumentNullException("textWriter");
-      new HjsonWriter().Save(json, textWriter, 0, false, "", true);
+      new HjsonWriter(options).Save(json, textWriter, 0, false, "", true, true);
       textWriter.Flush();
     }
 
     /// <summary>Saves Hjson to a string, adding whitespace and comments.</summary>
+    [Obsolete("Use Save() with options.")]
     public static void SaveWsc(JsonValue json, TextWriter textWriter)
     {
       if (textWriter==null) throw new ArgumentNullException("textWriter");
-      new HjsonWriter() { WriteWsc=true }.Save(json, textWriter, 0, false, "", true);
+      new HjsonWriter(new SaveOptions { KeepWsc=true }).Save(json, textWriter, 0, false, "", true, true);
       textWriter.Flush();
-    }
-
-    /// <summary>Saves Hjson to a string.</summary>
-    [Obsolete("Use json.ToString(Stringify.Hjson);")]
-    public static string SaveAsString(JsonValue json)
-    {
-      return json.ToString(Stringify.Hjson);
     }
   }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,12 +14,13 @@ namespace HjsonCli
     {
       string file=null;
       Stringify todo=Stringify.Hjson;
-      bool err=false;
+      bool err=false, roundtrip=false;
       foreach (string arg in args)
       {
         if (arg=="-j") todo=Stringify.Formatted;
         else if (arg=="-c") todo=Stringify.Plain;
         else if (arg=="-h") todo=Stringify.Hjson;
+        else if (arg=="-r") { roundtrip=true; todo=Stringify.Hjson; }
         else if (!arg.StartsWith("-"))
         {
           if (file==null) file=arg;
@@ -37,8 +39,21 @@ namespace HjsonCli
         return 1;
       }
 
-      var data=HjsonValue.Load(file);
-      Console.WriteLine(data.ToString(todo));
+      if (roundtrip)
+      {
+        using (var sr=new StreamReader(file))
+        using (var sw=new StringWriter())
+        {
+          var data=HjsonValue.LoadWsc(sr);
+          HjsonValue.Save(data, sw, new HjsonValue.SaveOptions { KeepWsc=true });
+          Console.WriteLine(sw.ToString());
+        }
+      }
+      else
+      {
+        var data=HjsonValue.Load(file);
+        Console.WriteLine(data.ToString(todo));
+      }
       return 0;
     }
   }

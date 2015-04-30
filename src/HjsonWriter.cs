@@ -12,10 +12,17 @@ namespace Hjson
 
   internal class HjsonWriter
   {
-    public bool WriteWsc { get; set; }
+    bool writeWsc;
+    bool emitRootBraces;
 
-    public HjsonWriter()
+    public HjsonWriter(HjsonValue.SaveOptions options)
     {
+      if (options!=null)
+      {
+        writeWsc=options.KeepWsc;
+        emitRootBraces=options.EmitRootBraces;
+      }
+      else emitRootBraces=true;
     }
 
     void nl(TextWriter tw, int level)
@@ -27,9 +34,12 @@ namespace Hjson
     string getWsc(string str)
     {
       if (string.IsNullOrEmpty(str)) return "";
-      foreach (char c in str)
+      for (int i=0; i<str.Length; i++)
       {
-        if (c=='\n' || c=='#') break;
+        char c=str[i];
+        if (c=='\n' ||
+          c=='#' ||
+          c=='/' && i+1<str.Length && (str[i+1]=='/' || str[i+1]=='*')) break;
         if (c>' ') return " # "+str;
       }
       return str;
@@ -39,7 +49,7 @@ namespace Hjson
     string getWsc(List<string> white, int index) { return white.Count>index?getWsc(white[index]):""; }
     bool testWsc(string str) { return str.Length>0 && str[str[0]=='\r' && str.Length>1?1:0]!='\n'; }
 
-    public void Save(JsonValue value, TextWriter tw, int level, bool hasComment, string separator, bool isRoot=false)
+    public void Save(JsonValue value, TextWriter tw, int level, bool hasComment, string separator, bool noIdent=false, bool isRootObject=false)
     {
       if (value==null)
       {
@@ -51,9 +61,11 @@ namespace Hjson
       {
         case JsonType.Object:
           var obj=value.Qo();
-          WscJsonObject kw=WriteWsc?obj as WscJsonObject:null;
-          if (!isRoot) { if (obj.Count>0) nl(tw, level); else tw.Write(separator); }
-          tw.Write('{');
+          WscJsonObject kw=writeWsc?obj as WscJsonObject:null;
+          bool showBraces=!isRootObject || (kw!=null?kw.RootBraces:emitRootBraces);
+          if (!noIdent) { if (obj.Count>0) nl(tw, level); else tw.Write(separator); }
+          if (showBraces) tw.Write('{');
+          else level--; // reduce level for root
           if (kw!=null)
           {
             var kwl=getWsc(kw.Comments, "");
@@ -70,28 +82,29 @@ namespace Hjson
               Save(val, tw, level+1, testWsc(kwl), separator);
             }
             tw.Write(kwl);
-            nl(tw, level);
+            if (showBraces) nl(tw, level);
           }
           else
           {
+            bool skipFirst=!showBraces;
             foreach (JsonPair pair in obj)
             {
-              nl(tw, level+1);
+              if (!skipFirst) nl(tw, level+1); else skipFirst=false;
               tw.Write(escapeName(pair.Key));
               tw.Write(":");
               Save(pair.Value, tw, level+1, false, " ");
             }
-            if (obj.Count>0) nl(tw, level);
+            if (showBraces && obj.Count>0) nl(tw, level);
           }
-          tw.Write('}');
+          if (showBraces) tw.Write('}');
           break;
         case JsonType.Array:
           int i=0, n=value.Count;
-          if (!isRoot) { if (n>0) nl(tw, level); else tw.Write(separator); }
+          if (!noIdent) { if (n>0) nl(tw, level); else tw.Write(separator); }
           tw.Write('[');
           WscJsonArray whiteL=null;
           string wsl=null;
-          if (WriteWsc)
+          if (writeWsc)
           {
             whiteL=value as WscJsonArray;
             if (whiteL!=null) wsl=getWsc(whiteL.Comments, 0);

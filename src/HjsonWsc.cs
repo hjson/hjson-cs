@@ -15,6 +15,8 @@ namespace Hjson
       Comments=new Dictionary<string, string>();
     }
 
+    /// <summary>Defines if braces are shown (root object only).</summary>
+    public bool RootBraces { get; set; }
     /// <summary>Defines the order of the keys.</summary>
     public List<string> Order { get; private set; }
     /// <summary>Defines a comment for each key. The "" entry is emitted before any element.</summary>

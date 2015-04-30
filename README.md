@@ -2,6 +2,7 @@
 
 [![Build Status](https://img.shields.io/travis/laktak/hjson-cs.svg?style=flat-square)](http://travis-ci.org/laktak/hjson-cs)
 [![nuget version](https://img.shields.io/nuget/v/Hjson.svg?style=flat-square)](https://www.nuget.org/packages/Hjson/)
+[![License](https://img.shields.io/github/license/laktak/hjson-cs.svg?style=flat-square)](https://github.com/laktak/hjson-cs/blob/master/LICENSE)
 
 [Hjson](http://hjson.org), the Human JSON. A configuration file format that caters to humans and helps reduce the errors they make.
 
