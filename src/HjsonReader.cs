@@ -257,7 +257,7 @@ namespace Hjson
       }
     }
 
-    internal static bool TryParseNumericLiteral(string text, out JsonValue value)
+    internal static bool TryParseNumericLiteral(string text, bool stopAtNext, out JsonValue value)
     {
       int c, leadingZeros=0, p=0;
       double val=0;
@@ -279,7 +279,7 @@ namespace Hjson
         if (testLeading)
         {
           if (c=='0') leadingZeros++;
-          else testLeading = false;
+          else testLeading=false;
         }
         val=val*10+(c-'0');
         p++;
@@ -290,6 +290,7 @@ namespace Hjson
       // fraction
       if (text[p]=='.')
       {
+        if (leadingZeros<0) return false;
         int fdigits=0;
         double frac=0;
         p++;
@@ -339,7 +340,18 @@ namespace Hjson
           val*=Math.Pow(10, exp*expSign);
       }
 
-      if (p+1!=text.Length) return false;
+      while (p<text.Length && IsWhite(text[p])) p++;
+
+      bool foundStop=false;
+      if (p<text.Length && stopAtNext)
+      {
+        // end scan if we find a control character like ,}] or a comment
+        char ch=text[p];
+        if (ch==',' || ch=='}' || ch==']' || ch=='#' || ch=='/' && (text.Length>p+1 && (text[p+1]=='/' || text[p+1]=='*')))
+          foundStop=true;
+      }
+
+      if (p+1!=text.Length && !foundStop) return false;
 
       if (negative) val*=-1;
       long lval=(long)val;
@@ -371,7 +383,7 @@ namespace Hjson
                 if (ch=='-' || ch>='0' && ch<='9')
                 {
                   JsonValue res;
-                  if (TryParseNumericLiteral(sb.ToString().Trim(), out res)) return res;
+                  if (TryParseNumericLiteral(sb.ToString(), false, out res)) return res;
                 }
                 break;
             }

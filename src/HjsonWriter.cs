@@ -79,7 +79,7 @@ namespace Hjson
 
               tw.Write(escapeName(key));
               tw.Write(":");
-              Save(val, tw, level+1, testWsc(kwl), separator);
+              Save(val, tw, level+1, testWsc(kwl), " ");
             }
             tw.Write(kwl);
             if (showBraces) nl(tw, level);
@@ -162,8 +162,8 @@ namespace Hjson
         first=='{' ||
         first=='[' ||
         BaseReader.IsWhite(last) ||
-        HjsonReader.TryParseNumericLiteral(value, out dummy) ||
-        isKeyword(value))
+        HjsonReader.TryParseNumericLiteral(value, true, out dummy) ||
+        startsWithKeyword(value))
       {
         // If the string contains no control characters, no quote characters, and no
         // backslash characters, then we can safely slap some quotes around it.
@@ -204,9 +204,16 @@ namespace Hjson
       }
     }
 
-    static bool isKeyword(string value)
+    static bool startsWithKeyword(string text)
     {
-      return value=="true" || value=="false" || value=="null";
+      int p;
+      if (text.StartsWith("true") || text.StartsWith("null")) p=4;
+      else if (text.StartsWith("false")) p=5;
+      else return false;
+      while (p<text.Length && BaseReader.IsWhite(text[p])) p++;
+      if (p==text.Length) return true;
+      char ch=text[p];
+      return ch==',' || ch=='}' || ch==']' || ch=='#' || ch=='/' && (text.Length>p+1 && (text[p+1]=='/' || text[p+1]=='*'));
     }
 
     static bool needsQuotes(char c)
