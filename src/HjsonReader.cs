@@ -146,7 +146,7 @@ namespace Hjson
           if (ReadWsc) wsc.Comments[""]=GetWhite();
           for (; ; )
           {
-            if (objectWithoutBraces) { if (SkipPeekChar()<0)  break; }
+            if (objectWithoutBraces) { if (SkipPeekChar()<0) break; }
             else if (SkipPeekChar()=='}') { ReadChar(); break; }
             string name=readKeyName();
             skipWhite2();

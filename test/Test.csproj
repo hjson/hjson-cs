@@ -44,6 +44,9 @@
     <Compile Include="..\src\BaseReader.cs">
       <Link>hjson\BaseReader.cs</Link>
     </Compile>
+    <Compile Include="..\src\HjsonOptions.cs">
+      <Link>hjson\HjsonOptions.cs</Link>
+    </Compile>
     <Compile Include="..\src\HjsonReader.cs">
       <Link>hjson\HjsonReader.cs</Link>
     </Compile>

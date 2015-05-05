@@ -15,7 +15,7 @@ namespace Hjson
     bool writeWsc;
     bool emitRootBraces;
 
-    public HjsonWriter(HjsonValue.SaveOptions options)
+    public HjsonWriter(HjsonOptions options)
     {
       if (options!=null)
       {
@@ -49,7 +49,7 @@ namespace Hjson
     string getWsc(List<string> white, int index) { return white.Count>index?getWsc(white[index]):""; }
     bool testWsc(string str) { return str.Length>0 && str[str[0]=='\r' && str.Length>1?1:0]!='\n'; }
 
-    public void Save(JsonValue value, TextWriter tw, int level, bool hasComment, string separator, bool noIdent=false, bool isRootObject=false)
+    public void Save(JsonValue value, TextWriter tw, int level, bool hasComment, string separator, bool noIndent=false, bool isRootObject=false)
     {
       if (value==null)
       {
@@ -63,7 +63,7 @@ namespace Hjson
           var obj=value.Qo();
           WscJsonObject kw=writeWsc?obj as WscJsonObject:null;
           bool showBraces=!isRootObject || (kw!=null?kw.RootBraces:emitRootBraces);
-          if (!noIdent) { if (obj.Count>0) nl(tw, level); else tw.Write(separator); }
+          if (!noIndent) { if (obj.Count>0) nl(tw, level); else tw.Write(separator); }
           if (showBraces) tw.Write('{');
           else level--; // reduce level for root
           if (kw!=null)
@@ -100,7 +100,7 @@ namespace Hjson
           break;
         case JsonType.Array:
           int i=0, n=value.Count;
-          if (!noIdent) { if (n>0) nl(tw, level); else tw.Write(separator); }
+          if (!noIndent) { if (n>0) nl(tw, level); else tw.Write(separator); }
           tw.Write('[');
           WscJsonArray whiteL=null;
           string wsl=null;

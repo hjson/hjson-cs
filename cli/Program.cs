@@ -14,13 +14,14 @@ namespace HjsonCli
     {
       string file=null;
       Stringify todo=Stringify.Hjson;
-      bool err=false, roundtrip=false;
+      bool err=false, roundtrip=false, rootBraces=false;
       foreach (string arg in args)
       {
         if (arg=="-j") todo=Stringify.Formatted;
         else if (arg=="-c") todo=Stringify.Plain;
         else if (arg=="-h") todo=Stringify.Hjson;
         else if (arg=="-r") { roundtrip=true; todo=Stringify.Hjson; }
+        else if (arg=="-b") rootBraces=true;
         else if (!arg.StartsWith("-"))
         {
           if (file==null) file=arg;
@@ -34,26 +35,25 @@ namespace HjsonCli
         Console.WriteLine("hjsonc [OPTION] FILE");
         Console.WriteLine("Options:");
         Console.WriteLine("  -h  Hjson output (default)");
+        Console.WriteLine("  -r  Hjson output, round trip with comments");
+        Console.WriteLine("  -b  output braces for the root object (Hjson).");
         Console.WriteLine("  -j  JSON output (formatted)");
         Console.WriteLine("  -c  JSON output (compact)");
         return 1;
       }
 
+      JsonValue data;
       if (roundtrip)
       {
         using (var sr=new StreamReader(file))
-        using (var sw=new StringWriter())
-        {
-          var data=HjsonValue.LoadWsc(sr);
-          HjsonValue.Save(data, sw, new HjsonValue.SaveOptions { KeepWsc=true });
-          Console.WriteLine(sw.ToString());
-        }
+          data=HjsonValue.LoadWsc(sr);
       }
+      else data=HjsonValue.Load(file);
+
+      if (todo==Stringify.Hjson)
+        Console.WriteLine(data.ToString(new HjsonOptions { KeepWsc=roundtrip, EmitRootBraces=rootBraces }));
       else
-      {
-        var data=HjsonValue.Load(file);
         Console.WriteLine(data.ToString(todo));
-      }
       return 0;
     }
   }

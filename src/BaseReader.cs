@@ -55,6 +55,7 @@ namespace Hjson
       int v;
       if (peek.Count>0)
       {
+        // normally peek will only hold not more than one character so this should not matter for performance
         v=peek[0];
         peek.RemoveAt(0);
       }

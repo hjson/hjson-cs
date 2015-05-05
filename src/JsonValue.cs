@@ -87,11 +87,13 @@ namespace Hjson
       textWriter.Flush();
     }
 
-    /// <summary>Saves the JSON to a string.</summary>
-    [Obsolete("Use ToString();")]
-    public string SaveAsString(bool formatted=false)
+    /// <summary>Saves as Hjson to a string.</summary>
+    public string ToString(HjsonOptions options)
     {
-      return ToString(formatted?Stringify.Formatted:Stringify.Plain);
+      if (options==null) throw new ArgumentNullException("options");
+      var sw=new StringWriter();
+      HjsonValue.Save(this, sw, options);
+      return sw.ToString();
     }
 
     /// <summary>Saves the JSON to a string.</summary>
