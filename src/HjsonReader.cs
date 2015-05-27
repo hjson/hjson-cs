@@ -42,8 +42,8 @@ namespace Hjson
             if (c=='\n') line++;
             else if (c<0) break;
           }
-          // if we have multiple lines, assume optional {} (but ignore \n suffix)
-          v=ReadCore(line>1 && (c!='\n' || PeekChar(i)>=0));
+          // if we have multiple lines, assume optional {}
+          v=ReadCore(line>1);
           break;
       }
 
@@ -181,11 +181,11 @@ namespace Hjson
         char ch=(char)c;
         if (ch==':')
         {
-          if (sb.Length==0) throw ParseError("Empty key name requires quotes");
+          if (sb.Length==0) throw ParseError("Found ':' but no key name (for an empty key name use quotes)");
           return sb.ToString();
         }
         else if (IsWhite(ch) || ch=='{' || ch=='}' || ch=='[' || ch==']' || ch==',')
-          throw ParseError("Key names that include {}[],: or whitespace require quotes");
+          throw ParseError("Found '"+ch+"' where a key name was expected (check your syntax or use quotes if the key name includes {}[],: or whitespace)");
         ReadChar();
         sb.Append(ch);
       }
