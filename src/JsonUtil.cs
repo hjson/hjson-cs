@@ -171,6 +171,7 @@ namespace Hjson
     }
 
     /// <summary>Convert the date to JSON/ISO 8601, compatible with ES5 Date.toJSON().</summary>
+    /// <remarks>Use DateTime.Parse() to convert back (will be of local kind).</remarks>
     public static string ToJson(this DateTime dt)
     {
       if (dt==DateTime.MinValue) return "";

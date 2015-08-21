@@ -123,6 +123,8 @@ namespace Hjson
     }
 
     /// <summary>Removes the item with the specified key.</summary>
+    /// <param name="key">The key of the element to remove.</param>
+    /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
     public bool Remove(string key)
     {
       if (key==null) throw new ArgumentNullException("key");

@@ -1,5 +1,23 @@
 ## Hjson ##
 
+# T:Hjson.HjsonOptions
+
+Options for Save.
+
+
+
+##### P:Hjson.HjsonOptions.KeepWsc
+
+Keep white space and comments.
+
+
+
+##### P:Hjson.HjsonOptions.EmitRootBraces
+
+Show braces at the root level.
+
+
+
 # T:Hjson.HjsonValue
 
 Contains functions to load and save in the Hjson format.
@@ -36,19 +54,19 @@ Parses the specified Hjson/JSON string.
 
 
 
-##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.String,Hjson.HjsonValue.SaveOptions)
+##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.String,Hjson.HjsonOptions)
 
 Saves Hjson to a file.
 
 
 
-##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.IO.Stream,Hjson.HjsonValue.SaveOptions)
+##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.IO.Stream,Hjson.HjsonOptions)
 
 Saves Hjson to a stream.
 
 
 
-##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.IO.TextWriter,Hjson.HjsonValue.SaveOptions)
+##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.IO.TextWriter,Hjson.HjsonOptions)
 
 Saves Hjson to a TextWriter.
 
@@ -60,367 +78,9 @@ Saves Hjson to a string, adding whitespace and comments.
 
 
 
-# T:Hjson.HjsonValue.SaveOptions
-
-Options for Save.
-
-
-
-##### P:Hjson.HjsonValue.SaveOptions.KeepWsc
-
-Keep white space and comments.
-
-
-
-##### P:Hjson.HjsonValue.SaveOptions.EmitRootBraces
-
-Show braces at the root level.
-
-
-
 # T:Hjson.WscJsonObject
 
 Implements an object value, including whitespace and comments.
-
-
-
-# T:Hjson.JsonObject
-
-Implements an object value.
-
-
-
-# T:Hjson.JsonValue
-
- JsonValue is the abstract base class for all values (string, number, true, false, null, object or array). 
-
-
-
-##### M:Hjson.JsonValue.ContainsKey(System.String)
-
-Returns true if the object contains the specified key.
-
-
-
-##### M:Hjson.JsonValue.Save(System.String,Hjson.Stringify)
-
-Saves the JSON to a file.
-
-
-
-##### M:Hjson.JsonValue.Save(System.IO.Stream,Hjson.Stringify)
-
-Saves the JSON to a stream.
-
-
-
-##### M:Hjson.JsonValue.Save(System.IO.TextWriter,Hjson.Stringify)
-
-Saves the JSON to a TextWriter.
-
-
-
-##### M:Hjson.JsonValue.SaveAsString(System.Boolean)
-
-Saves the JSON to a string.
-
-
-
-##### M:Hjson.JsonValue.ToString(Hjson.Stringify)
-
-Saves the JSON to a string.
-
-
-
-##### M:Hjson.JsonValue.ToString
-
-Saves the JSON to a string.
-
-
-
-##### M:Hjson.JsonValue.ToValue
-
-Returns the contained primitive value.
-
-
-
-##### M:Hjson.JsonValue.Load(System.String)
-
-Loads JSON from a file.
-
-
-
-##### M:Hjson.JsonValue.Load(System.IO.Stream)
-
-Loads JSON from a stream.
-
-
-
-##### M:Hjson.JsonValue.Load(System.IO.TextReader,Hjson.IJsonReader)
-
-Loads JSON from a TextReader.
-
-
-
-##### M:Hjson.JsonValue.Parse(System.String)
-
-Parses the specified JSON string.
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(System.Boolean)~Hjson.JsonValue
-
-Converts from bool.
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(System.Byte)~Hjson.JsonValue
-
-Converts from byte.
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(System.Char)~Hjson.JsonValue
-
-Converts from char.
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(System.Decimal)~Hjson.JsonValue
-
-Converts from decimal.
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(System.Double)~Hjson.JsonValue
-
-Converts from double.
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(System.Single)~Hjson.JsonValue
-
-Converts from float.
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(System.Int32)~Hjson.JsonValue
-
-Converts from int.
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(System.Int64)~Hjson.JsonValue
-
-Converts from long.
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(System.Int16)~Hjson.JsonValue
-
-Converts from short.
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(System.String)~Hjson.JsonValue
-
-Converts from string.
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Boolean
-
-Converts to bool. Also see [[|T:Hjson.JsonUtil]].
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Byte
-
-Converts to byte. Also see [[|T:Hjson.JsonUtil]].
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Char
-
-Converts to char. Also see [[|T:Hjson.JsonUtil]].
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Decimal
-
-Converts to decimal. Also see [[|T:Hjson.JsonUtil]].
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Double
-
-Converts to double. Also see [[|T:Hjson.JsonUtil]].
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Single
-
-Converts to float. Also see [[|T:Hjson.JsonUtil]].
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Int32
-
-Converts to int. Also see [[|T:Hjson.JsonUtil]].
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Int64
-
-Converts to long. Also see [[|T:Hjson.JsonUtil]].
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Int16
-
-Converts to short. Also see [[|T:Hjson.JsonUtil]].
-
-
-
-##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.String
-
-Converts to string. Also see [[|T:Hjson.JsonUtil]].
-
-
-
-##### P:Hjson.JsonValue.Eol
-
-Gets or sets the newline charater(s).
-
-
-
->Defaults to Environment.NewLine.
-
-
-
-##### P:Hjson.JsonValue.Count
-
-Gets the count of the contained items for arrays/objects.
-
-
-
-##### P:Hjson.JsonValue.JsonType
-
-The type of this value.
-
-
-
-##### P:Hjson.JsonValue.Item(System.Int32)
-
-Gets or sets the value for the specified index.
-
-
-
-##### P:Hjson.JsonValue.Item(System.String)
-
-Gets or sets the value for the specified key.
-
-
-
-##### M:Hjson.JsonObject.#ctor(System.Collections.Generic.KeyValuePair{System.String,Hjson.JsonValue}[])
-
-Initializes a new instance of this class.
-
-
-
->You can also initialize an object using the C# add syntax: new JsonObject { { "key", "value" }, ... }
-
-
-
-##### M:Hjson.JsonObject.#ctor(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Hjson.JsonValue}})
-
-Initializes a new instance of this class.
-
-
-
->You can also initialize an object using the C# add syntax: new JsonObject { { "key", "value" }, ... }
-
-
-
-##### M:Hjson.JsonObject.Add(System.String,Hjson.JsonValue)
-
-Adds a new item.
-
-
-
->You can also initialize an object using the C# add syntax: new JsonObject { { "key", "value" }, ... }
-
-
-
-##### M:Hjson.JsonObject.Add(System.Collections.Generic.KeyValuePair{System.String,Hjson.JsonValue})
-
-Adds a new item.
-
-
-
-##### M:Hjson.JsonObject.AddRange(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Hjson.JsonValue}})
-
-Adds a range of items.
-
-
-
-##### M:Hjson.JsonObject.Clear
-
-Clears the object.
-
-
-
-##### M:Hjson.JsonObject.ContainsKey(System.String)
-
-Determines whether the array contains a specific key.
-
-
-
-##### M:Hjson.JsonObject.CopyTo(System.Collections.Generic.KeyValuePair{System.String,Hjson.JsonValue}[],System.Int32)
-
-Copies the elements to an System.Array, starting at a particular System.Array index.
-
-
-
-##### M:Hjson.JsonObject.Remove(System.String)
-
-Removes the item with the specified key.
-
-
-
-##### M:Hjson.JsonObject.TryGetValue(System.String,Hjson.JsonValue@)
-
-Gets the value associated with the specified key.
-
-
-
-##### P:Hjson.JsonObject.Count
-
-Gets the count of the contained items.
-
-
-
-##### P:Hjson.JsonObject.Item(System.String)
-
-Gets or sets the value for the specified key.
-
-
-
-##### P:Hjson.JsonObject.JsonType
-
-The type of this value.
-
-
-
-##### P:Hjson.JsonObject.Keys
-
-Gets the keys of this object.
-
-
-
-##### P:Hjson.JsonObject.Values
-
-Gets the values of this object.
 
 
 
@@ -454,6 +114,42 @@ Implements an array value, including whitespace and comments.
 
 
 
+##### M:Hjson.WscJsonArray.#ctor
+
+Initializes a new instance of this class.
+
+
+
+##### P:Hjson.WscJsonArray.Comments
+
+Defines a comment for each item. The [0] entry is emitted before any element.
+
+
+
+# T:Hjson.IJsonReader
+
+Defines the reader interface.
+
+
+
+##### M:Hjson.IJsonReader.Key(System.String)
+
+Triggered when an item for an object is read.
+
+
+
+##### M:Hjson.IJsonReader.Index(System.Int32)
+
+Triggered when an item for an array is read.
+
+
+
+##### M:Hjson.IJsonReader.Value(Hjson.JsonValue)
+
+Triggered when a value is read.
+
+
+
 # T:Hjson.JsonArray
 
 Implements an array value.
@@ -469,6 +165,24 @@ Initializes a new instance of this class.
 ##### M:Hjson.JsonArray.#ctor(System.Collections.Generic.IEnumerable{Hjson.JsonValue})
 
 Initializes a new instance of this class.
+
+
+
+##### P:Hjson.JsonArray.Count
+
+Gets the count of the contained items.
+
+
+
+##### P:Hjson.JsonArray.Item(System.Int32)
+
+Gets or sets the value for the specified index.
+
+
+
+##### P:Hjson.JsonArray.JsonType
+
+The type of this value.
 
 
 
@@ -526,57 +240,116 @@ Removes the item with the specified index.
 
 
 
-##### P:Hjson.JsonArray.Count
+# T:Hjson.JsonObject
 
-Gets the count of the contained items.
-
-
-
-##### P:Hjson.JsonArray.Item(System.Int32)
-
-Gets or sets the value for the specified index.
+Implements an object value.
 
 
 
-##### P:Hjson.JsonArray.JsonType
-
-The type of this value.
-
-
-
-##### M:Hjson.WscJsonArray.#ctor
+##### M:Hjson.JsonObject.#ctor(System.Collections.Generic.KeyValuePair{System.String,Hjson.JsonValue}[])
 
 Initializes a new instance of this class.
 
 
 
-##### P:Hjson.WscJsonArray.Comments
-
-Defines a comment for each item. The [0] entry is emitted before any element.
+>You can also initialize an object using the C# add syntax: new JsonObject { { "key", "value" }, ... }
 
 
 
-# T:Hjson.IJsonReader
+##### M:Hjson.JsonObject.#ctor(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Hjson.JsonValue}})
 
-Defines the reader interface.
-
-
-
-##### M:Hjson.IJsonReader.Key(System.String)
-
-Triggered when an item for an object is read.
+Initializes a new instance of this class.
 
 
 
-##### M:Hjson.IJsonReader.Index(System.Int32)
-
-Triggered when an item for an array is read.
+>You can also initialize an object using the C# add syntax: new JsonObject { { "key", "value" }, ... }
 
 
 
-##### M:Hjson.IJsonReader.Value(Hjson.JsonValue)
+##### P:Hjson.JsonObject.Count
 
-Triggered when a value is read.
+Gets the count of the contained items.
+
+
+
+##### P:Hjson.JsonObject.Item(System.String)
+
+Gets or sets the value for the specified key.
+
+
+
+##### P:Hjson.JsonObject.JsonType
+
+The type of this value.
+
+
+
+##### P:Hjson.JsonObject.Keys
+
+Gets the keys of this object.
+
+
+
+##### P:Hjson.JsonObject.Values
+
+Gets the values of this object.
+
+
+
+##### M:Hjson.JsonObject.Add(System.String,Hjson.JsonValue)
+
+Adds a new item.
+
+
+
+>You can also initialize an object using the C# add syntax: new JsonObject { { "key", "value" }, ... }
+
+
+
+##### M:Hjson.JsonObject.Add(System.Collections.Generic.KeyValuePair{System.String,Hjson.JsonValue})
+
+Adds a new item.
+
+
+
+##### M:Hjson.JsonObject.AddRange(System.Collections.Generic.IEnumerable{System.Collections.Generic.KeyValuePair{System.String,Hjson.JsonValue}})
+
+Adds a range of items.
+
+
+
+##### M:Hjson.JsonObject.Clear
+
+Clears the object.
+
+
+
+##### M:Hjson.JsonObject.ContainsKey(System.String)
+
+Determines whether the array contains a specific key.
+
+
+
+##### M:Hjson.JsonObject.CopyTo(System.Collections.Generic.KeyValuePair{System.String,Hjson.JsonValue}[],System.Int32)
+
+Copies the elements to an System.Array, starting at a particular System.Array index.
+
+
+
+##### M:Hjson.JsonObject.Remove(System.String)
+
+Removes the item with the specified key.
+
+|Name | Description |
+|-----|------|
+|key: |The key of the element to remove.|
+Returns: true if the element is successfully found and removed; otherwise, false.
+
+
+
+##### M:Hjson.JsonObject.TryGetValue(System.String,Hjson.JsonValue@)
+
+Gets the value associated with the specified key.
 
 
 
@@ -772,6 +545,10 @@ Convert the date to JSON/ISO 8601, compatible with ES5 Date.toJSON().
 
 
 
+>Use DateTime.Parse() to convert back (will be of local kind).
+
+
+
 ##### M:Hjson.JsonUtil.ToJson(System.TimeSpan)
 
 Convert the timespan to JSON/ISO 8601.
@@ -839,6 +616,238 @@ Formatted JSON.
 ##### F:Hjson.Stringify.Hjson
 
 Hjson.
+
+
+
+# T:Hjson.JsonValue
+
+ JsonValue is the abstract base class for all values (string, number, true, false, null, object or array). 
+
+
+
+##### P:Hjson.JsonValue.Eol
+
+Gets or sets the newline charater(s).
+
+
+
+>Defaults to Environment.NewLine.
+
+
+
+##### P:Hjson.JsonValue.Count
+
+Gets the count of the contained items for arrays/objects.
+
+
+
+##### P:Hjson.JsonValue.JsonType
+
+The type of this value.
+
+
+
+##### P:Hjson.JsonValue.Item(System.Int32)
+
+Gets or sets the value for the specified index.
+
+
+
+##### P:Hjson.JsonValue.Item(System.String)
+
+Gets or sets the value for the specified key.
+
+
+
+##### M:Hjson.JsonValue.ContainsKey(System.String)
+
+Returns true if the object contains the specified key.
+
+
+
+##### M:Hjson.JsonValue.Save(System.String,Hjson.Stringify)
+
+Saves the JSON to a file.
+
+
+
+##### M:Hjson.JsonValue.Save(System.IO.Stream,Hjson.Stringify)
+
+Saves the JSON to a stream.
+
+
+
+##### M:Hjson.JsonValue.Save(System.IO.TextWriter,Hjson.Stringify)
+
+Saves the JSON to a TextWriter.
+
+
+
+##### M:Hjson.JsonValue.ToString(Hjson.HjsonOptions)
+
+Saves as Hjson to a string.
+
+
+
+##### M:Hjson.JsonValue.ToString(Hjson.Stringify)
+
+Saves the JSON to a string.
+
+
+
+##### M:Hjson.JsonValue.ToString
+
+Saves the JSON to a string.
+
+
+
+##### M:Hjson.JsonValue.ToValue
+
+Returns the contained primitive value.
+
+
+
+##### M:Hjson.JsonValue.Load(System.String)
+
+Loads JSON from a file.
+
+
+
+##### M:Hjson.JsonValue.Load(System.IO.Stream)
+
+Loads JSON from a stream.
+
+
+
+##### M:Hjson.JsonValue.Load(System.IO.TextReader,Hjson.IJsonReader)
+
+Loads JSON from a TextReader.
+
+
+
+##### M:Hjson.JsonValue.Parse(System.String)
+
+Parses the specified JSON string.
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(System.Boolean)~Hjson.JsonValue
+
+Converts from bool.
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(System.Byte)~Hjson.JsonValue
+
+Converts from byte.
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(System.Char)~Hjson.JsonValue
+
+Converts from char.
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(System.Decimal)~Hjson.JsonValue
+
+Converts from decimal.
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(System.Double)~Hjson.JsonValue
+
+Converts from double.
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(System.Single)~Hjson.JsonValue
+
+Converts from float.
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(System.Int32)~Hjson.JsonValue
+
+Converts from int.
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(System.Int64)~Hjson.JsonValue
+
+Converts from long.
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(System.Int16)~Hjson.JsonValue
+
+Converts from short.
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(System.String)~Hjson.JsonValue
+
+Converts from string.
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Boolean
+
+Converts to bool. Also see [[|T:Hjson.JsonUtil]].
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Byte
+
+Converts to byte. Also see [[|T:Hjson.JsonUtil]].
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Char
+
+Converts to char. Also see [[|T:Hjson.JsonUtil]].
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Decimal
+
+Converts to decimal. Also see [[|T:Hjson.JsonUtil]].
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Double
+
+Converts to double. Also see [[|T:Hjson.JsonUtil]].
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Single
+
+Converts to float. Also see [[|T:Hjson.JsonUtil]].
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Int32
+
+Converts to int. Also see [[|T:Hjson.JsonUtil]].
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Int64
+
+Converts to long. Also see [[|T:Hjson.JsonUtil]].
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.Int16
+
+Converts to short. Also see [[|T:Hjson.JsonUtil]].
+
+
+
+##### M:Hjson.JsonValue.op_Implicit(Hjson.JsonValue)~System.String
+
+Converts to string. Also see [[|T:Hjson.JsonUtil]].
 
 
 

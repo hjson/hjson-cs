@@ -388,7 +388,11 @@ namespace Hjson
                 break;
             }
           }
-          if (c=='\n') return sb.ToString();
+          if (c == '\n')
+          {
+            // remove any whitespace at the end (ignored in quoteless strings)
+            return sb.ToString().Trim();
+          }
         }
         ReadChar();
         if (c!='\r')
