@@ -174,6 +174,7 @@ namespace Hjson
       if (PeekChar()=='"') return ReadStringLiteral();
 
       sb.Length=0;
+      int space=-1;
       for (; ; )
       {
         int c=PeekChar();
@@ -182,12 +183,21 @@ namespace Hjson
         if (ch==':')
         {
           if (sb.Length==0) throw ParseError("Found ':' but no key name (for an empty key name use quotes)");
+          else if (space>=0 && space!=sb.Length) throw ParseError("Found whitespace in your key name (use quotes to include)");
           return sb.ToString();
         }
-        else if (IsWhite(ch) || ch=='{' || ch=='}' || ch=='[' || ch==']' || ch==',')
+        else if (IsWhite(ch))
+        {
+          if (space<0) space=sb.Length;
+          ReadChar();
+        }
+        else if (ch=='{' || ch=='}' || ch=='[' || ch==']' || ch==',')
           throw ParseError("Found '"+ch+"' where a key name was expected (check your syntax or use quotes if the key name includes {}[],: or whitespace)");
-        ReadChar();
-        sb.Append(ch);
+        else
+        {
+          ReadChar();
+          sb.Append(ch);
+        }
       }
     }
 

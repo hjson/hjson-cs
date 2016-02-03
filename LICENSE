@@ -5,7 +5,7 @@ The hjson-cs code is based on System.Json from https://github.com/mono/mono (MIT
 Copyright (c) 2001, 2002, 2003 Ximian, Inc and the individuals listed
 on the ChangeLog entries.
 
-Copyright (c) 2014, 2015 Christian Zangl
+Copyright (c) 2014-2016 Christian Zangl
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the

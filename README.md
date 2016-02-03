@@ -146,3 +146,7 @@ See [api.md](api.md).
 A commandline tool to convert from/to Hjson is available in the cli folder.
 
 For other tools see [hjson.org](http://hjson.org).
+
+# History
+
+[see history.md](history.md)
