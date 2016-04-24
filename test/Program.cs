@@ -63,7 +63,8 @@ namespace Test
 
       Console.WriteLine("running tests...");
 
-      foreach (var file in Directory.GetFiles(assetsDir, "*_test.*"))
+      var tests=Directory.GetFiles(assetsDir, "*_test.*");
+      foreach (var file in tests)
       {
         string name=Path.GetFileNameWithoutExtension(file);
         name=name.Substring(0, name.Length-5);

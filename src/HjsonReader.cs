@@ -33,17 +33,19 @@ namespace Hjson
           v=ReadCore();
           break;
         default:
-          // look if we are dealing with a single JSON value (true/false/null/#/"")
-          // if it is multiline we assume it's a Hjson object without root braces.
-          int i=0, line=Line;
-          while (line==1)
+          try
           {
-            c=PeekChar(i++);
-            if (c=='\n') line++;
-            else if (c<0) break;
+            // assume we have a root object without braces
+            v=ReadCore(true);
           }
-          // if we have multiple lines, assume optional {}
-          v=ReadCore(line>1);
+          catch (Exception)
+          {
+            // test if we are dealing with a single JSON value instead (true/false/null/num/"")
+            Reset();
+            try { v=ReadCore(); break; }
+            catch (Exception) { }
+            throw; // throw original error
+          }
           break;
       }
 
@@ -375,8 +377,8 @@ namespace Hjson
       sb.Length=0;
       for (; ; )
       {
-        if (c<0) throw ParseError("String did not end");
-        if (c=='\n' || c==',' ||
+        bool isEol=c<0 || c=='\n';
+        if (isEol || c==',' ||
           c=='}' || c==']' ||
           c=='#' ||
           c=='/' && (PeekChar(1)=='/' || PeekChar(1)=='*'))
@@ -398,7 +400,7 @@ namespace Hjson
                 break;
             }
           }
-          if (c == '\n')
+          if (isEol)
           {
             // remove any whitespace at the end (ignored in quoteless strings)
             return sb.ToString().Trim();

@@ -10,9 +10,11 @@ namespace Hjson
 {
   internal abstract class BaseReader
   {
+    string buffer;
     TextReader r;
     StringBuilder sb=new StringBuilder();
     StringBuilder white=new StringBuilder();
+    // peek could be removed since we now use a buffer
     List<int> peek=new List<int>();
     bool prevLf;
 
@@ -27,9 +29,19 @@ namespace Hjson
     public BaseReader(TextReader reader, IJsonReader jsonReader)
     {
       if (reader==null) throw new ArgumentNullException("reader");
-      this.r=reader;
+      // use a buffer so we can support reset
       this.Reader=jsonReader;
+      buffer=reader.ReadToEnd();
+      Reset();
+    }
+
+    public void Reset()
+    {
       Line=1;
+      this.r=new StringReader(buffer);
+      peek.Clear();
+      white.Length=sb.Length=0;
+      prevLf=false;
     }
 
     public int PeekChar(int idx=0)

@@ -4,7 +4,9 @@
 [![nuget version](https://img.shields.io/nuget/v/Hjson.svg?style=flat-square)](https://www.nuget.org/packages/Hjson/)
 [![License](https://img.shields.io/github/license/laktak/hjson-cs.svg?style=flat-square)](https://github.com/laktak/hjson-cs/blob/master/LICENSE)
 
-[Hjson](http://hjson.org), the Human JSON. A configuration file format that caters to humans and helps reduce the errors they make.
+[Hjson](http://hjson.org), the Human JSON. A configuration file format for humans. Relaxed syntax, fewer mistakes, more comments.
+
+![Hjson Intro](http://hjson.org/hjson1.gif)
 
 ```
 {
@@ -146,7 +148,3 @@ See [api.md](api.md).
 A commandline tool to convert from/to Hjson is available in the cli folder.
 
 For other tools see [hjson.org](http://hjson.org).
-
-# History
-
-[see history.md](history.md)
