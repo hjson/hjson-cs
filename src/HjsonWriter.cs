@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Hjson
 {
@@ -14,6 +15,7 @@ namespace Hjson
   {
     bool writeWsc;
     bool emitRootBraces;
+    static Regex needsEscapeName=new Regex(@"[,\{\[\}\]\s:#""]|\/\/|\/\*|'''");
 
     public HjsonWriter(HjsonOptions options)
     {
@@ -140,7 +142,7 @@ namespace Hjson
 
     static string escapeName(string name)
     {
-      if (name.Length==0 || name.Any(ch => BaseReader.IsWhite(ch) || ch=='{' || ch=='}' || ch=='[' || ch==']' || ch==',' || ch==':'))
+      if (name.Length==0 || needsEscapeName.IsMatch(name))
         return "\""+JsonWriter.EscapeString(name)+"\"";
       else
         return name;
@@ -150,18 +152,20 @@ namespace Hjson
     {
       if (value=="") { tw.Write(separator+"\"\""); return; }
 
-      char first=value[0], second=value.Length>1?value[1]:'\0', last=value[value.Length-1];
+      char left=value[0], right=value[value.Length-1];
+      char left1=value.Length>1?value[1]:'\0', left2=value.Length>2?value[2]:'\0';
       bool doEscape=hasComment || value.Any(c => needsQuotes(c));
       JsonValue dummy;
 
       if (doEscape ||
-        BaseReader.IsWhite(first) ||
-        first=='"' ||
-        first=='#' ||
-        first=='/' && (second=='*' || second=='/') ||
-        first=='{' ||
-        first=='[' ||
-        BaseReader.IsWhite(last) ||
+        BaseReader.IsWhite(left) ||
+        left=='"' ||
+        left=='#' ||
+        left=='\'' && left1=='\'' && left2=='\'' ||
+        left=='/' && (left1=='*' || left1=='/') ||
+        left=='{' ||
+        left=='[' ||
+        BaseReader.IsWhite(right) ||
         HjsonReader.TryParseNumericLiteral(value, true, out dummy) ||
         startsWithKeyword(value))
       {
