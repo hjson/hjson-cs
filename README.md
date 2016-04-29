@@ -147,4 +147,6 @@ See [api.md](api.md).
 
 A commandline tool to convert from/to Hjson is available in the cli folder.
 
+You can also install it from [chocolatey](https://chocolatey.org/packages/hjson).
+
 For other tools see [hjson.org](http://hjson.org).
