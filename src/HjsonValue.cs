@@ -75,14 +75,5 @@ namespace Hjson
       new HjsonWriter(options).Save(json, textWriter, 0, false, "", true, true);
       textWriter.Flush();
     }
-
-    /// <summary>Saves Hjson to a string, adding whitespace and comments.</summary>
-    [Obsolete("Use Save() with options.")]
-    public static void SaveWsc(JsonValue json, TextWriter textWriter)
-    {
-      if (textWriter==null) throw new ArgumentNullException("textWriter");
-      new HjsonWriter(new HjsonOptions { KeepWsc=true }).Save(json, textWriter, 0, false, "", true, true);
-      textWriter.Flush();
-    }
   }
 }
