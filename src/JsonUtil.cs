@@ -179,6 +179,15 @@ namespace Hjson
       else return dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
     }
 
+    /// <summary>Convert the date to a precise string representations (ten millionths of a second).</summary>
+    /// <remarks>Use DateTime.Parse() to convert back (will be of local kind).</remarks>
+    public static string ToPrecise(this DateTime dt)
+    {
+      if (dt==DateTime.MinValue) return "";
+      else if (dt.Kind==DateTimeKind.Unspecified) return dt.ToString("yyyy-MM-ddTHH:mm:ss.fffffff");
+      else return dt.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
+    }
+
     /// <summary>Convert the timespan to JSON/ISO 8601.</summary>
     public static string ToJson(this TimeSpan ts)
     {
