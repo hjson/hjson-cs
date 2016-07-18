@@ -42,14 +42,7 @@ namespace HjsonCli
         return 1;
       }
 
-      JsonValue data;
-      if (roundtrip)
-      {
-        using (var sr=new StreamReader(file))
-          data=HjsonValue.LoadWsc(sr);
-      }
-      else data=HjsonValue.Load(file);
-
+      JsonValue data=HjsonValue.Load(file, roundtrip);
       if (todo==Stringify.Hjson)
         Console.WriteLine(data.ToString(new HjsonOptions { KeepWsc=roundtrip, EmitRootBraces=rootBraces }));
       else

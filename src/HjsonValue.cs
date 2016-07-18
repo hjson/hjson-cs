@@ -14,36 +14,67 @@ namespace Hjson
     /// <summary>Loads Hjson/JSON from a file.</summary>
     public static JsonValue Load(string path)
     {
-      if (Path.GetExtension(path).ToLower()==".json") return JsonValue.Load(path);
-      try
-      {
-        using (var s=File.OpenRead(path))
-          return Load(s);
-      }
-      catch (Exception e) { throw new Exception(e.Message+" (in "+path+")", e); }
+      return load(path, null, false);
+    }
+
+    /// <summary>Loads Hjson/JSON from a file, optionally preserving whitespace and comments.</summary>
+    public static JsonValue Load(string path, bool preserveComments)
+    {
+      return load(path, null, preserveComments);
     }
 
     /// <summary>Loads Hjson/JSON from a stream.</summary>
     public static JsonValue Load(Stream stream)
     {
-      if (stream==null) throw new ArgumentNullException("stream");
-      return Load(new StreamReader(stream, true));
+      return load(stream, null, false);
+    }
+
+    /// <summary>Loads Hjson/JSON from a stream, optionally preserving whitespace and comments.</summary>
+    public static JsonValue Load(Stream stream, bool preserveComments)
+    {
+      return load(stream, null, preserveComments);
     }
 
     /// <summary>Loads Hjson/JSON from a TextReader.</summary>
     public static JsonValue Load(TextReader textReader, IJsonReader jsonReader=null)
     {
-      if (textReader==null) throw new ArgumentNullException("textReader");
-      var ret=new HjsonReader(textReader, jsonReader).Read();
-      return ret;
+      return load(textReader, jsonReader, false);
+    }
+
+    /// <summary>Loads Hjson/JSON from a TextReader, optionally preserving whitespace and comments.</summary>
+    public static JsonValue Load(TextReader textReader, bool preserveComments, IJsonReader jsonReader=null)
+    {
+      return load(textReader, jsonReader, preserveComments);
     }
 
     /// <summary>Loads Hjson/JSON from a TextReader, preserving whitespace and comments.</summary>
+    [Obsolete("Use Load")]
     public static JsonValue LoadWsc(TextReader textReader)
     {
+      return load(textReader, null, true);
+    }
+
+    static JsonValue load(string path, IJsonReader jsonReader, bool wsc)
+    {
+      if (Path.GetExtension(path).ToLower()==".json") return JsonValue.Load(path);
+      try
+      {
+        using (var s=File.OpenRead(path))
+          return load(s, jsonReader, wsc);
+      }
+      catch (Exception e) { throw new Exception(e.Message+" (in "+path+")", e); }
+    }
+
+    static JsonValue load(Stream stream, IJsonReader jsonReader, bool wsc)
+    {
+      if (stream==null) throw new ArgumentNullException("stream");
+      return load(new StreamReader(stream, true), jsonReader, wsc);
+    }
+
+    static JsonValue load(TextReader textReader, IJsonReader jsonReader, bool wsc)
+    {
       if (textReader==null) throw new ArgumentNullException("textReader");
-      var ret=new HjsonReader(textReader, null) { ReadWsc=true }.Read();
-      return ret;
+      return new HjsonReader(textReader, jsonReader) { ReadWsc=wsc }.Read();
     }
 
     /// <summary>Parses the specified Hjson/JSON string.</summary>
@@ -51,6 +82,13 @@ namespace Hjson
     {
       if (hjsonString==null) throw new ArgumentNullException("hjsonString");
       return Load(new StringReader(hjsonString));
+    }
+
+        /// <summary>Parses the specified Hjson/JSON string, optionally preserving whitespace and comments.</summary>
+    public static JsonValue Parse(string hjsonString, bool preserveComments)
+    {
+      if (hjsonString==null) throw new ArgumentNullException("hjsonString");
+      return Load(new StringReader(hjsonString), preserveComments);
     }
 
     /// <summary>Saves Hjson to a file.</summary>
