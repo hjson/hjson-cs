@@ -1,7 +1,9 @@
 # hjson-java History
 
+- v2.0.0
+  - add stricter check for {}[],: at the start of a quoteless string
 - v1.14.5
-  - Add HjsonValue.Load/Parse overloads
+  - add HjsonValue.Load/Parse overloads
 - v1.14.4
   - fix writer for comment tokens in keyname
 - v1.14.3
