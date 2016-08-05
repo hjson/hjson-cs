@@ -22,7 +22,7 @@ namespace HjsonSample
       HjsonValue.Save(data, "test2.hjson");
 
       // edit (preserve whitespace and comments)
-      var wdata=(WscJsonObject)HjsonValue.LoadWsc(new StreamReader("test.hjson")).Qo();
+      var wdata=(WscJsonObject)HjsonValue.Load(new StreamReader("test.hjson"), preserveComments:true).Qo();
 
       // edit like you normally would
       wdata["hugo"]="value";
@@ -31,7 +31,7 @@ namespace HjsonSample
       wdata.Comments["hugo"]="just another test";
 
       var sw=new StringWriter();
-      HjsonValue.SaveWsc(wdata, sw);
+      HjsonValue.Save(wdata, sw, new HjsonOptions() { KeepWsc = true });
       Console.WriteLine(sw.ToString());
     }
   }
