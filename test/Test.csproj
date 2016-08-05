@@ -41,51 +41,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\src\BaseReader.cs">
-      <Link>hjson\BaseReader.cs</Link>
-    </Compile>
-    <Compile Include="..\src\HjsonOptions.cs">
-      <Link>hjson\HjsonOptions.cs</Link>
-    </Compile>
-    <Compile Include="..\src\HjsonReader.cs">
-      <Link>hjson\HjsonReader.cs</Link>
-    </Compile>
-    <Compile Include="..\src\HjsonValue.cs">
-      <Link>hjson\HjsonValue.cs</Link>
-    </Compile>
-    <Compile Include="..\src\HjsonWriter.cs">
-      <Link>hjson\HjsonWriter.cs</Link>
-    </Compile>
-    <Compile Include="..\src\HjsonWsc.cs">
-      <Link>hjson\HjsonWsc.cs</Link>
-    </Compile>
-    <Compile Include="..\src\IJsonReader.cs">
-      <Link>hjson\IJsonReader.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonArray.cs">
-      <Link>hjson\JsonArray.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonObject.cs">
-      <Link>hjson\JsonObject.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonPrimitive.cs">
-      <Link>hjson\JsonPrimitive.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonReader.cs">
-      <Link>hjson\JsonReader.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonType.cs">
-      <Link>hjson\JsonType.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonUtil.cs">
-      <Link>hjson\JsonUtil.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonValue.cs">
-      <Link>hjson\JsonValue.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonWriter.cs">
-      <Link>hjson\JsonWriter.cs</Link>
-    </Compile>
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +134,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="assets\testlist.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\src\Hjson.csproj">
+      <Project>{ff9e2637-8bd3-4f8d-b563-d105b10d5354}</Project>
+      <Name>Hjson</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
