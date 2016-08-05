@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FEDD354F-316F-4B07-B622-D788808AB8C2}</ProjectGuid>
+    <ProjectGuid>{9F5BC310-5CBB-4B03-B7A4-9AD81F95DDC0}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>HjsonSample</RootNamespace>
