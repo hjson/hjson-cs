@@ -113,6 +113,24 @@ namespace Hjson
       catch (Exception e) { throw failM(e, key); }
     }
 
+    /// <summary>Converts a JsonValue to a string representation.</summary>
+    public static string Qstr(this JsonValue json)
+    {
+      if (json==null) return null;
+      else if (json.JsonType==JsonType.String) return (string)json;
+      else return json.ToString();
+    }
+
+    /// <summary>Converts a JsonValue to a string of a key in a JsonObject.</summary>
+    public static string Qstr(this JsonObject json, string key, string defaultValue="")
+    {
+      try
+      {
+        if (json.ContainsKey(key)) return json[key].Qstr();
+        else return defaultValue;
+      }
+      catch (Exception e) { throw failM(e, key); }
+    }
     /// <summary>Gets the JsonValue of a key in a JsonObject.</summary>
     public static JsonValue Qv(this JsonObject json, string key)
     {

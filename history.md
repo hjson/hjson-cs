@@ -1,5 +1,7 @@
 # hjson-java History
 
+- v2.0.1
+  - add JsonUtil.Qstr()
 - v2.0.0
   - add stricter check for {}[],: at the start of a quoteless string
 - v1.14.5
