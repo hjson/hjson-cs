@@ -41,55 +41,105 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\src\BaseReader.cs">
-      <Link>hjson\BaseReader.cs</Link>
-    </Compile>
-    <Compile Include="..\src\HjsonOptions.cs">
-      <Link>hjson\HjsonOptions.cs</Link>
-    </Compile>
-    <Compile Include="..\src\HjsonReader.cs">
-      <Link>hjson\HjsonReader.cs</Link>
-    </Compile>
-    <Compile Include="..\src\HjsonValue.cs">
-      <Link>hjson\HjsonValue.cs</Link>
-    </Compile>
-    <Compile Include="..\src\HjsonWriter.cs">
-      <Link>hjson\HjsonWriter.cs</Link>
-    </Compile>
-    <Compile Include="..\src\HjsonWsc.cs">
-      <Link>hjson\HjsonWsc.cs</Link>
-    </Compile>
-    <Compile Include="..\src\IJsonReader.cs">
-      <Link>hjson\IJsonReader.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonArray.cs">
-      <Link>hjson\JsonArray.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonObject.cs">
-      <Link>hjson\JsonObject.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonPrimitive.cs">
-      <Link>hjson\JsonPrimitive.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonReader.cs">
-      <Link>hjson\JsonReader.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonType.cs">
-      <Link>hjson\JsonType.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonUtil.cs">
-      <Link>hjson\JsonUtil.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonValue.cs">
-      <Link>hjson\JsonValue.cs</Link>
-    </Compile>
-    <Compile Include="..\src\JsonWriter.cs">
-      <Link>hjson\JsonWriter.cs</Link>
-    </Compile>
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\charset_result.hjson" />
+    <None Include="assets\charset_result.json" />
+    <None Include="assets\charset_test.hjson" />
+    <None Include="assets\comments_result.hjson" />
+    <None Include="assets\comments_result.json" />
+    <None Include="assets\comments_test.hjson" />
+    <None Include="assets\empty_result.hjson" />
+    <None Include="assets\empty_result.json" />
+    <None Include="assets\empty_test.hjson" />
+    <None Include="assets\fail10_test.json" />
+    <None Include="assets\fail11_test.json" />
+    <None Include="assets\fail12_test.json" />
+    <None Include="assets\fail13_test.json" />
+    <None Include="assets\fail14_test.json" />
+    <None Include="assets\fail15_test.json" />
+    <None Include="assets\fail16_test.json" />
+    <None Include="assets\fail17_test.json" />
+    <None Include="assets\fail19_test.json" />
+    <None Include="assets\fail20_test.json" />
+    <None Include="assets\fail21_test.json" />
+    <None Include="assets\fail22_test.json" />
+    <None Include="assets\fail23_test.json" />
+    <None Include="assets\fail24_test.json" />
+    <None Include="assets\fail26_test.json" />
+    <None Include="assets\fail28_test.json" />
+    <None Include="assets\fail29_test.json" />
+    <None Include="assets\fail2_test.json" />
+    <None Include="assets\fail30_test.json" />
+    <None Include="assets\fail31_test.json" />
+    <None Include="assets\fail32_test.json" />
+    <None Include="assets\fail33_test.json" />
+    <None Include="assets\fail34_test.json" />
+    <None Include="assets\fail5_test.json" />
+    <None Include="assets\fail6_test.json" />
+    <None Include="assets\fail7_test.json" />
+    <None Include="assets\fail8_test.json" />
+    <None Include="assets\failKey1_test.hjson" />
+    <None Include="assets\failKey2_test.hjson" />
+    <None Include="assets\failKey3_test.hjson" />
+    <None Include="assets\failObj1_test.hjson" />
+    <None Include="assets\failObj2_test.hjson" />
+    <None Include="assets\failObj3_test.hjson" />
+    <None Include="assets\failStr1_test.hjson" />
+    <None Include="assets\failStr2_test.hjson" />
+    <None Include="assets\failStr3_test.hjson" />
+    <None Include="assets\failStr4_test.hjson" />
+    <None Include="assets\failStr5_test.hjson" />
+    <None Include="assets\failStr6_test.hjson" />
+    <None Include="assets\kan_result.hjson" />
+    <None Include="assets\kan_result.json" />
+    <None Include="assets\kan_test.hjson" />
+    <None Include="assets\keys_result.hjson" />
+    <None Include="assets\keys_result.json" />
+    <None Include="assets\keys_test.hjson" />
+    <None Include="assets\oa_result.hjson" />
+    <None Include="assets\oa_result.json" />
+    <None Include="assets\oa_test.hjson" />
+    <None Include="assets\pass1_result.hjson" />
+    <None Include="assets\pass1_result.json" />
+    <None Include="assets\pass1_test.json" />
+    <None Include="assets\pass2_result.hjson" />
+    <None Include="assets\pass2_result.json" />
+    <None Include="assets\pass2_test.json" />
+    <None Include="assets\pass3_result.hjson" />
+    <None Include="assets\pass3_result.json" />
+    <None Include="assets\pass3_test.json" />
+    <None Include="assets\pass4_result.hjson" />
+    <None Include="assets\pass4_result.json" />
+    <None Include="assets\pass4_test.json" />
+    <None Include="assets\passSingle_result.hjson" />
+    <None Include="assets\passSingle_result.json" />
+    <None Include="assets\passSingle_test.hjson" />
+    <None Include="assets\root_result.hjson" />
+    <None Include="assets\root_result.json" />
+    <None Include="assets\root_test.hjson" />
+    <None Include="assets\stringify1_result.hjson" />
+    <None Include="assets\stringify1_result.json" />
+    <None Include="assets\stringify1_test.hjson" />
+    <None Include="assets\strings_result.hjson" />
+    <None Include="assets\strings_result.json" />
+    <None Include="assets\strings_test.hjson" />
+    <None Include="assets\trail_result.hjson" />
+    <None Include="assets\trail_result.json" />
+    <None Include="assets\trail_test.hjson" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="assets\testlist.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\src\Hjson.csproj">
+      <Project>{ff9e2637-8bd3-4f8d-b563-d105b10d5354}</Project>
+      <Name>Hjson</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
