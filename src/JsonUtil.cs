@@ -94,16 +94,23 @@ namespace Hjson
       catch (Exception e) { throw failM(e, key); }
     }
 
-    /// <summary>Gets the string from a JsonValue.</summary>
+    /// <summary>Gets the string from a JsonValue.
+    /// This method will throw an error if the value is an array or object,
+    /// but <see cref="Qstr(Hjson.JsonValue)"/> can be used to read any 
+    /// value or type as a string.</summary>
     public static string Qs(this JsonValue json)
     {
       if (json==null) return null;
       else if (json.JsonType==JsonType.String) return (string)json;
+      else if (json.JsonType==JsonType.Boolean || json.JsonType==JsonType.Number) return json.ToString();
       else throw failQ(json, "Qs");
     }
 
-    /// <summary>Gets the string value of a key in a JsonObject.</summary>
-    public static string Qs(this JsonObject json, string key, string defaultValue="")
+    /// <summary>Gets the string value of a key in a JsonObject.
+    /// This method will throw an error if the value is an array or object,
+    /// but <see cref="Qstr(Hjson.JsonObject,string,string)"/> can be used to read any 
+    /// value or type as a string.</summary>
+    public static string Qs(this JsonObject json, string key, string defaultValue = "")
     {
       try
       {
@@ -113,7 +120,10 @@ namespace Hjson
       catch (Exception e) { throw failM(e, key); }
     }
 
-    /// <summary>Converts a JsonValue to a string representation.</summary>
+    /// <summary>Converts a JsonValue to a string representation.
+    /// This will read even arrays or objects as their (JSON) string
+    /// value. See <see cref="Qs(Hjson.JsonValue)"/> to just read primitive types
+    /// as strings.</summary>
     public static string Qstr(this JsonValue json)
     {
       if (json==null) return null;
@@ -121,7 +131,10 @@ namespace Hjson
       else return json.ToString();
     }
 
-    /// <summary>Converts a JsonValue to a string of a key in a JsonObject.</summary>
+    /// <summary>Converts a JsonValue to a string of a key in a JsonObject.
+    /// This will read even arrays or objects as their (JSON) string
+    /// value. See <see cref="Qs(Hjson.JsonObject,string,string)"/> to just read 
+    /// primitive types as strings.</summary>
     public static string Qstr(this JsonObject json, string key, string defaultValue="")
     {
       try
