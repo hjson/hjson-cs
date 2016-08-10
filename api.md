@@ -30,15 +30,33 @@ Loads Hjson/JSON from a file.
 
 
 
+##### M:Hjson.HjsonValue.Load(System.String,System.Boolean)
+
+Loads Hjson/JSON from a file, optionally preserving whitespace and comments.
+
+
+
 ##### M:Hjson.HjsonValue.Load(System.IO.Stream)
 
 Loads Hjson/JSON from a stream.
 
 
 
+##### M:Hjson.HjsonValue.Load(System.IO.Stream,System.Boolean)
+
+Loads Hjson/JSON from a stream, optionally preserving whitespace and comments.
+
+
+
 ##### M:Hjson.HjsonValue.Load(System.IO.TextReader,Hjson.IJsonReader)
 
 Loads Hjson/JSON from a TextReader.
+
+
+
+##### M:Hjson.HjsonValue.Load(System.IO.TextReader,System.Boolean,Hjson.IJsonReader)
+
+Loads Hjson/JSON from a TextReader, optionally preserving whitespace and comments.
 
 
 
@@ -51,6 +69,12 @@ Loads Hjson/JSON from a TextReader, preserving whitespace and comments.
 ##### M:Hjson.HjsonValue.Parse(System.String)
 
 Parses the specified Hjson/JSON string.
+
+
+
+##### M:Hjson.HjsonValue.Parse(System.String,System.Boolean)
+
+Parses the specified Hjson/JSON string, optionally preserving whitespace and comments.
 
 
 
@@ -69,12 +93,6 @@ Saves Hjson to a stream.
 ##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.IO.TextWriter,Hjson.HjsonOptions)
 
 Saves Hjson to a TextWriter.
-
-
-
-##### M:Hjson.HjsonValue.SaveWsc(Hjson.JsonValue,System.IO.TextWriter)
-
-Saves Hjson to a string, adding whitespace and comments.
 
 
 
@@ -433,67 +451,79 @@ Provides Json extension methods.
 
 ##### M:Hjson.JsonUtil.Qb(Hjson.JsonValue)
 
-Gets the bool from a JsonValue.
+For JsonValues with type boolean, this method will return its value as bool, otherwise it will throw.
 
 
 
 ##### M:Hjson.JsonUtil.Qb(Hjson.JsonObject,System.String,System.Boolean)
 
-Gets the bool value of a key in a JsonObject.
+Gets the value of the member specified by key, then calls [[|M:Hjson.JsonUtil.Qb(Hjson.JsonValue)]]. If the object does not contain the key, the defaultValue is returned.
 
 
 
 ##### M:Hjson.JsonUtil.Qi(Hjson.JsonValue)
 
-Gets the int from a JsonValue.
+For JsonValues with type number, this method will return its value as int, otherwise it will throw.
 
 
 
 ##### M:Hjson.JsonUtil.Qi(Hjson.JsonObject,System.String,System.Int32)
 
-Gets the int value of a key in a JsonObject.
+Gets the value of the member specified by key, then calls [[|M:Hjson.JsonUtil.Qi(Hjson.JsonValue)]]. If the object does not contain the key, the defaultValue is returned.
 
 
 
 ##### M:Hjson.JsonUtil.Ql(Hjson.JsonValue)
 
-Gets the long from a JsonValue.
+For JsonValues with type number, this method will return its value as long, otherwise it will throw.
 
 
 
 ##### M:Hjson.JsonUtil.Ql(Hjson.JsonObject,System.String,System.Int64)
 
-Gets the long value of a key in a JsonObject.
+Gets the value of the member specified by key, then calls [[|M:Hjson.JsonUtil.Ql(Hjson.JsonValue)]]. If the object does not contain the key, the defaultValue is returned.
 
 
 
 ##### M:Hjson.JsonUtil.Qd(Hjson.JsonValue)
 
-Gets the double from a JsonValue.
+For JsonValues with type number, this method will return its value as double, otherwise it will throw.
 
 
 
 ##### M:Hjson.JsonUtil.Qd(Hjson.JsonObject,System.String,System.Double)
 
-Gets the double value of a key in a JsonObject.
+Gets the value of the member specified by key, then calls [[|M:Hjson.JsonUtil.Qd(Hjson.JsonValue)]]. If the object does not contain the key, the defaultValue is returned.
 
 
 
 ##### M:Hjson.JsonUtil.Qs(Hjson.JsonValue)
 
-Gets the string from a JsonValue.
+For JsonValues with type string, this method will return its value as string, otherwise it will throw. Use [[|M:Hjson.JsonUtil.Qstr(Hjson.JsonValue)]] to get a string value from number or boolean types as well.
 
 
 
 ##### M:Hjson.JsonUtil.Qs(Hjson.JsonObject,System.String,System.String)
 
-Gets the string value of a key in a JsonObject.
+Gets the value of the member specified by key, then calls [[|M:Hjson.JsonUtil.Qs(Hjson.JsonValue)]]. If the object does not contain the key, the defaultValue is returned.
+
+
+
+##### M:Hjson.JsonUtil.Qstr(Hjson.JsonValue)
+
+For JsonValues with type string, number or boolean, this method will return its value as a string (converted if necessary). For arrays or objects it will throw.
+
+
+
+##### M:Hjson.JsonUtil.Qstr(Hjson.JsonObject,System.String,System.String)
+
+Gets the value of the member specified by key, then, for string, number or boolean JsonValues, this method will return its value as a string (converted if necessary).
 
 
 
 ##### M:Hjson.JsonUtil.Qv(Hjson.JsonObject,System.String)
 
-Gets the JsonValue of a key in a JsonObject.
+Gets the JsonValue of the member specified by key.
 
 
 
@@ -542,6 +572,16 @@ Convert the json date (unix epoch date offset) to a DateTime.
 ##### M:Hjson.JsonUtil.ToJson(System.DateTime)
 
 Convert the date to JSON/ISO 8601, compatible with ES5 Date.toJSON().
+
+
+
+>Use DateTime.Parse() to convert back (will be of local kind).
+
+
+
+##### M:Hjson.JsonUtil.ToPrecise(System.DateTime)
+
+Convert the date to a precise string representations (ten millionths of a second).
 
 
 

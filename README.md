@@ -29,6 +29,11 @@
 
 Tested on .net & Mono.
 
+This library includes two readers/writers that fully conform to the respective specification:
+
+- JSON
+- Hjson
+
 The C# implementation of Hjson is based on [System.Json](https://github.com/mono/mono). For other platforms see [hjson.org](http://hjson.org).
 
 # Install from nuget
@@ -68,6 +73,8 @@ var jsonObject = HjsonValue.Load(filePath).Qo();
 var jsonObject = HjsonValue.Parse("{\"name\":\"hugo\",\"age\":5}").Qo();
 string name = jsonObject.Qs("name");
 int age = jsonObject.Qi("age");
+// you may prefer to get any value as string
+string age2 = jsonObject.Qstr("age");
 
 // or iterate over the members
 foreach (var item in jsonObject)
