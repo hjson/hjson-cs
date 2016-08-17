@@ -1,5 +1,7 @@
-# hjson-java History
+# hjson-cs History
 
+- v2.0.2
+  - move to hjson org
 - v2.0.1
   - add JsonUtil.Qstr()
 - v2.0.0

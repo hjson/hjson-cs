@@ -10,6 +10,9 @@ namespace HjsonSample
 {
   class Program
   {
+    // note: this sample uses the Hjson library directly.
+    // Normally you would use nuget.
+
     static void Main(string[] args)
     {
       var data=HjsonValue.Load("test.hjson").Qo();
