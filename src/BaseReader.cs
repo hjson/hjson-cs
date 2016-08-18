@@ -239,8 +239,9 @@ namespace Hjson
               if ((c=ReadChar())<0)
                 throw ParseError("Incomplete unicode character escape literal");
               if (c>='0' && c<='9') cp+=(ushort)(c-'0');
-              if (c>='A' && c<='F') cp+=(ushort)(c-'A'+10);
-              if (c>='a' && c<='f') cp+=(ushort)(c-'a'+10);
+              else if (c>='A' && c<='F') cp+=(ushort)(c-'A'+10);
+              else if (c>='a' && c<='f') cp+=(ushort)(c-'a'+10);
+              else throw ParseError("Bad \\u char "+(char)c);
             }
             sb.Append((char)cp);
             break;
