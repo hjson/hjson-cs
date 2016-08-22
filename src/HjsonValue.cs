@@ -113,5 +113,11 @@ namespace Hjson
       new HjsonWriter(options).Save(json, textWriter, 0, false, "", true, true);
       textWriter.Flush();
     }
+
+    internal static bool IsPunctuatorChar(char ch)
+    {
+      return ch=='{' || ch=='}' || ch=='[' || ch==']' || ch==',' || ch==':';
+    }
+
   }
 }

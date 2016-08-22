@@ -19,11 +19,6 @@ namespace Hjson
     {
     }
 
-    bool isPunctuatorChar(char ch)
-    {
-      return ch=='{' || ch=='}' || ch=='[' || ch==']' || ch==',' || ch==':';
-    }
-
     public JsonValue Read()
     {
       JsonValue v;
@@ -200,7 +195,7 @@ namespace Hjson
           if (space<0) space=sb.Length;
           ReadChar();
         }
-        else if (isPunctuatorChar(ch))
+        else if (HjsonValue.IsPunctuatorChar(ch))
           throw ParseError("Found '"+ch+"' where a key name was expected (check your syntax or use quotes if the key name includes {}[],: or whitespace)");
         else
         {
@@ -381,7 +376,7 @@ namespace Hjson
 
     JsonValue readTfnns(int c)
     {
-      if (isPunctuatorChar((char)c))
+      if (HjsonValue.IsPunctuatorChar((char)c))
         throw ParseError("Found a punctuator character '" + c + "' when excpecting a quoteless string (check your syntax)");
 
       sb.Length=0;

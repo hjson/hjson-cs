@@ -1,5 +1,7 @@
 # hjson-cs History
 
+- v2.0.5
+  - fix stringify for strings staring with a punctuator char
 - v2.0.3
   - throw on bad \u char
 - v2.0.2

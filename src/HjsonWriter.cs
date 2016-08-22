@@ -158,14 +158,12 @@ namespace Hjson
       JsonValue dummy;
 
       if (doEscape ||
-        BaseReader.IsWhite(left) ||
+        BaseReader.IsWhite(left) || BaseReader.IsWhite(right) ||
         left=='"' ||
         left=='#' ||
         left=='\'' && left1=='\'' && left2=='\'' ||
         left=='/' && (left1=='*' || left1=='/') ||
-        left=='{' ||
-        left=='[' ||
-        BaseReader.IsWhite(right) ||
+        HjsonValue.IsPunctuatorChar(left) ||
         HjsonReader.TryParseNumericLiteral(value, true, out dummy) ||
         startsWithKeyword(value))
       {
