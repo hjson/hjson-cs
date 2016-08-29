@@ -21,7 +21,6 @@ namespace Hjson
 
     public JsonValue Read()
     {
-      JsonValue v;
       // Braces for the root object are optional
 
       int c=SkipPeekChar();
@@ -30,25 +29,26 @@ namespace Hjson
       {
         case '[':
         case '{':
-          v=ReadCore();
-          break;
+          return checkTrailing(ReadCore());
         default:
           try
           {
             // assume we have a root object without braces
-            v=ReadCore(true);
+            return checkTrailing(ReadCore(true));
           }
           catch (Exception)
           {
             // test if we are dealing with a single JSON value instead (true/false/null/num/"")
             Reset();
-            try { v=ReadCore(); break; }
+            try { return checkTrailing(ReadCore()); }
             catch (Exception) { }
             throw; // throw original error
           }
-          break;
       }
+    }
 
+    JsonValue checkTrailing(JsonValue v)
+    {
       skipWhite2();
       if (ReadChar()>=0) throw ParseError("Extra characters in input");
       return v;
@@ -167,8 +167,6 @@ namespace Hjson
         default: return readTfnns(c);
       }
     }
-
-
 
     string readKeyName()
     {
@@ -377,7 +375,7 @@ namespace Hjson
     JsonValue readTfnns(int c)
     {
       if (HjsonValue.IsPunctuatorChar((char)c))
-        throw ParseError("Found a punctuator character '" + c + "' when excpecting a quoteless string (check your syntax)");
+        throw ParseError("Found a punctuator character '" + c + "' when expecting a quoteless string (check your syntax)");
 
       sb.Length=0;
       for (; ; )
