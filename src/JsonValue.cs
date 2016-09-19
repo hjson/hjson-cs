@@ -116,6 +116,12 @@ namespace Hjson
       return ((JsonPrimitive)this).Value;
     }
 
+    /// <summary>Wraps an unknown object into a JSON value (to be used with DSF).</summary>
+    public static JsonValue FromObject(object value)
+    {
+      return JsonPrimitive.FromObject(value);
+    }
+
     IEnumerator IEnumerable.GetEnumerator()
     {
       throw new InvalidOperationException();

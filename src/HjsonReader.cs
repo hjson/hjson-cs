@@ -13,10 +13,16 @@ namespace Hjson
   internal class HjsonReader : BaseReader
   {
     StringBuilder sb=new StringBuilder();
+    IEnumerable<IHjsonDsfProvider> dsfProviders=Enumerable.Empty<IHjsonDsfProvider>();
 
-    public HjsonReader(TextReader reader, IJsonReader jsonReader)
+    public HjsonReader(TextReader reader, IJsonReader jsonReader, HjsonOptions options)
       : base(reader, jsonReader)
     {
+      if (options!=null)
+      {
+        ReadWsc=options.KeepWsc;
+        dsfProviders=options.DsfProviders;
+      }
     }
 
     public JsonValue Read()
@@ -24,7 +30,6 @@ namespace Hjson
       // Braces for the root object are optional
 
       int c=SkipPeekChar();
-      //if (c<0) throw ParseError("Incomplete input");
       switch (c)
       {
         case '[':
@@ -365,7 +370,12 @@ namespace Hjson
 
       if (p+1!=text.Length && !foundStop) return false;
 
-      if (negative) val*=-1;
+      if (negative)
+      {
+        if (val==0.0) { value=-0.0; return true; }
+        val*=-1;
+      }
+
       long lval=(long)val;
       if (lval==val) value=lval;
       else value=val;
@@ -406,7 +416,7 @@ namespace Hjson
           if (isEol)
           {
             // remove any whitespace at the end (ignored in quoteless strings)
-            return sb.ToString().Trim();
+            return HjsonDsf.Parse(dsfProviders, sb.ToString().Trim());
           }
         }
         ReadChar();

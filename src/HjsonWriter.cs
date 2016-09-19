@@ -15,6 +15,7 @@ namespace Hjson
   {
     bool writeWsc;
     bool emitRootBraces;
+    IEnumerable<IHjsonDsfProvider> dsfProviders=Enumerable.Empty<IHjsonDsfProvider>();
     static Regex needsEscapeName=new Regex(@"[,\{\[\}\]\s:#""]|\/\/|\/\*|'''");
 
     public HjsonWriter(HjsonOptions options)
@@ -23,6 +24,7 @@ namespace Hjson
       {
         writeWsc=options.KeepWsc;
         emitRootBraces=options.EmitRootBraces;
+        dsfProviders=options.DsfProviders;
       }
       else emitRootBraces=true;
     }
@@ -59,6 +61,16 @@ namespace Hjson
         tw.Write("null");
         return;
       }
+
+      // check for DSF
+      string dsfValue=HjsonDsf.Stringify(dsfProviders, value);
+      if (dsfValue!=null)
+      {
+        tw.Write(separator);
+        tw.Write(dsfValue);
+        return;
+      }
+
       switch (value.JsonType)
       {
         case JsonType.Object:

@@ -14,5 +14,7 @@ namespace Hjson
     Array,
     /// <summary>Json value of type boolean.</summary>
     Boolean,
+    /// <summary>Json value of an unknown type.</summary>
+    Unknown,
   }
 }

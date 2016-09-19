@@ -14,14 +14,14 @@ namespace HjsonCli
     {
       string file=null;
       Stringify todo=Stringify.Hjson;
-      bool err=false, roundtrip=false, rootBraces=false;
+      bool err=false, roundtrip=false, rootBraces=true;
       foreach (string arg in args)
       {
         if (arg=="-j") todo=Stringify.Formatted;
         else if (arg=="-c") todo=Stringify.Plain;
         else if (arg=="-h") todo=Stringify.Hjson;
         else if (arg=="-r") { roundtrip=true; todo=Stringify.Hjson; }
-        else if (arg=="-b") rootBraces=true;
+        else if (arg=="-n") rootBraces=false;
         else if (!arg.StartsWith("-"))
         {
           if (file==null) file=arg;
@@ -36,13 +36,13 @@ namespace HjsonCli
         Console.WriteLine("Options:");
         Console.WriteLine("  -h  Hjson output (default)");
         Console.WriteLine("  -r  Hjson output, round trip with comments");
-        Console.WriteLine("  -b  output braces for the root object (Hjson).");
         Console.WriteLine("  -j  JSON output (formatted)");
         Console.WriteLine("  -c  JSON output (compact)");
+        Console.WriteLine("  -n  omit braces for the root object (Hjson).");
         return 1;
       }
 
-      JsonValue data=HjsonValue.Load(file, roundtrip);
+      JsonValue data=HjsonValue.Load(file, new HjsonOptions { KeepWsc=roundtrip });
       if (todo==Stringify.Hjson)
         Console.WriteLine(data.ToString(new HjsonOptions { KeepWsc=roundtrip, EmitRootBraces=rootBraces }));
       else

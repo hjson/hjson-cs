@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HjsonDsf.cs" />
     <Compile Include="HjsonOptions.cs" />
     <Compile Include="HjsonValue.cs" />
     <Compile Include="HjsonWsc.cs" />

@@ -25,7 +25,7 @@ namespace HjsonSample
       HjsonValue.Save(data, "test2.hjson");
 
       // edit (preserve whitespace and comments)
-      var wdata=(WscJsonObject)HjsonValue.Load(new StreamReader("test.hjson"), preserveComments:true).Qo();
+      var wdata=(WscJsonObject)HjsonValue.Load(new StreamReader("test.hjson"), new HjsonOptions { KeepWsc=true }).Qo();
 
       // edit like you normally would
       wdata["hugo"]="value";

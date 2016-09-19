@@ -33,6 +33,9 @@ namespace Hjson
     /// <summary>Initializes a new short.</summary>
     public JsonPrimitive(short value) { this.value=(long)value; }
 
+    JsonPrimitive() { }
+    public static new JsonPrimitive FromObject(object value) { return new JsonPrimitive { value=value }; }
+
     internal object Value
     {
       get { return value; }
@@ -49,7 +52,18 @@ namespace Hjson
         {
           case TypeCode.Boolean: return JsonType.Boolean;
           case TypeCode.String: return JsonType.String;
-          default: return JsonType.Number;
+          case TypeCode.Byte:
+          case TypeCode.SByte:
+          case TypeCode.Int16:
+          case TypeCode.UInt16:
+          case TypeCode.Int32:
+          case TypeCode.UInt32:
+          case TypeCode.Int64:
+          case TypeCode.UInt64:
+          case TypeCode.Single:
+          case TypeCode.Double:
+          case TypeCode.Decimal: return JsonType.Number;
+          default: return JsonType.Unknown;
         }
       }
     }
