@@ -1,6 +1,8 @@
 /dist
+/nuget
 bin
 obj
 packages
 *.suo
 *.user
+*.nupkg

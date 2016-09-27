@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Hjson</id>
+    <version>$version$</version>
+    <title>Hjson</title>
+    <authors>Christian Zangl</authors>
+    <owners>Christian Zangl</owners>
+    <licenseUrl>https://github.com/laktak/hjson-cs/blob/master/LICENSE</licenseUrl>
+    <projectUrl>http://hjson.org</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Hjson, the Human JSON. A configuration file format for humans. Relaxed syntax, fewer mistakes, more comments. For details go to http://hjson.org. </description>
+    <summary>JSON for Humans. Relaxed syntax, fewer mistakes, more comments.</summary>
+    <copyright>Copyright Christian Zangl</copyright>
+    <tags>JSON comments config hjson parser serializer</tags>
+  </metadata>
+  <files>
+    <file src="nuget/**/*.dll" target=""/>
+    <file src="nuget/**/*.xml" target=""/>
+  </files>
+</package>
