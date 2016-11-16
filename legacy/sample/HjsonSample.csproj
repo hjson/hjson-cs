@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Hjson, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Hjson.2.1.1\lib\net40\Hjson.dll</HintPath>
+      <HintPath>..\packages\Hjson.2.1.2\lib\net40\Hjson.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -46,14 +46,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="..\..\sample\Program.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-    <None Include="packages.config" />
-    <None Include="test.hjson">
+    <None Include="..\..\sample\test.hjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

@@ -18,14 +18,14 @@ namespace HjsonSample
       var data=HjsonValue.Load("test.hjson").Qo();
       Console.WriteLine(data.Qs("hello"));
 
-      Console.WriteLine("Saving as json...");
-      HjsonValue.Save(data, "test.json");
+      Console.WriteLine("Saving as test-out.json...");
+      HjsonValue.Save(data, "test-out.json");
 
-      Console.WriteLine("Saving as hjson...");
-      HjsonValue.Save(data, "test2.hjson");
+      Console.WriteLine("Saving as test-out.hjson...");
+      HjsonValue.Save(data, "test-out.hjson");
 
       // edit (preserve whitespace and comments)
-      var wdata=(WscJsonObject)HjsonValue.Load(new StreamReader("test.hjson"), new HjsonOptions { KeepWsc=true }).Qo();
+      var wdata=(WscJsonObject)HjsonValue.Load("test.hjson", new HjsonOptions { KeepWsc=true }).Qo();
 
       // edit like you normally would
       wdata["hugo"]="value";
