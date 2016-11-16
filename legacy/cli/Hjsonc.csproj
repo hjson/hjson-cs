@@ -43,7 +43,7 @@
     <Compile Include="..\..\cli\Program.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Hjson.csproj">
+    <ProjectReference Include="..\Hjson\Hjson.csproj">
       <Project>{ff9e2637-8bd3-4f8d-b563-d105b10d5354}</Project>
       <Name>Hjson</Name>
     </ProjectReference>

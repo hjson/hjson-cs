@@ -2,7 +2,11 @@
 set -e # exit script on error
 BASE=`dirname "$(readlink -f "$0")"`
 cd $BASE
-echo $BASE
+
+VERSION=`cat Hjson/project.json | sed -rn 's/.*version": "(.*)".*/\1/p'`
+VERSION2=`cat Hjson/Properties/AssemblyInfo.cs | sed -rn 's/.*AssemblyFileVersion\("(.*).0"\).*/\1/p'`
+
+if [[ "$VERSION" != "$VERSION2" ]]; then echo error: version mismatch; exit; fi
 
 echo ------------------
 echo build core
@@ -27,5 +31,4 @@ echo ------------------
 echo pkg
 
 mkdir -p nuget
-VERSION=`cat Hjson/Properties/AssemblyInfo.cs | sed -rn 's/.*AssemblyFileVersion\("(.*).0"\).*/\1/p'`
 nuget pack Hjson.nuspec -Version $VERSION -OutputDirectory nuget/
