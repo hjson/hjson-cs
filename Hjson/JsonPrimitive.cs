@@ -48,23 +48,21 @@ namespace Hjson
       {
         if (value==null) return JsonType.String;
 
-        switch (Type.GetTypeCode(value.GetType()))
-        {
-          case TypeCode.Boolean: return JsonType.Boolean;
-          case TypeCode.String: return JsonType.String;
-          case TypeCode.Byte:
-          case TypeCode.SByte:
-          case TypeCode.Int16:
-          case TypeCode.UInt16:
-          case TypeCode.Int32:
-          case TypeCode.UInt32:
-          case TypeCode.Int64:
-          case TypeCode.UInt64:
-          case TypeCode.Single:
-          case TypeCode.Double:
-          case TypeCode.Decimal: return JsonType.Number;
-          default: return JsonType.Unknown;
-        }
+        var type=value.GetType();
+        if (type==typeof(Boolean)) return JsonType.Boolean;
+        if (type==typeof(String)) return JsonType.String;
+        if (type==typeof(Byte) ||
+          type==typeof(SByte) ||
+          type==typeof(Int16) ||
+          type==typeof(UInt16) ||
+          type==typeof(Int32) ||
+          type==typeof(UInt32) ||
+          type==typeof(Int64) ||
+          type==typeof(UInt64) ||
+          type==typeof(Single) ||
+          type==typeof(Double) ||
+          type==typeof(Decimal)) return JsonType.Number;
+        return JsonType.Unknown;
       }
     }
 

@@ -1,5 +1,5 @@
 language: csharp
 solution: Hjson.sln
 script:
-  - xbuild /p:Configuration=Release Hjson.sln
-  - mono ./test/bin/Release/Test.exe
+  - xbuild /p:Configuration=Release legacy/Hjson.sln
+  - mono ./legacy/test/bin/Release/Test.exe ./test/assets

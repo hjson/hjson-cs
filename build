@@ -1,0 +1,31 @@
+#!/bin/bash
+set -e # exit script on error
+BASE=`dirname "$(readlink -f "$0")"`
+cd $BASE
+echo $BASE
+
+echo ------------------
+echo build core
+
+dotnet restore
+dotnet build Hjson -c Release
+dotnet build cli -c Release
+dotnet build test -c Release
+
+# test
+dotnet run -p test -- test/assets
+
+echo ------------------
+echo build .net
+
+xbuild /p:Configuration=Release legacy/Hjson.sln
+
+# test
+mono legacy/test/bin/Release/Test.exe test/assets
+
+echo ------------------
+echo pkg
+
+mkdir -p nuget
+VERSION=`cat Hjson/Properties/AssemblyInfo.cs | sed -rn 's/.*AssemblyFileVersion\("(.*).0"\).*/\1/p'`
+nuget pack Hjson.nuspec -Version $VERSION -OutputDirectory nuget/

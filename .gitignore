@@ -1,8 +1,8 @@
-/dist
 /nuget
 bin
 obj
 packages
 *.suo
 *.user
-*.nupkg
+project.lock.json
+project.fragment.lock.json

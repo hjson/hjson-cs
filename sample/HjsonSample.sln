@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hjson", "Hjson\Hjson.csproj", "{FF9E2637-8BD3-4F8D-B563-D105B10D5354}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HjsonSample", "HjsonSample.csproj", "{9F5BC310-5CBB-4B03-B7A4-9AD81F95DDC0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FF9E2637-8BD3-4F8D-B563-D105B10D5354}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF9E2637-8BD3-4F8D-B563-D105B10D5354}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FF9E2637-8BD3-4F8D-B563-D105B10D5354}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF9E2637-8BD3-4F8D-B563-D105B10D5354}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F5BC310-5CBB-4B03-B7A4-9AD81F95DDC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F5BC310-5CBB-4B03-B7A4-9AD81F95DDC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F5BC310-5CBB-4B03-B7A4-9AD81F95DDC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F5BC310-5CBB-4B03-B7A4-9AD81F95DDC0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

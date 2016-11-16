@@ -9,13 +9,14 @@
     <licenseUrl>https://github.com/laktak/hjson-cs/blob/master/LICENSE</licenseUrl>
     <projectUrl>http://hjson.org</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Hjson, the Human JSON. A configuration file format for humans. Relaxed syntax, fewer mistakes, more comments. For details go to http://hjson.org. </description>
-    <summary>JSON for Humans. Relaxed syntax, fewer mistakes, more comments.</summary>
+    <description>Hjson, a user interface for JSON. Relaxed syntax, fewer mistakes, more comments. Supports .NET Core, .NET 4.x and Mono. For details go to http://hjson.org. </description>
     <copyright>Copyright Christian Zangl</copyright>
     <tags>JSON comments config hjson parser serializer</tags>
   </metadata>
   <files>
-    <file src="nuget/**/*.dll" target=""/>
-    <file src="nuget/**/*.xml" target=""/>
+    <file src="Hjson/bin/Release/netstandard1.3/Hjson.dll" target="lib/netstandard1.3/Hjson.dll" />
+    <file src="Hjson/bin/Release/netstandard1.3/Hjson.xml" target="lib/netstandard1.3/Hjson.xml" />
+    <file src="legacy/Hjson/bin/Release/Hjson.dll" target="lib/net40/Hjson.dll" />
+    <file src="legacy/Hjson/bin/Release/Hjson.xml" target="lib/net40/Hjson.xml" />
   </files>
 </package>

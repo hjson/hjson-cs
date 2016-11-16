@@ -11,7 +11,7 @@ namespace Test
 {
   class Program
   {
-    static string assetsDir=Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "../../assets");
+    static string assetsDir;
 
     static string load(string file, bool cr)
     {
@@ -59,8 +59,14 @@ namespace Test
 
     static int Main(string[] args)
     {
-      string filter=args.Length==1?args[0]:null;
+      string filter=args.Length==2?args[1]:null;
+      if (args.Length==0)
+      {
+        Console.WriteLine("error: specify the assets directory");
+        return 1;
+      }
 
+      assetsDir=args[0];
       Console.WriteLine("running tests...");
 
       var tests=Directory.GetFiles(assetsDir, "*_test.*");

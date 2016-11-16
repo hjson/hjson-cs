@@ -4,11 +4,15 @@
 [![nuget version](https://img.shields.io/nuget/v/Hjson.svg?style=flat-square)](https://www.nuget.org/packages/Hjson/)
 [![License](https://img.shields.io/github/license/hjson/hjson-cs.svg?style=flat-square)](https://github.com/hjson/hjson-cs/blob/master/LICENSE)
 
-[Hjson](http://hjson.org), the Human JSON. A configuration file format for humans. Relaxed syntax, fewer mistakes, more comments.
+[Hjson](http://hjson.org), a user interface for JSON
 
 ![Hjson Intro](http://hjson.org/hjson1.gif)
 
-```
+JSON is easy for humans to read and write... in theory. In practice JSON gives us plenty of opportunities to make mistakes without even realizing it.
+
+Hjson is a syntax extension to JSON. It's NOT a proposal to replace JSON or to incorporate it into the JSON spec itself. It's intended to be used like a user interface for humans, to read and edit before passing the JSON data to the machine.
+
+```Hjson
 {
   # specify rate in requests/second (because comments are helpful!)
   rate: 1000
@@ -27,7 +31,7 @@
 }
 ```
 
-Tested on .net & Mono.
+Supported frameworks/runtimes include .NET Core, .NET 4.x & Mono.
 
 This library includes two readers/writers that fully conform to the respective specification:
 
@@ -154,6 +158,10 @@ See [api.md](api.md).
 
 A commandline tool to convert from/to Hjson is available in the cli folder.
 
-You can also install it from [chocolatey](https://chocolatey.org/packages/hjson).
-
 For other tools see [hjson.org](http://hjson.org).
+
+# Source/Projects
+
+Solutions in the root folder target .NET Core.
+
+Solutions for .NET 4.x can be found in the legacy folder.
