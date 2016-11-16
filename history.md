@@ -1,5 +1,7 @@
 # hjson-cs History
 
+- v2.1.1
+  - add support for .NET Core
 - v2.1.0
   - add DSF (domain specific formats), experimental
 - v2.0.5
