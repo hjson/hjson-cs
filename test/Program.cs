@@ -26,7 +26,7 @@ namespace Test
       bool shouldFail=name.StartsWith("fail");
 
       JsonValue.Eol=outputCr?"\r\n":"\n";
-      var text=load(file, inputCr);
+      var text=load(Path.Combine(assetsDir, file), inputCr);
 
       try
       {
@@ -69,9 +69,10 @@ namespace Test
       assetsDir=args[0];
       Console.WriteLine("running tests...");
 
-      var tests=Directory.GetFiles(assetsDir, "*_test.*");
+      var tests=File.ReadAllLines(Path.Combine(assetsDir, "testlist.txt"), Encoding.UTF8);
       foreach (var file in tests)
       {
+        if (file.Contains("/")) continue; // skip for now
         string name=Path.GetFileNameWithoutExtension(file);
         name=name.Substring(0, name.Length-5);
         if (filter!=null && !name.Contains(filter)) continue;
