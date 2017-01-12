@@ -186,7 +186,7 @@ namespace Hjson
         // sequences.
 
         if (!value.Any(c => needsEscape(c))) tw.Write(separator+"\""+value+"\"");
-        else if (!value.Any(c => needsEscapeML(c)) && !value.Contains("'''")) writeMLString(value, tw, level, separator);
+        else if (!value.Any(c => needsEscapeML(c)) && !value.Contains("'''") && !value.All(c => BaseReader.IsWhite(c))) writeMLString(value, tw, level, separator);
         else tw.Write(separator+"\""+JsonWriter.EscapeString(value)+"\"");
       }
       else tw.Write(separator+value);
@@ -263,6 +263,7 @@ namespace Hjson
       {
         case '\n':
         case '\r':
+        case '\t':
           return false;
         default:
           return needsQuotes(c);
