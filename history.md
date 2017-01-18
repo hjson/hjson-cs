@@ -1,5 +1,7 @@
 # hjson-cs History
 
+- v2.1.3
+  - Update ML stringify to match JS
 - v2.1.2
   - add support for .NET Core
 - v2.1.0

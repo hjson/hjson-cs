@@ -1,8 +1,68 @@
 ## Hjson ##
 
+# T:Hjson.IHjsonDsfProvider
+
+ A interface to support Domain Specific Formats for Hjson. 
+
+
+
+##### P:Hjson.IHjsonDsfProvider.Name
+
+Gets the name of this DSF.
+
+
+
+##### P:Hjson.IHjsonDsfProvider.Description
+
+Gets the description of this DSF.
+
+
+
+##### M:Hjson.IHjsonDsfProvider.Parse(System.String)
+
+Tries to parse the text as a DSF value.
+
+
+
+##### M:Hjson.IHjsonDsfProvider.Stringify(Hjson.JsonValue)
+
+Stringifies DSF values.
+
+
+
+# T:Hjson.HjsonDsf
+
+ Provides standard DSF providers. 
+
+
+
+##### M:Hjson.HjsonDsf.Math
+
+Returns a math DSF provider.
+
+
+
+##### M:Hjson.HjsonDsf.Hex(System.Boolean)
+
+Returns a hex DSF provider.
+
+
+
+##### M:Hjson.HjsonDsf.Date
+
+Returns a date DSF provider.
+
+
+
 # T:Hjson.HjsonOptions
 
 Options for Save.
+
+
+
+##### M:Hjson.HjsonOptions.#ctor
+
+Initializes a new instance of this class.
 
 
 
@@ -14,7 +74,13 @@ Keep white space and comments.
 
 ##### P:Hjson.HjsonOptions.EmitRootBraces
 
-Show braces at the root level.
+Show braces at the root level (default true).
+
+
+
+##### P:Hjson.HjsonOptions.DsfProviders
+
+ Gets or sets DSF providers. 
 
 
 
@@ -30,7 +96,7 @@ Loads Hjson/JSON from a file.
 
 
 
-##### M:Hjson.HjsonValue.Load(System.String,System.Boolean)
+##### M:Hjson.HjsonValue.Load(System.String,Hjson.HjsonOptions)
 
 Loads Hjson/JSON from a file, optionally preserving whitespace and comments.
 
@@ -42,7 +108,7 @@ Loads Hjson/JSON from a stream.
 
 
 
-##### M:Hjson.HjsonValue.Load(System.IO.Stream,System.Boolean)
+##### M:Hjson.HjsonValue.Load(System.IO.Stream,Hjson.HjsonOptions)
 
 Loads Hjson/JSON from a stream, optionally preserving whitespace and comments.
 
@@ -54,7 +120,7 @@ Loads Hjson/JSON from a TextReader.
 
 
 
-##### M:Hjson.HjsonValue.Load(System.IO.TextReader,System.Boolean,Hjson.IJsonReader)
+##### M:Hjson.HjsonValue.Load(System.IO.TextReader,Hjson.HjsonOptions,Hjson.IJsonReader)
 
 Loads Hjson/JSON from a TextReader, optionally preserving whitespace and comments.
 
@@ -72,7 +138,7 @@ Parses the specified Hjson/JSON string.
 
 
 
-##### M:Hjson.HjsonValue.Parse(System.String,System.Boolean)
+##### M:Hjson.HjsonValue.Parse(System.String,Hjson.HjsonOptions)
 
 Parses the specified Hjson/JSON string, optionally preserving whitespace and comments.
 
@@ -93,6 +159,30 @@ Saves Hjson to a stream.
 ##### M:Hjson.HjsonValue.Save(Hjson.JsonValue,System.IO.TextWriter,Hjson.HjsonOptions)
 
 Saves Hjson to a TextWriter.
+
+
+
+##### M:Hjson.HjsonValue.Load(System.String,System.Boolean)
+
+Loads Hjson/JSON from a file, optionally preserving whitespace and comments.
+
+
+
+##### M:Hjson.HjsonValue.Load(System.IO.Stream,System.Boolean)
+
+Loads Hjson/JSON from a stream, optionally preserving whitespace and comments.
+
+
+
+##### M:Hjson.HjsonValue.Load(System.IO.TextReader,System.Boolean,Hjson.IJsonReader)
+
+Loads Hjson/JSON from a TextReader, optionally preserving whitespace and comments.
+
+
+
+##### M:Hjson.HjsonValue.Parse(System.String,System.Boolean)
+
+Parses the specified Hjson/JSON string, optionally preserving whitespace and comments.
 
 
 
@@ -443,6 +533,52 @@ The type of this value.
 
 
 
+# T:Hjson.JsonType
+
+Defines the known json types.
+
+
+
+>There is no null type as the primitive will be null instead of the JsonPrimitive containing null.
+
+
+
+##### F:Hjson.JsonType.String
+
+Json value of type string.
+
+
+
+##### F:Hjson.JsonType.Number
+
+Json value of type number.
+
+
+
+##### F:Hjson.JsonType.Object
+
+Json value of type object.
+
+
+
+##### F:Hjson.JsonType.Array
+
+Json value of type array.
+
+
+
+##### F:Hjson.JsonType.Boolean
+
+Json value of type boolean.
+
+
+
+##### F:Hjson.JsonType.Unknown
+
+Json value of an unknown type.
+
+
+
 # T:Hjson.JsonUtil
 
 Provides Json extension methods.
@@ -595,46 +731,6 @@ Convert the timespan to JSON/ISO 8601.
 
 
 
-# T:Hjson.JsonType
-
-Defines the known json types.
-
-
-
->There is no null type as the primitive will be null instead of the JsonPrimitive containing null.
-
-
-
-##### F:Hjson.JsonType.String
-
-Json value of type string.
-
-
-
-##### F:Hjson.JsonType.Number
-
-Json value of type number.
-
-
-
-##### F:Hjson.JsonType.Object
-
-Json value of type object.
-
-
-
-##### F:Hjson.JsonType.Array
-
-Json value of type array.
-
-
-
-##### F:Hjson.JsonType.Boolean
-
-Json value of type boolean.
-
-
-
 # T:Hjson.Stringify
 
 The ToString format.
@@ -744,6 +840,12 @@ Saves the JSON to a string.
 ##### M:Hjson.JsonValue.ToValue
 
 Returns the contained primitive value.
+
+
+
+##### M:Hjson.JsonValue.FromObject(System.Object)
+
+Wraps an unknown object into a JSON value (to be used with DSF).
 
 
 
