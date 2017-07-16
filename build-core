@@ -1,0 +1,28 @@
+#!/bin/bash
+set -e # exit script on error
+BASE=`dirname "$(readlink -f "$0")"`
+cd $BASE
+
+VERSION=`cat Hjson/Hjson.csproj | sed -rn 's/.*VersionPrefix>(.*)<\/.*/\1/p'`
+VERSION2=`cat Hjson/Properties/AssemblyInfo.cs | sed -rn 's/.*AssemblyFileVersion\("(.*).0"\).*/\1/p'`
+if [[ "$VERSION" != "$VERSION2" ]]; then echo error: version mismatch $VERSION:$VERSION2; exit; fi
+
+echo ------------------
+echo build core
+
+dotnet restore Hjson
+dotnet restore cli
+dotnet restore test
+dotnet restore sample/sample.csproj
+dotnet build Hjson -c Release
+dotnet build cli -c Release
+dotnet build test -c Release
+
+# test
+dotnet run -p test/test.csproj -- test/assets
+
+echo ------------------
+echo pkg
+
+dotnet pack Hjson -c Release
+
