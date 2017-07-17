@@ -63,7 +63,8 @@ namespace Hjson
           for (; ; )
           {
             if (SkipPeekChar()=='}') { ReadChar(); break; }
-            string name=ReadStringLiteral();
+            if (PeekChar()!='"') throw ParseError("Invalid JSON string literal format");
+            string name=ReadStringLiteral(null);
             SkipWhite();
             Expect(':');
             SkipWhite();
@@ -87,7 +88,7 @@ namespace Hjson
           Expect("null");
           return (JsonValue)null;
         case '"':
-          return ReadStringLiteral();
+          return ReadStringLiteral(null);
         default:
           if (c>='0' && c<='9' || c=='-')
             return ReadNumericLiteral();

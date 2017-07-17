@@ -1,5 +1,7 @@
 # hjson-cs History
 
+- v3.0.0
+  - add support for single quoted strings
 - v2.1.3
   - Update ML stringify to match JS
 - v2.1.2

@@ -168,7 +168,8 @@ namespace Hjson
             if (ReadWsc) { wsc.Comments[name]=GetWhite(); wsc.Order.Add(name); }
           }
           return obj;
-        case '"': return ReadStringLiteral();
+        case '\'':
+        case '"': return ReadStringLiteral(readMlString);
         default: return readTfnns(c);
       }
     }
@@ -178,13 +179,14 @@ namespace Hjson
       // quotes for keys are optional in Hjson
       // unless they include {}[],: or whitespace.
 
-      if (PeekChar()=='"') return ReadStringLiteral();
+      int c=PeekChar();
+      if (c=='"' || c=='\'') return ReadStringLiteral(null);
 
       sb.Length=0;
       int space=-1;
       for (; ; )
       {
-        int c=PeekChar();
+        c=PeekChar();
         if (c<0) throw ParseError("Name is not closed");
         char ch=(char)c;
         if (ch==':')
@@ -218,7 +220,7 @@ namespace Hjson
       }
     }
 
-    JsonValue readMlString()
+    string readMlString()
     {
       // Parse a multiline string value.
       int triple=0;
@@ -420,11 +422,7 @@ namespace Hjson
           }
         }
         ReadChar();
-        if (c!='\r')
-        {
-          sb.Append((char)c);
-          if (sb.Length==3 && sb[0]=='\'' && sb[1]=='\'' && sb[2]=='\'') return readMlString();
-        }
+        if (c!='\r') sb.Append((char)c);
         c=PeekChar();
       }
     }

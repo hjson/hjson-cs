@@ -200,17 +200,30 @@ namespace Hjson
       else return val;
     }
 
-    public string ReadStringLiteral()
+    public string ReadStringLiteral(Func<string> allowML)
     {
-      if (PeekChar()!='"') throw ParseError("Invalid JSON string literal format");
+      // callers make sure that (exitCh == '"' || exitCh == "'")
 
-      ReadChar();
+      int exitCh=ReadChar();
       sb.Length=0;
       for (; ; )
       {
         int c=ReadChar();
         if (c<0) throw ParseError("JSON string is not closed");
-        if (c=='"') return sb.ToString();
+        if (c==exitCh)
+        {
+          if (allowML!=null && exitCh=='\'' && PeekChar()=='\'' && sb.Length==0)
+          {
+            // ''' indicates a multiline string
+            ReadChar();
+            return allowML();
+          }
+          else return sb.ToString();
+        }
+        else if (c=='\n' || c=='\r')
+        {
+          throw ParseError("Bad string containing newline");
+        }
         else if (c!='\\')
         {
           sb.Append((char)c);
@@ -224,6 +237,7 @@ namespace Hjson
         switch (c)
         {
           case '"':
+          case '\'':
           case '\\':
           case '/': sb.Append((char)c); break;
           case 'b': sb.Append('\x8'); break;

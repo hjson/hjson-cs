@@ -16,7 +16,7 @@ namespace Hjson
     bool writeWsc;
     bool emitRootBraces;
     IEnumerable<IHjsonDsfProvider> dsfProviders=Enumerable.Empty<IHjsonDsfProvider>();
-    static Regex needsEscapeName=new Regex(@"[,\{\[\}\]\s:#""]|\/\/|\/\*|'''");
+    static Regex needsEscapeName=new Regex(@"[,\{\[\}\]\s:#""']|\/\/|\/\*|'''");
 
     public HjsonWriter(HjsonOptions options)
     {
@@ -172,8 +172,8 @@ namespace Hjson
       if (doEscape ||
         BaseReader.IsWhite(left) || BaseReader.IsWhite(right) ||
         left=='"' ||
+        left=='\'' ||
         left=='#' ||
-        left=='\'' && left1=='\'' && left2=='\'' ||
         left=='/' && (left1=='*' || left1=='/') ||
         HjsonValue.IsPunctuatorChar(left) ||
         HjsonReader.TryParseNumericLiteral(value, true, out dummy) ||
