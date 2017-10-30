@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
-    <AssemblyName>cli</AssemblyName>
     <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <AssemblyName>cli</AssemblyName>
     <PackageId>cli</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hjson\Hjson.csproj" />
+    <ProjectReference Include="../Hjson/Hjson.csproj" />
   </ItemGroup>
 
 </Project>

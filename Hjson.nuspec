@@ -14,8 +14,8 @@
     <tags>JSON comments config hjson parser serializer</tags>
   </metadata>
   <files>
-    <file src="Hjson/bin/Release/netstandard1.3/Hjson.dll" target="lib/netstandard1.3/Hjson.dll" />
-    <file src="Hjson/bin/Release/netstandard1.3/Hjson.xml" target="lib/netstandard1.3/Hjson.xml" />
+    <file src="Hjson/bin/Release/netstandard2.0/Hjson.dll" target="lib/netstandard2.0/Hjson.dll" />
+    <file src="Hjson/bin/Release/netstandard2.0/Hjson.xml" target="lib/netstandard2.0/Hjson.xml" />
     <file src="legacy/Hjson/bin/Release/Hjson.dll" target="lib/net40/Hjson.dll" />
     <file src="legacy/Hjson/bin/Release/Hjson.xml" target="lib/net40/Hjson.xml" />
   </files>

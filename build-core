@@ -10,10 +10,10 @@ if [[ "$VERSION" != "$VERSION2" ]]; then echo error: version mismatch $VERSION:$
 echo ------------------
 echo build core
 
-dotnet restore Hjson
-dotnet restore cli
-dotnet restore test
-dotnet restore sample/sample.csproj
+#dotnet restore Hjson
+#dotnet restore cli
+#dotnet restore test
+#dotnet restore sample/sample.csproj
 dotnet build Hjson -c Release
 dotnet build cli -c Release
 dotnet build test -c Release
