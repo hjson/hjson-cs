@@ -1,5 +1,6 @@
 language: csharp
-solution: Hjson.sln
+mono: 4.0.0
+dotnet: 2.0.0
 script:
-  - xbuild /p:Configuration=Release legacy/Hjson.sln
-  - mono ./legacy/test/bin/Release/Test.exe ./test/assets
+  - ./build-core
+  - ./build-mono
