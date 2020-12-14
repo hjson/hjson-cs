@@ -1,287 +1,290 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace Hjson
 {
-  internal abstract class BaseReader
-  {
-    string buffer;
-    TextReader r;
-    StringBuilder sb=new StringBuilder();
-    StringBuilder white=new StringBuilder();
-    // peek could be removed since we now use a buffer
-    List<int> peek=new List<int>();
-    bool prevLf;
+	internal abstract class BaseReader
+	{
+		private readonly string buffer;
+		private TextReader r;
+		private readonly StringBuilder sb = new StringBuilder();
+		private readonly StringBuilder white = new StringBuilder();
 
-    public int Line { get; private set; }
-    public int Column { get; private set; }
+		// peek could be removed since we now use a buffer
+		private readonly List<int> peek = new List<int>();
+		private bool prevLf;
 
-    protected IJsonReader Reader { get; private set; }
-    protected bool HasReader { get { return Reader!=null; } }
+		public int Line { get; private set; }
+		public int Column { get; private set; }
 
-    public bool ReadWsc { get; set; }
+		protected IJsonReader Reader { get; private set; }
+		protected bool HasReader => this.Reader != null;
 
-    public BaseReader(TextReader reader, IJsonReader jsonReader)
-    {
-      if (reader==null) throw new ArgumentNullException("reader");
-      // use a buffer so we can support reset
-      this.Reader=jsonReader;
-      buffer=reader.ReadToEnd();
-      Reset();
-    }
+		public bool ReadWsc { get; set; }
 
-    public void Reset()
-    {
-      Line=1;
-      this.r=new StringReader(buffer);
-      peek.Clear();
-      white.Length=sb.Length=0;
-      prevLf=false;
-    }
+		public BaseReader(TextReader reader, IJsonReader jsonReader)
+		{
+			if (reader == null) throw new ArgumentNullException("reader");
+			// use a buffer so we can support reset
+			this.Reader = jsonReader;
+			this.buffer = reader.ReadToEnd();
+			this.Reset();
+		}
 
-    public int PeekChar(int idx=0)
-    {
-      if (idx<0) throw new ArgumentOutOfRangeException();
-      while (idx>=peek.Count)
-      {
-        int c=r.Read();
-        if (c<0) return c;
-        peek.Add(c);
-      }
-      return peek[idx];
-    }
+		public void Reset()
+		{
+			this.Line = 1;
+			this.r = new StringReader(this.buffer);
+			this.peek.Clear();
+			this.white.Length = this.sb.Length = 0;
+			this.prevLf = false;
+		}
 
-    public virtual int SkipPeekChar()
-    {
-      SkipWhite();
-      return PeekChar();
-    }
+		public int PeekChar(int idx = 0)
+		{
+			if (idx < 0) throw new ArgumentOutOfRangeException();
+			while (idx >= this.peek.Count)
+			{
+				var c = this.r.Read();
+				if (c < 0) return c;
+				this.peek.Add(c);
+			}
+			return this.peek[idx];
+		}
 
-    public int ReadChar()
-    {
-      int v;
-      if (peek.Count>0)
-      {
-        // normally peek will only hold not more than one character so this should not matter for performance
-        v=peek[0];
-        peek.RemoveAt(0);
-      }
-      else v=r.Read();
+		public virtual int SkipPeekChar()
+		{
+			this.SkipWhite();
+			return this.PeekChar();
+		}
 
-      if (ReadWsc && v!='\r') white.Append((char)v);
+		public int ReadChar()
+		{
+			int v;
+			if (this.peek.Count > 0)
+			{
+				// normally peek will only hold not more than one character so this should not matter for performance
+				v = this.peek[0];
+				this.peek.RemoveAt(0);
+			}
+			else
+			{
+				v = this.r.Read();
+			}
 
-      if (prevLf)
-      {
-        Line++;
-        Column=0;
-        prevLf=false;
-      }
+			if (this.ReadWsc && v != '\r') this.white.Append((char)v);
 
-      if (v=='\n') prevLf=true;
-      Column++;
+			if (this.prevLf)
+			{
+				this.Line++;
+				this.Column = 0;
+				this.prevLf = false;
+			}
 
-      return v;
-    }
+			if (v == '\n') this.prevLf = true;
+			this.Column++;
 
-    protected void ResetWhite()
-    {
-      if (ReadWsc) white.Length=0;
-    }
+			return v;
+		}
 
-    protected virtual string GetWhite()
-    {
-      if (!ReadWsc) throw new InvalidOperationException();
-      return white.ToString();
-    }
+		protected void ResetWhite()
+		{
+			if (this.ReadWsc) this.white.Length = 0;
+		}
 
-    public static bool IsWhite(char c)
-    {
-      return c==' ' || c=='\t' || c=='\r' || c=='\n';
-    }
+		protected virtual string GetWhite()
+		{
+			if (!this.ReadWsc) throw new InvalidOperationException();
+			return this.white.ToString();
+		}
 
-    public void SkipWhite()
-    {
-      for (; ; )
-      {
-        if (IsWhite((char)PeekChar())) ReadChar();
-        else break;
-      }
-    }
+		public static bool IsWhite(char c) => c == ' ' || c == '\t' || c == '\r' || c == '\n';
 
-    // It could return either long or double, depending on the parsed value.
-    public JsonValue ReadNumericLiteral()
-    {
-      int c, leadingZeros=0;
-      double val=0;
-      bool negative=false, testLeading=true;
+		public void SkipWhite()
+		{
+			for (; ; )
+			{
+				if (IsWhite((char)this.PeekChar())) this.ReadChar();
+				else break;
+			}
+		}
 
-      if (PeekChar()=='-')
-      {
-        negative=true;
-        ReadChar();
-        if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; extra negation");
-      }
+		// It could return either long or double, depending on the parsed value.
+		public JsonValue ReadNumericLiteral()
+		{
+			int c, leadingZeros = 0;
+			double val = 0;
+			bool negative = false, testLeading = true;
 
-      for (int x=0; ; x++)
-      {
-        c=PeekChar();
-        if (c<'0' || c>'9') break;
-        if (testLeading)
-        {
-          if (c=='0') leadingZeros++;
-          else testLeading = false;
-        }
-        val=val*10+(c-'0');
-        ReadChar();
-      }
-      if (testLeading) leadingZeros--; // single 0 is allowed
-      if (leadingZeros>0) throw ParseError("leading multiple zeros are not allowed");
+			if (this.PeekChar() == '-')
+			{
+				negative = true;
+				this.ReadChar();
+				if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra negation");
+			}
 
-      // fraction
-      if (PeekChar()=='.')
-      {
-        int fdigits=0;
-        double frac=0;
-        ReadChar();
-        if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; extra dot");
-        double d=10;
-        for (; ; )
-        {
-          c=PeekChar();
-          if (c<'0' || '9'<c) break;
-          ReadChar();
-          frac+=(c-'0')/d;
-          d*=10;
-          fdigits++;
-        }
-        if (fdigits==0) throw ParseError("Invalid JSON numeric literal; extra dot");
-        val+=frac;
-      }
+			for (var x = 0; ; x++)
+			{
+				c = this.PeekChar();
+				if (c < '0' || c > '9') break;
+				if (testLeading)
+				{
+					if (c == '0') leadingZeros++;
+					else testLeading = false;
+				}
+				val = val * 10 + (c - '0');
+				this.ReadChar();
+			}
+			if (testLeading) leadingZeros--; // single 0 is allowed
+			if (leadingZeros > 0) throw this.ParseError("leading multiple zeros are not allowed");
 
-      c=PeekChar();
-      if (c=='e' || c=='E')
-      {
-        // exponent
-        int exp=0, expSign=1;
+			// fraction
+			if (this.PeekChar() == '.')
+			{
+				var fdigits = 0;
+				double frac = 0;
+				this.ReadChar();
+				if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra dot");
+				double d = 10;
+				for (; ; )
+				{
+					c = this.PeekChar();
+					if (c < '0' || '9' < c) break;
+					this.ReadChar();
+					frac += (c - '0') / d;
+					d *= 10;
+					fdigits++;
+				}
+				if (fdigits == 0) throw this.ParseError("Invalid JSON numeric literal; extra dot");
+				val += frac;
+			}
 
-        ReadChar();
-        if (PeekChar()<0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
+			c = this.PeekChar();
+			if (c == 'e' || c == 'E')
+			{
+				// exponent
+				int exp = 0, expSign = 1;
 
-        c=PeekChar();
-        if (c=='-')
-        {
-          ReadChar();
-          expSign=-1;
-        }
-        else if (c=='+') ReadChar();
+				this.ReadChar();
+				if (this.PeekChar() < 0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
 
-        if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; incomplete exponent");
+				c = this.PeekChar();
+				if (c == '-')
+				{
+					this.ReadChar();
+					expSign = -1;
+				}
+				else if (c == '+')
+				{
+					this.ReadChar();
+				}
 
-        for (; ; )
-        {
-          c=PeekChar();
-          if (c<'0' || c>'9') break;
-          exp=exp*10+(c-'0');
-          ReadChar();
-        }
+				if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; incomplete exponent");
 
-        if (exp!=0)
-          val*=Math.Pow(10, exp*expSign);
-      }
+				for (; ; )
+				{
+					c = this.PeekChar();
+					if (c < '0' || c > '9') break;
+					exp = exp * 10 + (c - '0');
+					this.ReadChar();
+				}
 
-      if (negative) val*=-1;
-      long lval=(long)val;
-      if (lval==val) return lval;
-      else return val;
-    }
+				if (exp != 0)
+					val *= Math.Pow(10, exp * expSign);
+			}
 
-    public string ReadStringLiteral(Func<string> allowML)
-    {
-      // callers make sure that (exitCh == '"' || exitCh == "'")
+			if (negative) val *= -1;
+			var lval = (long)val;
+			if (lval == val) return lval;
+			else return val;
+		}
 
-      int exitCh=ReadChar();
-      sb.Length=0;
-      for (; ; )
-      {
-        int c=ReadChar();
-        if (c<0) throw ParseError("JSON string is not closed");
-        if (c==exitCh)
-        {
-          if (allowML!=null && exitCh=='\'' && PeekChar()=='\'' && sb.Length==0)
-          {
-            // ''' indicates a multiline string
-            ReadChar();
-            return allowML();
-          }
-          else return sb.ToString();
-        }
-        else if (c=='\n' || c=='\r')
-        {
-          throw ParseError("Bad string containing newline");
-        }
-        else if (c!='\\')
-        {
-          sb.Append((char)c);
-          continue;
-        }
+		public string ReadStringLiteral(Func<string> allowML)
+		{
+			// callers make sure that (exitCh == '"' || exitCh == "'")
 
-        // escaped expression
-        c=ReadChar();
-        if (c<0)
-          throw ParseError("Invalid JSON string literal; incomplete escape sequence");
-        switch (c)
-        {
-          case '"':
-          case '\'':
-          case '\\':
-          case '/': sb.Append((char)c); break;
-          case 'b': sb.Append('\x8'); break;
-          case 'f': sb.Append('\f'); break;
-          case 'n': sb.Append('\n'); break;
-          case 'r': sb.Append('\r'); break;
-          case 't': sb.Append('\t'); break;
-          case 'u':
-            ushort cp=0;
-            for (int i=0; i<4; i++)
-            {
-              cp <<= 4;
-              if ((c=ReadChar())<0)
-                throw ParseError("Incomplete unicode character escape literal");
-              if (c>='0' && c<='9') cp+=(ushort)(c-'0');
-              else if (c>='A' && c<='F') cp+=(ushort)(c-'A'+10);
-              else if (c>='a' && c<='f') cp+=(ushort)(c-'a'+10);
-              else throw ParseError("Bad \\u char "+(char)c);
-            }
-            sb.Append((char)cp);
-            break;
-          default:
-            throw ParseError("Invalid JSON string literal; unexpected escape character");
-        }
-      }
-    }
+			var exitCh = this.ReadChar();
+			this.sb.Length = 0;
+			for (; ; )
+			{
+				var c = this.ReadChar();
+				if (c < 0) throw this.ParseError("JSON string is not closed");
+				if (c == exitCh)
+				{
+					if (allowML != null && exitCh == '\'' && this.PeekChar() == '\'' && this.sb.Length == 0)
+					{
+						// ''' indicates a multiline string
+						this.ReadChar();
+						return allowML();
+					}
+					else
+					{
+						return this.sb.ToString();
+					}
+				}
+				else if (c == '\n' || c == '\r')
+				{
+					throw this.ParseError("Bad string containing newline");
+				}
+				else if (c != '\\')
+				{
+					this.sb.Append((char)c);
+					continue;
+				}
 
-    public void Expect(char expected)
-    {
-      int c;
-      if ((c=ReadChar())!=expected)
-        throw ParseError(String.Format("Expected '{0}', got '{1}'", expected, (char)c));
-    }
+				// escaped expression
+				c = this.ReadChar();
+				if (c < 0)
+					throw this.ParseError("Invalid JSON string literal; incomplete escape sequence");
+				switch (c)
+				{
+					case '"':
+					case '\'':
+					case '\\':
+					case '/': this.sb.Append((char)c); break;
+					case 'b': this.sb.Append('\x8'); break;
+					case 'f': this.sb.Append('\f'); break;
+					case 'n': this.sb.Append('\n'); break;
+					case 'r': this.sb.Append('\r'); break;
+					case 't': this.sb.Append('\t'); break;
+					case 'u':
+						ushort cp = 0;
+						for (var i = 0; i < 4; i++)
+						{
+							cp <<= 4;
+							if ((c = this.ReadChar()) < 0)
+								throw this.ParseError("Incomplete unicode character escape literal");
+							if (c >= '0' && c <= '9') cp += (ushort)(c - '0');
+							else if (c >= 'A' && c <= 'F') cp += (ushort)(c - 'A' + 10);
+							else if (c >= 'a' && c <= 'f') cp += (ushort)(c - 'a' + 10);
+							else throw this.ParseError("Bad \\u char " + (char)c);
+						}
+						this.sb.Append((char)cp);
+						break;
+					default:
+						throw this.ParseError("Invalid JSON string literal; unexpected escape character");
+				}
+			}
+		}
 
-    public void Expect(string expected)
-    {
-      for (int i=0; i<expected.Length; i++)
-        if (ReadChar()!=expected[i])
-          throw ParseError(String.Format("Expected '{0}', differed at {1}", expected, i));
-    }
+		public void Expect(char expected)
+		{
+			int c;
+			if ((c = this.ReadChar()) != expected)
+				throw this.ParseError(string.Format("Expected '{0}', got '{1}'", expected, (char)c));
+		}
 
-    public Exception ParseError(string msg)
-    {
-      return new ArgumentException(String.Format("{0}. At line {1}, column {2}", msg, Line, Column));
-    }
-  }
+		public void Expect(string expected)
+		{
+			for (var i = 0; i < expected.Length; i++)
+			{
+				if (this.ReadChar() != expected[i])
+					throw this.ParseError(string.Format("Expected '{0}', differed at {1}", expected, i));
+			}
+		}
+
+		public Exception ParseError(string msg) => new ArgumentException(string.Format("{0}. At line {1}, column {2}", msg, this.Line, this.Column));
+	}
 }

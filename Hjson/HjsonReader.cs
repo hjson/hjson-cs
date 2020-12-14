@@ -1,430 +1,441 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace Hjson
 {
-  using JsonPair=KeyValuePair<string, JsonValue>;
+	using JsonPair = KeyValuePair<string, JsonValue>;
 
-  internal class HjsonReader : BaseReader
-  {
-    StringBuilder sb=new StringBuilder();
-    IEnumerable<IHjsonDsfProvider> dsfProviders=Enumerable.Empty<IHjsonDsfProvider>();
+	internal class HjsonReader: BaseReader
+	{
+		private readonly StringBuilder sb = new StringBuilder();
+		private readonly IEnumerable<IHjsonDsfProvider> dsfProviders = Enumerable.Empty<IHjsonDsfProvider>();
 
-    public HjsonReader(TextReader reader, IJsonReader jsonReader, HjsonOptions options)
-      : base(reader, jsonReader)
-    {
-      if (options!=null)
-      {
-        ReadWsc=options.KeepWsc;
-        dsfProviders=options.DsfProviders;
-      }
-    }
+		public HjsonReader(TextReader reader, IJsonReader jsonReader, HjsonOptions options)
+		  : base(reader, jsonReader)
+		{
+			if (options != null)
+			{
+				this.ReadWsc = options.KeepWsc;
+				this.dsfProviders = options.DsfProviders;
+			}
+		}
 
-    public JsonValue Read()
-    {
-      // Braces for the root object are optional
+		public JsonValue Read()
+		{
+			// Braces for the root object are optional
 
-      int c=SkipPeekChar();
-      switch (c)
-      {
-        case '[':
-        case '{':
-          return checkTrailing(ReadCore());
-        default:
-          try
-          {
-            // assume we have a root object without braces
-            return checkTrailing(ReadCore(true));
-          }
-          catch (Exception)
-          {
-            // test if we are dealing with a single JSON value instead (true/false/null/num/"")
-            Reset();
-            try { return checkTrailing(ReadCore()); }
-            catch (Exception) { }
-            throw; // throw original error
-          }
-      }
-    }
+			var c = this.SkipPeekChar();
+			switch (c)
+			{
+				case '[':
+				case '{':
+					return this.checkTrailing(this.ReadCore());
+				default:
+					try
+					{
+						// assume we have a root object without braces
+						return this.checkTrailing(this.ReadCore(true));
+					}
+					catch (Exception)
+					{
+						// test if we are dealing with a single JSON value instead (true/false/null/num/"")
+						this.Reset();
+						try { return this.checkTrailing(this.ReadCore()); }
+						catch (Exception) { }
+						throw; // throw original error
+					}
+			}
+		}
 
-    JsonValue checkTrailing(JsonValue v)
-    {
-      skipWhite2();
-      if (ReadChar()>=0) throw ParseError("Extra characters in input");
-      return v;
-    }
+		private JsonValue checkTrailing(JsonValue v)
+		{
+			this.skipWhite2();
+			if (this.ReadChar() >= 0) throw this.ParseError("Extra characters in input");
+			return v;
+		}
 
-    void skipWhite2()
-    {
-      while (PeekChar()>=0)
-      {
-        while (IsWhite((char)PeekChar())) ReadChar();
-        int p=PeekChar();
-        if (p=='#' || p=='/' && PeekChar(1)=='/')
-        {
-          for (; ; )
-          {
-            var ch=PeekChar();
-            if (ch<0 || ch=='\n') break;
-            ReadChar();
-          }
-        }
-        else if (p=='/' && PeekChar(1)=='*')
-        {
-          ReadChar(); ReadChar();
-          for (; ; )
-          {
-            var ch=PeekChar();
-            if (ch<0 || ch=='*' && PeekChar(1)=='/') break;
-            ReadChar();
-          }
-          if (PeekChar()>=0) { ReadChar(); ReadChar(); }
-        }
-        else break;
-      }
-    }
+		private void skipWhite2()
+		{
+			while (this.PeekChar() >= 0)
+			{
+				while (IsWhite((char)this.PeekChar())) this.ReadChar();
+				var p = this.PeekChar();
+				if (p == '#' || p == '/' && this.PeekChar(1) == '/')
+				{
+					for (; ; )
+					{
+						var ch = this.PeekChar();
+						if (ch < 0 || ch == '\n') break;
+						this.ReadChar();
+					}
+				}
+				else if (p == '/' && this.PeekChar(1) == '*')
+				{
+					this.ReadChar(); this.ReadChar();
+					for (; ; )
+					{
+						var ch = this.PeekChar();
+						if (ch < 0 || ch == '*' && this.PeekChar(1) == '/') break;
+						this.ReadChar();
+					}
+					if (this.PeekChar() >= 0) { this.ReadChar(); this.ReadChar(); }
+				}
+				else
+				{
+					break;
+				}
+			}
+		}
 
-    protected override string GetWhite()
-    {
-      var res=base.GetWhite();
-      int to=res.Length-1;
-      if (to>=0)
-      {
-        // remove trailing whitespace
-        for (; to>0 && res[to]<=' ' && res[to]!='\n'; to--) ;
-        // but only up to EOL
-        if (res[to]=='\n') to--;
-        if (to>=0 && res[to]=='\r') to--;
-        res=res.Substring(0, to+1);
-        foreach (char c in res) if (c>' ') return res;
-      }
-      return "";
-    }
+		protected override string GetWhite()
+		{
+			var res = base.GetWhite();
+			var to = res.Length - 1;
+			if (to >= 0)
+			{
+				// remove trailing whitespace
+				for (; to > 0 && res[to] <= ' ' && res[to] != '\n'; to--) ;
+				// but only up to EOL
+				if (res[to] == '\n') to--;
+				if (to >= 0 && res[to] == '\r') to--;
+				res = res.Substring(0, to + 1);
+				foreach (var c in res) if (c > ' ') return res;
+			}
+			return "";
+		}
 
-    public override int SkipPeekChar()
-    {
-      skipWhite2();
-      return PeekChar();
-    }
+		public override int SkipPeekChar()
+		{
+			this.skipWhite2();
+			return this.PeekChar();
+		}
 
-    JsonValue ReadCore(bool objectWithoutBraces=false)
-    {
-      int c=objectWithoutBraces?'{':SkipPeekChar();
-      if (c<0) throw ParseError("Incomplete input");
-      switch (c)
-      {
-        case '[':
-          JsonArray list;
-          WscJsonArray wscL=null;
-          ReadChar();
-          ResetWhite();
-          if (ReadWsc) list=wscL=new WscJsonArray();
-          else list=new JsonArray();
-          SkipPeekChar();
-          if (ReadWsc) wscL.Comments.Add(GetWhite());
-          for (int i=0; ; i++)
-          {
-            if (SkipPeekChar()==']') { ReadChar(); break; }
-            if (HasReader) Reader.Index(i);
-            var value=ReadCore();
-            if (HasReader) Reader.Value(value);
-            list.Add(value);
-            ResetWhite();
-            if (SkipPeekChar()==',') { ReadChar(); ResetWhite(); SkipPeekChar(); }
-            if (ReadWsc) wscL.Comments.Add(GetWhite());
-          }
-          return list;
-        case '{':
-          JsonObject obj;
-          WscJsonObject wsc=null;
-          if (!objectWithoutBraces)
-          {
-            ReadChar();
-            ResetWhite();
-          }
-          if (ReadWsc) obj=wsc=new WscJsonObject() { RootBraces=!objectWithoutBraces };
-          else obj=new JsonObject();
-          SkipPeekChar();
-          if (ReadWsc) wsc.Comments[""]=GetWhite();
-          for (; ; )
-          {
-            if (objectWithoutBraces) { if (SkipPeekChar()<0) break; }
-            else if (SkipPeekChar()=='}') { ReadChar(); break; }
-            string name=readKeyName();
-            skipWhite2();
-            Expect(':');
-            skipWhite2();
-            if (HasReader) Reader.Key(name);
-            var value=ReadCore();
-            if (HasReader) Reader.Value(value);
-            obj.Add(new JsonPair(name, value));
-            ResetWhite();
-            if (SkipPeekChar()==',') { ReadChar(); ResetWhite(); SkipPeekChar(); }
-            if (ReadWsc) { wsc.Comments[name]=GetWhite(); wsc.Order.Add(name); }
-          }
-          return obj;
-        case '\'':
-        case '"': return ReadStringLiteral(readMlString);
-        default: return readTfnns(c);
-      }
-    }
+		private JsonValue ReadCore(bool objectWithoutBraces = false)
+		{
+			var c = objectWithoutBraces ? '{' : this.SkipPeekChar();
+			if (c < 0) throw this.ParseError("Incomplete input");
+			switch (c)
+			{
+				case '[':
+					JsonArray list;
+					WscJsonArray wscL = null;
+					this.ReadChar();
+					this.ResetWhite();
+					if (this.ReadWsc) list = wscL = new WscJsonArray();
+					else list = new JsonArray();
+					this.SkipPeekChar();
+					if (this.ReadWsc) wscL.Comments.Add(this.GetWhite());
+					for (var i = 0; ; i++)
+					{
+						if (this.SkipPeekChar() == ']') { this.ReadChar(); break; }
+						if (this.HasReader) this.Reader.Index(i);
+						var value = this.ReadCore();
+						if (this.HasReader) this.Reader.Value(value);
+						list.Add(value);
+						this.ResetWhite();
+						if (this.SkipPeekChar() == ',') { this.ReadChar(); this.ResetWhite(); this.SkipPeekChar(); }
+						if (this.ReadWsc) wscL.Comments.Add(this.GetWhite());
+					}
+					return list;
+				case '{':
+					JsonObject obj;
+					WscJsonObject wsc = null;
+					if (!objectWithoutBraces)
+					{
+						this.ReadChar();
+						this.ResetWhite();
+					}
+					if (this.ReadWsc) obj = wsc = new WscJsonObject() { RootBraces = !objectWithoutBraces };
+					else obj = new JsonObject();
+					this.SkipPeekChar();
+					if (this.ReadWsc) wsc.Comments[""] = this.GetWhite();
+					for (; ; )
+					{
+						if (objectWithoutBraces) { if (this.SkipPeekChar() < 0) break; }
+						else if (this.SkipPeekChar() == '}') { this.ReadChar(); break; }
+						var name = this.readKeyName();
+						this.skipWhite2();
+						this.Expect(':');
+						this.skipWhite2();
+						if (this.HasReader) this.Reader.Key(name);
+						var value = this.ReadCore();
+						if (this.HasReader) this.Reader.Value(value);
+						obj.Add(new JsonPair(name, value));
+						this.ResetWhite();
+						if (this.SkipPeekChar() == ',') { this.ReadChar(); this.ResetWhite(); this.SkipPeekChar(); }
+						if (this.ReadWsc) { wsc.Comments[name] = this.GetWhite(); wsc.Order.Add(name); }
+					}
+					return obj;
+				case '\'':
+				case '"': return this.ReadStringLiteral(this.readMlString);
+				default: return this.readTfnns(c);
+			}
+		}
 
-    string readKeyName()
-    {
-      // quotes for keys are optional in Hjson
-      // unless they include {}[],: or whitespace.
+		private string readKeyName()
+		{
+			// quotes for keys are optional in Hjson
+			// unless they include {}[],: or whitespace.
 
-      int c=PeekChar();
-      if (c=='"' || c=='\'') return ReadStringLiteral(null);
+			var c = this.PeekChar();
+			if (c == '"' || c == '\'') return this.ReadStringLiteral(null);
 
-      sb.Length=0;
-      int space=-1;
-      for (; ; )
-      {
-        c=PeekChar();
-        if (c<0) throw ParseError("Name is not closed");
-        char ch=(char)c;
-        if (ch==':')
-        {
-          if (sb.Length==0) throw ParseError("Found ':' but no key name (for an empty key name use quotes)");
-          else if (space>=0 && space!=sb.Length) throw ParseError("Found whitespace in your key name (use quotes to include)");
-          return sb.ToString();
-        }
-        else if (IsWhite(ch))
-        {
-          if (space<0) space=sb.Length;
-          ReadChar();
-        }
-        else if (HjsonValue.IsPunctuatorChar(ch))
-          throw ParseError("Found '"+ch+"' where a key name was expected (check your syntax or use quotes if the key name includes {}[],: or whitespace)");
-        else
-        {
-          ReadChar();
-          sb.Append(ch);
-        }
-      }
-    }
+			this.sb.Length = 0;
+			var space = -1;
+			for (; ; )
+			{
+				c = this.PeekChar();
+				if (c < 0) throw this.ParseError("Name is not closed");
+				var ch = (char)c;
+				if (ch == ':')
+				{
+					if (this.sb.Length == 0) throw this.ParseError("Found ':' but no key name (for an empty key name use quotes)");
+					else if (space >= 0 && space != this.sb.Length) throw this.ParseError("Found whitespace in your key name (use quotes to include)");
+					return this.sb.ToString();
+				}
+				else if (IsWhite(ch))
+				{
+					if (space < 0) space = this.sb.Length;
+					this.ReadChar();
+				}
+				else if (HjsonValue.IsPunctuatorChar(ch))
+				{
+					throw this.ParseError("Found '" + ch + "' where a key name was expected (check your syntax or use quotes if the key name includes {}[],: or whitespace)");
+				}
+				else
+				{
+					this.ReadChar();
+					this.sb.Append(ch);
+				}
+			}
+		}
 
-    void skipIndent(int indent)
-    {
-      while (indent-->0)
-      {
-        char c=(char)PeekChar();
-        if (IsWhite(c) && c!='\n') ReadChar();
-        else break;
-      }
-    }
+		private void skipIndent(int indent)
+		{
+			while (indent-- > 0)
+			{
+				var c = (char)this.PeekChar();
+				if (IsWhite(c) && c != '\n') this.ReadChar();
+				else break;
+			}
+		}
 
-    string readMlString()
-    {
-      // Parse a multiline string value.
-      int triple=0;
-      sb.Length=0;
+		private string readMlString()
+		{
+			// Parse a multiline string value.
+			var triple = 0;
+			this.sb.Length = 0;
 
-      // we are at '''
-      var indent=Column-3;
+			// we are at '''
+			var indent = this.Column - 3;
 
-      // skip white/to (newline)
-      for (; ; )
-      {
-        char c=(char)PeekChar();
-        if (IsWhite(c) && c!='\n') ReadChar();
-        else break;
-      }
-      if (PeekChar()=='\n') { ReadChar(); skipIndent(indent); }
+			// skip white/to (newline)
+			for (; ; )
+			{
+				var c = (char)this.PeekChar();
+				if (IsWhite(c) && c != '\n') this.ReadChar();
+				else break;
+			}
+			if (this.PeekChar() == '\n') { this.ReadChar(); this.skipIndent(indent); }
 
-      // When parsing for string values, we must look for " and \ characters.
-      while (true)
-      {
-        int ch=PeekChar();
-        if (ch<0) throw ParseError("Bad multiline string");
-        else if (ch=='\'')
-        {
-          triple++;
-          ReadChar();
-          if (triple==3)
-          {
-            if (sb[sb.Length-1]=='\n') sb.Length--;
-            return sb.ToString();
-          }
-          else continue;
-        }
-        else
-        {
-          while (triple>0)
-          {
-            sb.Append('\'');
-            triple--;
-          }
-        }
-        if (ch=='\n')
-        {
-          sb.Append('\n');
-          ReadChar();
-          skipIndent(indent);
-        }
-        else
-        {
-          if (ch!='\r') sb.Append((char)ch);
-          ReadChar();
-        }
-      }
-    }
+			// When parsing for string values, we must look for " and \ characters.
+			while (true)
+			{
+				var ch = this.PeekChar();
+				if (ch < 0)
+				{
+					throw this.ParseError("Bad multiline string");
+				}
+				else if (ch == '\'')
+				{
+					triple++;
+					this.ReadChar();
+					if (triple == 3)
+					{
+						if (this.sb[this.sb.Length - 1] == '\n') this.sb.Length--;
+						return this.sb.ToString();
+					}
+					else
+					{
+						continue;
+					}
+				}
+				else
+				{
+					while (triple > 0)
+					{
+						this.sb.Append('\'');
+						triple--;
+					}
+				}
+				if (ch == '\n')
+				{
+					this.sb.Append('\n');
+					this.ReadChar();
+					this.skipIndent(indent);
+				}
+				else
+				{
+					if (ch != '\r') this.sb.Append((char)ch);
+					this.ReadChar();
+				}
+			}
+		}
 
-    internal static bool TryParseNumericLiteral(string text, bool stopAtNext, out JsonValue value)
-    {
-      int c, leadingZeros=0, p=0;
-      double val=0;
-      bool negative=false, testLeading=true;
-      text+='\0';
-      value=null;
+		internal static bool TryParseNumericLiteral(string text, bool stopAtNext, out JsonValue value)
+		{
+			int c, leadingZeros = 0, p = 0;
+			double val = 0;
+			bool negative = false, testLeading = true;
+			text += '\0';
+			value = null;
 
-      if (text[p]=='-')
-      {
-        negative=true;
-        p++;
-        if (text[p]==0) return false;
-      }
+			if (text[p] == '-')
+			{
+				negative = true;
+				p++;
+				if (text[p] == 0) return false;
+			}
 
-      for (int x=0; ; x++)
-      {
-        c=text[p];
-        if (c<'0' || c>'9') break;
-        if (testLeading)
-        {
-          if (c=='0') leadingZeros++;
-          else testLeading=false;
-        }
-        val=val*10+(c-'0');
-        p++;
-      }
-      if (testLeading) leadingZeros--; // single 0 is allowed
-      if (leadingZeros>0) return false;
+			for (var x = 0; ; x++)
+			{
+				c = text[p];
+				if (c < '0' || c > '9') break;
+				if (testLeading)
+				{
+					if (c == '0') leadingZeros++;
+					else testLeading = false;
+				}
+				val = val * 10 + (c - '0');
+				p++;
+			}
+			if (testLeading) leadingZeros--; // single 0 is allowed
+			if (leadingZeros > 0) return false;
 
-      // fraction
-      if (text[p]=='.')
-      {
-        if (leadingZeros<0) return false;
-        int fdigits=0;
-        double frac=0;
-        p++;
-        if (text[p]==0) return false;
-        double d=10;
-        for (; ; )
-        {
-          c=text[p];
-          if (c<'0' || '9'<c) break;
-          p++;
-          frac+=(c-'0')/d;
-          d*=10;
-          fdigits++;
-        }
-        if (fdigits==0) return false;
-        val+=frac;
-      }
+			// fraction
+			if (text[p] == '.')
+			{
+				if (leadingZeros < 0) return false;
+				var fdigits = 0;
+				double frac = 0;
+				p++;
+				if (text[p] == 0) return false;
+				double d = 10;
+				for (; ; )
+				{
+					c = text[p];
+					if (c < '0' || '9' < c) break;
+					p++;
+					frac += (c - '0') / d;
+					d *= 10;
+					fdigits++;
+				}
+				if (fdigits == 0) return false;
+				val += frac;
+			}
 
-      c=text[p];
-      if (c=='e' || c=='E')
-      {
-        // exponent
-        int exp=0, expSign=1;
+			c = text[p];
+			if (c == 'e' || c == 'E')
+			{
+				// exponent
+				int exp = 0, expSign = 1;
 
-        p++;
-        if (text[p]==0) return false;
+				p++;
+				if (text[p] == 0) return false;
 
-        c=text[p];
-        if (c=='-')
-        {
-          p++;
-          expSign=-1;
-        }
-        else if (c=='+') p++;
+				c = text[p];
+				if (c == '-')
+				{
+					p++;
+					expSign = -1;
+				}
+				else if (c == '+')
+				{
+					p++;
+				}
 
-        if (text[p]==0) return false;
+				if (text[p] == 0) return false;
 
-        for (; ; )
-        {
-          c=text[p];
-          if (c<'0' || c>'9') break;
-          exp=exp*10+(c-'0');
-          p++;
-        }
+				for (; ; )
+				{
+					c = text[p];
+					if (c < '0' || c > '9') break;
+					exp = exp * 10 + (c - '0');
+					p++;
+				}
 
-        if (exp!=0)
-          val*=Math.Pow(10, exp*expSign);
-      }
+				if (exp != 0)
+					val *= Math.Pow(10, exp * expSign);
+			}
 
-      while (p<text.Length && IsWhite(text[p])) p++;
+			while (p < text.Length && IsWhite(text[p])) p++;
 
-      bool foundStop=false;
-      if (p<text.Length && stopAtNext)
-      {
-        // end scan if we find a control character like ,}] or a comment
-        char ch=text[p];
-        if (ch==',' || ch=='}' || ch==']' || ch=='#' || ch=='/' && (text.Length>p+1 && (text[p+1]=='/' || text[p+1]=='*')))
-          foundStop=true;
-      }
+			var foundStop = false;
+			if (p < text.Length && stopAtNext)
+			{
+				// end scan if we find a control character like ,}] or a comment
+				var ch = text[p];
+				if (ch == ',' || ch == '}' || ch == ']' || ch == '#' || ch == '/' && (text.Length > p + 1 && (text[p + 1] == '/' || text[p + 1] == '*')))
+					foundStop = true;
+			}
 
-      if (p+1!=text.Length && !foundStop) return false;
+			if (p + 1 != text.Length && !foundStop) return false;
 
-      if (negative)
-      {
-        if (val==0.0) { value=-0.0; return true; }
-        val*=-1;
-      }
+			if (negative)
+			{
+				if (val == 0.0) { value = -0.0; return true; }
+				val *= -1;
+			}
 
-      long lval=(long)val;
-      if (lval==val) value=lval;
-      else value=val;
-      return true;
-    }
+			var lval = (long)val;
+			if (lval == val) value = lval;
+			else value = val;
+			return true;
+		}
 
-    JsonValue readTfnns(int c)
-    {
-      if (HjsonValue.IsPunctuatorChar((char)c))
-        throw ParseError("Found a punctuator character '" + c + "' when expecting a quoteless string (check your syntax)");
+		private JsonValue readTfnns(int c)
+		{
+			if (HjsonValue.IsPunctuatorChar((char)c))
+				throw this.ParseError("Found a punctuator character '" + c + "' when expecting a quoteless string (check your syntax)");
 
-      sb.Length=0;
-      for (; ; )
-      {
-        bool isEol=c<0 || c=='\n';
-        if (isEol || c==',' ||
-          c=='}' || c==']' ||
-          c=='#' ||
-          c=='/' && (PeekChar(1)=='/' || PeekChar(1)=='*'))
-        {
-          if (sb.Length>0)
-          {
-            char ch=sb[0];
-            switch (ch)
-            {
-              case 'f': if (sb.ToString().Trim()=="false") return false; break;
-              case 'n': if (sb.ToString().Trim()=="null") return null; break;
-              case 't': if (sb.ToString().Trim()=="true") return true; break;
-              default:
-                if (ch=='-' || ch>='0' && ch<='9')
-                {
-                  JsonValue res;
-                  if (TryParseNumericLiteral(sb.ToString(), false, out res)) return res;
-                }
-                break;
-            }
-          }
-          if (isEol)
-          {
-            // remove any whitespace at the end (ignored in quoteless strings)
-            return HjsonDsf.Parse(dsfProviders, sb.ToString().Trim());
-          }
-        }
-        ReadChar();
-        if (c!='\r') sb.Append((char)c);
-        c=PeekChar();
-      }
-    }
-  }
+			this.sb.Length = 0;
+			for (; ; )
+			{
+				var isEol = c < 0 || c == '\n';
+				if (isEol || c == ',' ||
+				  c == '}' || c == ']' ||
+				  c == '#' ||
+				  c == '/' && (this.PeekChar(1) == '/' || this.PeekChar(1) == '*'))
+				{
+					if (this.sb.Length > 0)
+					{
+						var ch = this.sb[0];
+						switch (ch)
+						{
+							case 'f': if (this.sb.ToString().Trim() == "false") return false; break;
+							case 'n': if (this.sb.ToString().Trim() == "null") return null; break;
+							case 't': if (this.sb.ToString().Trim() == "true") return true; break;
+							default:
+								if (ch == '-' || ch >= '0' && ch <= '9')
+								{
+									if (TryParseNumericLiteral(this.sb.ToString(), false, out var res)) return res;
+								}
+								break;
+						}
+					}
+					if (isEol)
+					{
+						// remove any whitespace at the end (ignored in quoteless strings)
+						return HjsonDsf.Parse(this.dsfProviders, this.sb.ToString().Trim());
+					}
+				}
+				this.ReadChar();
+				if (c != '\r') this.sb.Append((char)c);
+				c = this.PeekChar();
+			}
+		}
+	}
 }
