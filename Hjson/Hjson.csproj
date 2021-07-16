@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.0.1</VersionPrefix>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>Hjson</AssemblyName>
     <PackageId>Hjson</PackageId>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>

@@ -85,7 +85,7 @@ namespace Hjson
 				case '"':
 					return this.ReadStringLiteral(null);
 				default:
-					if (c >= '0' && c <= '9' || c == '-')
+					if (c >= '0' && c <= '9' || c == '-' || c == '+')
 						return this.ReadNumericLiteral();
 					else
 						throw this.ParseError(string.Format("Unexpected character '{0}'", (char)c));

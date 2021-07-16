@@ -79,33 +79,36 @@ namespace Hjson
 			{
 				case JsonType.Object:
 					var obj = value.Qo();
-					var kw = this.writeWsc ? obj as WscJsonObject : null;
-					var showBraces = !isRootObject || (kw != null ? kw.RootBraces : this.emitRootBraces);
-					if (!noIndent)
-					{
-						this.nl(tw, level);
-					}
+					//var kw = this.writeWsc ? obj as WscJsonObject : null;
+					//var showBraces = !isRootObject || (kw != null ? kw.RootBraces : this.emitRootBraces);
+					var showBraces = !isRootObject || this.emitRootBraces;
+					if (!noIndent) this.nl(tw, level);
+
+
 					if (showBraces) tw.Write('{');
 					else level--; // reduce level for root
-					if (kw != null)
-					{
-						var kwl = this.getWsc(kw.Comments, "");
-						foreach (var key in kw.Order.Concat(kw.Keys).Distinct())
-						{
-							if (!obj.ContainsKey(key)) continue;
-							var val = obj[key];
-							tw.Write(kwl);
-							this.nl(tw, level + 1);
-							kwl = this.getWsc(kw.Comments, key);
 
-							tw.Write(escapeName(key));
-							tw.Write(":");
-							this.Save(val, tw, level + 1, this.testWsc(kwl), " ");
-						}
-						tw.Write(kwl);
-						if (showBraces) this.nl(tw, level);
-					}
-					else
+					//if (kw != null)
+					//{
+					//	var kwl = this.getWsc(kw.Comments, "");
+					//	foreach (var key in kw.Order.Concat(kw.Keys).Distinct())
+					//	{
+					//		if (!obj.ContainsKey(key)) continue;
+					//		var val = obj[key];
+					//		tw.Write(kwl);
+					//		this.nl(tw, level + 1);
+					//		kwl = this.getWsc(kw.Comments, key);
+
+					//		tw.Write(escapeName(key));
+					//		tw.Write(":");
+					//		this.Save(val, tw, level + 1, this.testWsc(kwl), " ");
+					//	}
+					//	tw.Write(kwl);
+					//	if (showBraces) this.nl(tw, level);
+					//}
+					//else
+					//{
+					if (obj.Count > 0)
 					{
 						var skipFirst = !showBraces;
 						foreach (var pair in obj)
@@ -122,8 +125,14 @@ namespace Hjson
 							tw.Write(":");
 							this.Save(pair.Value, tw, level + 1, false, " ");
 						}
-						if (showBraces) this.nl(tw, level);
 					}
+					else
+					{
+						this.nl(tw, level);
+					}
+
+					if (showBraces) this.nl(tw, level);
+
 					if (showBraces) tw.Write('}');
 					if (level == 0) tw.Write(JsonValue.eol);
 					break;

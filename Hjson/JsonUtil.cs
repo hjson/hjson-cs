@@ -50,6 +50,14 @@ namespace Hjson
 			else throw failQ(json, "Qi");
 		}
 
+		/// <summary>For JsonValues with type number, this method will return its
+		/// value as int, otherwise it will throw.</summary>
+		public static uint Qui(this JsonValue json)
+		{
+			if (json != null && json.JsonType == JsonType.Number) return Convert.ToUInt32(json.ToValue());
+			else throw failQ(json, "Qi");
+		}
+
 		/// <summary>Gets the value of the member specified by key, then calls <see cref="Qi(Hjson.JsonValue)"/>.
 		/// If the object does not contain the key, the defaultValue is returned.</summary>
 		public static int Qi(this JsonObject json, string key, int defaultValue = 0)
@@ -68,6 +76,17 @@ namespace Hjson
 		{
 			if (json != null && json.JsonType == JsonType.Number) return Convert.ToInt64(json.ToValue());
 			else throw failQ(json, "Ql");
+		}
+
+		/// <summary>For JsonValues with type number, this method will return its
+		/// value as long, otherwise it will throw.</summary>
+		public static ulong Qul(this JsonValue json)
+		{
+			unchecked
+			{
+				if (json != null && json.JsonType == JsonType.Number) return (ulong)Convert.ToUInt64(json.ToValue());
+				else throw failQ(json, "Ql");
+			}
 		}
 
 		/// <summary>Gets the value of the member specified by key, then calls <see cref="Ql(Hjson.JsonValue)"/>.

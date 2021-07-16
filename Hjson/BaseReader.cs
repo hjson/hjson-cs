@@ -114,91 +114,224 @@ namespace Hjson
 		// It could return either long or double, depending on the parsed value.
 		public JsonValue ReadNumericLiteral()
 		{
-			int c, leadingZeros = 0;
-			double val = 0;
-			bool negative = false, testLeading = true;
-
-			if (this.PeekChar() == '-')
+			unchecked
 			{
-				negative = true;
-				this.ReadChar();
-				if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra negation");
-			}
+				this.sb.Length = 0;
 
-			for (var x = 0; ; x++)
-			{
-				c = this.PeekChar();
-				if (c < '0' || c > '9') break;
-				if (testLeading)
+				int c, leadingZeros = 0;
+				double val = 0;
+				bool negative = false, testLeading = true;
+				bool has_digit = false;
+
+				if (this.PeekChar() == '-')
 				{
-					if (c == '0') leadingZeros++;
-					else testLeading = false;
-				}
-				val = val * 10 + (c - '0');
-				this.ReadChar();
-			}
-			if (testLeading) leadingZeros--; // single 0 is allowed
-			if (leadingZeros > 0) throw this.ParseError("leading multiple zeros are not allowed");
-
-			// fraction
-			if (this.PeekChar() == '.')
-			{
-				var fdigits = 0;
-				double frac = 0;
-				this.ReadChar();
-				if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra dot");
-				double d = 10;
-				for (; ; )
-				{
-					c = this.PeekChar();
-					if (c < '0' || '9' < c) break;
-					this.ReadChar();
-					frac += (c - '0') / d;
-					d *= 10;
-					fdigits++;
-				}
-				if (fdigits == 0) throw this.ParseError("Invalid JSON numeric literal; extra dot");
-				val += frac;
-			}
-
-			c = this.PeekChar();
-			if (c == 'e' || c == 'E')
-			{
-				// exponent
-				int exp = 0, expSign = 1;
-
-				this.ReadChar();
-				if (this.PeekChar() < 0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
-
-				c = this.PeekChar();
-				if (c == '-')
-				{
-					this.ReadChar();
-					expSign = -1;
-				}
-				else if (c == '+')
-				{
-					this.ReadChar();
+					negative = true;
+					sb.Append(this.ReadChar());
+					if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra negation");
 				}
 
-				if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; incomplete exponent");
+				if (this.PeekChar() == '+')
+				{
+					negative = false;
+					sb.Append(this.ReadChar());
+					if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra negation");
+				}
 
-				for (; ; )
+				for (var x = 0; ; x++)
 				{
 					c = this.PeekChar();
 					if (c < '0' || c > '9') break;
-					exp = exp * 10 + (c - '0');
-					this.ReadChar();
+					if (testLeading)
+					{
+						if (c == '0') leadingZeros++;
+						else testLeading = false;
+					}
+					val = val * 10 + (c - '0');
+					sb.Append(this.ReadChar());
+				}
+				if (testLeading) leadingZeros--; // single 0 is allowed
+				if (leadingZeros > 0) throw this.ParseError("leading multiple zeros are not allowed");
+
+				// fraction
+				if (this.PeekChar() == '.')
+				{
+					has_digit = true;
+
+					var fdigits = 0;
+					double frac = 0;
+					sb.Append(this.ReadChar());
+					if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra dot");
+					double d = 10;
+					for (; ; )
+					{
+						c = this.PeekChar();
+						if (c < '0' || '9' < c) break;
+						sb.Append(this.ReadChar());
+						frac += (c - '0') / d;
+						d *= 10;
+						fdigits++;
+					}
+					if (fdigits == 0) throw this.ParseError("Invalid JSON numeric literal; extra dot");
+					val += frac;
 				}
 
-				if (exp != 0)
-					val *= Math.Pow(10, exp * expSign);
-			}
+				c = this.PeekChar();
+				if (c == 'e' || c == 'E')
+				{
+					// exponent
+					int exp = 0, expSign = 1;
 
-			if (negative) val *= -1;
-			var lval = (long)val;
-			if (lval == val) return lval;
-			else return val;
+					sb.Append(this.ReadChar());
+					if (this.PeekChar() < 0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
+
+					c = this.PeekChar();
+					if (c == '-')
+					{
+						sb.Append(this.ReadChar());
+						expSign = -1;
+					}
+					else if (c == '+')
+					{
+						sb.Append(this.ReadChar());
+					}
+
+					if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; incomplete exponent");
+
+					for (; ; )
+					{
+						c = this.PeekChar();
+						if (c < '0' || c > '9') break;
+						exp = exp * 10 + (c - '0');
+						sb.Append(this.ReadChar());
+					}
+
+					if (exp != 0)
+						val *= Math.Pow(10, exp * expSign);
+				}
+
+				var str = sb.ToString();
+
+				if (has_digit)
+				{
+					return double.Parse(str, System.Globalization.NumberStyles.Float);
+				}
+				else
+				{
+					if (negative)
+					{
+						return long.Parse(str, System.Globalization.NumberStyles.Integer);
+					}
+					else
+					{
+						return ulong.Parse(str, System.Globalization.NumberStyles.Integer);
+					}
+				}
+
+				//if (negative) val *= -1;
+				//var lval = (ulong)val;
+				//if (lval == val) return lval;
+				//else return val;
+
+
+
+
+
+
+
+
+				//int c, leadingZeros = 0;
+				//double val = 0;
+				//bool negative = false, testLeading = true;
+
+				//if (this.PeekChar() == '-')
+				//{
+				//	negative = true;
+				//	this.ReadChar();
+				//	if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra negation");
+				//}
+
+				//if (this.PeekChar() == '+')
+				//{
+				//	negative = false;
+				//	this.ReadChar();
+				//	if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra negation");
+				//}
+
+				//for (var x = 0; ; x++)
+				//{
+				//	c = this.PeekChar();
+				//	if (c < '0' || c > '9') break;
+				//	if (testLeading)
+				//	{
+				//		if (c == '0') leadingZeros++;
+				//		else testLeading = false;
+				//	}
+				//	val = val * 10 + (c - '0');
+				//	this.ReadChar();
+				//}
+				//if (testLeading) leadingZeros--; // single 0 is allowed
+				//if (leadingZeros > 0) throw this.ParseError("leading multiple zeros are not allowed");
+
+				//// fraction
+				//if (this.PeekChar() == '.')
+				//{
+				//	var fdigits = 0;
+				//	double frac = 0;
+				//	this.ReadChar();
+				//	if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra dot");
+				//	double d = 10;
+				//	for (; ; )
+				//	{
+				//		c = this.PeekChar();
+				//		if (c < '0' || '9' < c) break;
+				//		this.ReadChar();
+				//		frac += (c - '0') / d;
+				//		d *= 10;
+				//		fdigits++;
+				//	}
+				//	if (fdigits == 0) throw this.ParseError("Invalid JSON numeric literal; extra dot");
+				//	val += frac;
+				//}
+
+				//c = this.PeekChar();
+				//if (c == 'e' || c == 'E')
+				//{
+				//	// exponent
+				//	int exp = 0, expSign = 1;
+
+				//	this.ReadChar();
+				//	if (this.PeekChar() < 0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
+
+				//	c = this.PeekChar();
+				//	if (c == '-')
+				//	{
+				//		this.ReadChar();
+				//		expSign = -1;
+				//	}
+				//	else if (c == '+')
+				//	{
+				//		this.ReadChar();
+				//	}
+
+				//	if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; incomplete exponent");
+
+				//	for (; ; )
+				//	{
+				//		c = this.PeekChar();
+				//		if (c < '0' || c > '9') break;
+				//		exp = exp * 10 + (c - '0');
+				//		this.ReadChar();
+				//	}
+
+				//	if (exp != 0)
+				//		val *= Math.Pow(10, exp * expSign);
+				//}
+
+				//if (negative) val *= -1;
+				//var lval = (ulong)val;
+				//if (lval == val) return lval;
+				//else return val;
+			}
 		}
 
 		public string ReadStringLiteral(Func<string> allowML)

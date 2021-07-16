@@ -292,10 +292,18 @@ namespace Hjson
 			bool negative = false, testLeading = true;
 			text += '\0';
 			value = null;
+			var has_digit = false;
 
 			if (text[p] == '-')
 			{
 				negative = true;
+				p++;
+				if (text[p] == 0) return false;
+			}
+
+			if (text[p] == '+')
+			{
+				negative = false;
 				p++;
 				if (text[p] == 0) return false;
 			}
@@ -318,6 +326,8 @@ namespace Hjson
 			// fraction
 			if (text[p] == '.')
 			{
+				has_digit = true;
+
 				if (leadingZeros < 0) return false;
 				var fdigits = 0;
 				double frac = 0;
@@ -390,10 +400,34 @@ namespace Hjson
 				val *= -1;
 			}
 
-			var lval = (long)val;
-			if (lval == val) value = lval;
-			else value = val;
-			return true;
+
+			var ok = false;
+			var str = text;
+			if (has_digit)
+			{
+				ok = double.TryParse(str, System.Globalization.NumberStyles.Float, null, out var num);
+				value = num;
+			}
+			else
+			{
+				if (negative)
+				{
+					ok = long.TryParse(str, System.Globalization.NumberStyles.Integer, null, out var num);
+					value = num;
+				}
+				else
+				{
+					ok = ulong.TryParse(str, System.Globalization.NumberStyles.Integer, null, out var num);
+					value = num;
+				}
+			}
+
+			return ok;
+
+			//var lval = (long)val;
+			//if (lval == val) value = lval;
+			//else value = val;
+			//return true;
 		}
 
 		private JsonValue readTfnns(int c)
@@ -419,7 +453,7 @@ namespace Hjson
 							case 'n': if (this.sb.ToString().Trim() == "null") return null; break;
 							case 't': if (this.sb.ToString().Trim() == "true") return true; break;
 							default:
-								if (ch == '-' || ch >= '0' && ch <= '9')
+								if ((ch == '-' || ch == '+') || (ch >= '0' && ch <= '9'))
 								{
 									if (TryParseNumericLiteral(this.sb.ToString(), false, out var res)) return res;
 								}

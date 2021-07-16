@@ -156,6 +156,8 @@ namespace Hjson
 		public static implicit operator JsonValue(int value) => new JsonPrimitive(value);
 		/// <summary>Converts from long.</summary>
 		public static implicit operator JsonValue(long value) => new JsonPrimitive(value);
+		/// <summary>Converts from ulong.</summary>
+		public static implicit operator JsonValue(ulong value) => new JsonPrimitive(value);
 		/// <summary>Converts from short.</summary>
 		public static implicit operator JsonValue(short value) => new JsonPrimitive(value);
 		/// <summary>Converts from string.</summary>
@@ -217,6 +219,13 @@ namespace Hjson
 		{
 			if (value == null) throw new ArgumentNullException("value");
 			return Convert.ToInt64(((JsonPrimitive)value).Value);
+		}
+
+		/// <summary>Converts to ulong. Also see <see cref="JsonUtil"/>.</summary>
+		public static implicit operator ulong(JsonValue value)
+		{
+			if (value == null) throw new ArgumentNullException("value");
+			return Convert.ToUInt64(((JsonPrimitive)value).Value);
 		}
 
 		/// <summary>Converts to short. Also see <see cref="JsonUtil"/>.</summary>

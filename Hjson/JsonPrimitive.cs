@@ -10,27 +10,76 @@ namespace Hjson
 		private object value;
 
 		/// <summary>Initializes a new string.</summary>
-		public JsonPrimitive(string value) => this.value = value;
-		/// <summary>Initializes a new char.</summary>
-		public JsonPrimitive(char value) => this.value = value.ToString();
-		/// <summary>Initializes a new bool.</summary>
-		public JsonPrimitive(bool value) => this.value = value;
-		/// <summary>Initializes a new decimal.</summary>
-		public JsonPrimitive(decimal value) => this.value = value;
-		/// <summary>Initializes a new double.</summary>
-		public JsonPrimitive(double value) => this.value = value;
-		/// <summary>Initializes a new float.</summary>
-		public JsonPrimitive(float value) => this.value = (double)value;
-		/// <summary>Initializes a new long.</summary>
-		public JsonPrimitive(long value) => this.value = value;
-		/// <summary>Initializes a new int.</summary>
-		public JsonPrimitive(int value) => this.value = (long)value;
-		/// <summary>Initializes a new byte.</summary>
-		public JsonPrimitive(byte value) => this.value = (long)value;
-		/// <summary>Initializes a new short.</summary>
-		public JsonPrimitive(short value) => this.value = (long)value;
+		public JsonPrimitive(string value)
+		{
+			this.value = value;
+		}
 
-		private JsonPrimitive() { }
+		/// <summary>Initializes a new char.</summary>
+		public JsonPrimitive(char value)
+		{
+			this.value = value.ToString();
+		}
+
+		/// <summary>Initializes a new bool.</summary>
+		public JsonPrimitive(bool value)
+		{
+			this.value = value;
+		}
+
+		/// <summary>Initializes a new decimal.</summary>
+		public JsonPrimitive(decimal value)
+		{
+			this.value = value;
+		}
+
+		/// <summary>Initializes a new double.</summary>
+		public JsonPrimitive(double value)
+		{
+			this.value = value;
+		}
+
+		/// <summary>Initializes a new float.</summary>
+		public JsonPrimitive(float value)
+		{
+			this.value = (double)value;
+		}
+
+		/// <summary>Initializes a new long.</summary>
+		public JsonPrimitive(long value)
+		{
+			this.value = value;
+		}
+
+		/// <summary>Initializes a new ulong.</summary>
+		public JsonPrimitive(ulong value)
+		{
+			this.value = value;
+		}
+
+		/// <summary>Initializes a new int.</summary>
+		public JsonPrimitive(int value)
+		{
+			this.value = (long)value;
+		}
+
+		/// <summary>Initializes a new byte.</summary>
+		public JsonPrimitive(byte value)
+		{
+			this.value = (long)value;
+		}
+
+		/// <summary>Initializes a new short.</summary>
+		public JsonPrimitive(short value)
+		{
+			this.value = (long)value;
+		}
+
+		private JsonPrimitive() 
+		{ 
+		
+		}
+
 		public static new JsonPrimitive FromObject(object value)
 		{
 			return new JsonPrimitive { value = value };
