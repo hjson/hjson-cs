@@ -78,120 +78,120 @@ namespace Hjson
 			switch (value.JsonType)
 			{
 				case JsonType.Object:
-					var obj = value.Qo();
-					//var kw = this.writeWsc ? obj as WscJsonObject : null;
-					//var showBraces = !isRootObject || (kw != null ? kw.RootBraces : this.emitRootBraces);
-					var showBraces = !isRootObject || this.emitRootBraces;
-					if (!noIndent) this.nl(tw, level);
+				var obj = value.Qo();
+				//var kw = this.writeWsc ? obj as WscJsonObject : null;
+				//var showBraces = !isRootObject || (kw != null ? kw.RootBraces : this.emitRootBraces);
+				var showBraces = !isRootObject || this.emitRootBraces;
+				if (!noIndent) this.nl(tw, level);
 
 
-					if (showBraces) tw.Write('{');
-					else level--; // reduce level for root
+				if (showBraces) tw.Write('{');
+				else level--; // reduce level for root
 
-					//if (kw != null)
-					//{
-					//	var kwl = this.getWsc(kw.Comments, "");
-					//	foreach (var key in kw.Order.Concat(kw.Keys).Distinct())
-					//	{
-					//		if (!obj.ContainsKey(key)) continue;
-					//		var val = obj[key];
-					//		tw.Write(kwl);
-					//		this.nl(tw, level + 1);
-					//		kwl = this.getWsc(kw.Comments, key);
+				//if (kw != null)
+				//{
+				//	var kwl = this.getWsc(kw.Comments, "");
+				//	foreach (var key in kw.Order.Concat(kw.Keys).Distinct())
+				//	{
+				//		if (!obj.ContainsKey(key)) continue;
+				//		var val = obj[key];
+				//		tw.Write(kwl);
+				//		this.nl(tw, level + 1);
+				//		kwl = this.getWsc(kw.Comments, key);
 
-					//		tw.Write(escapeName(key));
-					//		tw.Write(":");
-					//		this.Save(val, tw, level + 1, this.testWsc(kwl), " ");
-					//	}
-					//	tw.Write(kwl);
-					//	if (showBraces) this.nl(tw, level);
-					//}
-					//else
-					//{
-					if (obj.Count > 0)
+				//		tw.Write(escapeName(key));
+				//		tw.Write(":");
+				//		this.Save(val, tw, level + 1, this.testWsc(kwl), " ");
+				//	}
+				//	tw.Write(kwl);
+				//	if (showBraces) this.nl(tw, level);
+				//}
+				//else
+				//{
+				if (obj.Count > 0)
+				{
+					var skipFirst = !showBraces;
+					foreach (var pair in obj)
 					{
-						var skipFirst = !showBraces;
-						foreach (var pair in obj)
+						if (!skipFirst) this.nl(tw, level + 1); else skipFirst = false;
+
+						if (!string.IsNullOrEmpty(pair.Value.Comment))
 						{
-							if (!skipFirst) this.nl(tw, level + 1); else skipFirst = false;
-
-							if (!string.IsNullOrEmpty(pair.Value.Comment))
-							{
-								tw.Write($"// {pair.Value.Comment}");
-								this.nl(tw, level + 1);
-							}
-
-							tw.Write(escapeName(pair.Key));
-							tw.Write(":");
-							this.Save(pair.Value, tw, level + 1, false, " ");
-						}
-					}
-					else
-					{
-						this.nl(tw, level);
-					}
-
-					if (showBraces) this.nl(tw, level);
-
-					if (showBraces) tw.Write('}');
-					if (level == 0) tw.Write(JsonValue.eol);
-					break;
-				case JsonType.Array:
-					int i = 0, n = value.Count;
-					if (!noIndent)
-					{
-						if (n > 0 && !value.Inline) this.nl(tw, level);
-						else tw.Write(separator);
-					}
-					tw.Write('[');
-					WscJsonArray whiteL = null;
-					string wsl = null;
-					if (this.writeWsc)
-					{
-						whiteL = value as WscJsonArray;
-						if (whiteL != null) wsl = this.getWsc(whiteL.Comments, 0);
-					}
-					for (; i < n; i++)
-					{
-						var v = value[i];
-						if (whiteL != null)
-						{
-							tw.Write(wsl);
-							wsl = this.getWsc(whiteL.Comments, i + 1);
-						}
-
-						if (value.Inline)
-						{
-							this.Save(v, tw, level + 1, wsl != null && this.testWsc(wsl), (i == 0) ? " " : ", ", true);
-						}
-						else
-						{
+							tw.Write($"// {pair.Value.Comment}");
 							this.nl(tw, level + 1);
-							this.Save(v, tw, level + 1, wsl != null && this.testWsc(wsl), "", true);
 						}
+
+						tw.Write(escapeName(pair.Key));
+						tw.Write(":");
+						this.Save(pair.Value, tw, level + 1, false, " ");
 					}
-					if (whiteL != null) tw.Write(wsl);
-					if (n > 0 && !value.Inline)
+				}
+				else
+				{
+					this.nl(tw, level);
+				}
+
+				if (showBraces) this.nl(tw, level);
+
+				if (showBraces) tw.Write('}');
+				if (level == 0) tw.Write(JsonValue.eol);
+				break;
+				case JsonType.Array:
+				int i = 0, n = value.Count;
+				if (!noIndent)
+				{
+					if (n > 0 && !value.Inline) this.nl(tw, level);
+					else tw.Write(separator);
+				}
+				tw.Write('[');
+				WscJsonArray whiteL = null;
+				string wsl = null;
+				if (this.writeWsc)
+				{
+					whiteL = value as WscJsonArray;
+					if (whiteL != null) wsl = this.getWsc(whiteL.Comments, 0);
+				}
+				for (; i < n; i++)
+				{
+					var v = value[i];
+					if (whiteL != null)
 					{
-						this.nl(tw, level);
-						tw.Write(']');
+						tw.Write(wsl);
+						wsl = this.getWsc(whiteL.Comments, i + 1);
+					}
+
+					if (value.Inline)
+					{
+						this.Save(v, tw, level + 1, wsl != null && this.testWsc(wsl), (i == 0) ? " " : ", ", true);
 					}
 					else
 					{
-						tw.Write(" ]");
+						this.nl(tw, level + 1);
+						this.Save(v, tw, level + 1, wsl != null && this.testWsc(wsl), "", true);
 					}
-					break;
+				}
+				if (whiteL != null) tw.Write(wsl);
+				if (n > 0 && !value.Inline)
+				{
+					this.nl(tw, level);
+					tw.Write(']');
+				}
+				else
+				{
+					tw.Write(" ]");
+				}
+				break;
 				case JsonType.Boolean:
-					tw.Write(separator);
-					tw.Write(value ? "true" : "false");
-					break;
+				tw.Write(separator);
+				tw.Write(value ? "true" : "false");
+				break;
 				case JsonType.String:
-					this.writeString(((JsonPrimitive)value).GetRawString(), tw, level, hasComment, separator);
-					break;
+				this.writeString(((JsonPrimitive)value).GetRawString(), tw, level, hasComment, separator);
+				break;
 				default:
-					tw.Write(separator);
-					tw.Write(((JsonPrimitive)value).GetRawString());
-					break;
+				tw.Write(separator);
+				tw.Write(((JsonPrimitive)value).GetRawString());
+				break;
 			}
 		}
 
@@ -284,9 +284,9 @@ namespace Hjson
 				case '\b':
 				case '\n':
 				case '\r':
-					return true;
+				return true;
 				default:
-					return false;
+				return false;
 			}
 		}
 
@@ -296,9 +296,9 @@ namespace Hjson
 			{
 				case '\"':
 				case '\\':
-					return true;
+				return true;
 				default:
-					return needsQuotes(c);
+				return needsQuotes(c);
 			}
 		}
 
@@ -309,9 +309,9 @@ namespace Hjson
 				case '\n':
 				case '\r':
 				case '\t':
-					return false;
+				return false;
 				default:
-					return needsQuotes(c);
+				return needsQuotes(c);
 			}
 		}
 	}

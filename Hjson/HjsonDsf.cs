@@ -92,15 +92,15 @@ namespace Hjson
 				case "inf":
 				case "+Inf":
 				case "Inf":
-					return double.PositiveInfinity;
+				return double.PositiveInfinity;
 				case "-inf":
 				case "-Inf":
-					return double.NegativeInfinity;
+				return double.NegativeInfinity;
 				case "nan":
 				case "NaN":
-					return double.NaN;
+				return double.NaN;
 				default:
-					return null;
+				return null;
 			}
 		}
 

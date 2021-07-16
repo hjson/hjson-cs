@@ -24,7 +24,7 @@ file_header_template = unset
 
 # this. and Me. preferences
 dotnet_style_qualification_for_event = true:suggestion
-dotnet_style_qualification_for_field = true:silent
+dotnet_style_qualification_for_field = true:suggestion
 dotnet_style_qualification_for_method = true:suggestion
 dotnet_style_qualification_for_property = true:suggestion
 
@@ -33,20 +33,22 @@ dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
 dotnet_style_predefined_type_for_member_access = true:suggestion
 
 # Parentheses preferences
-dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:suggestion
-dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:suggestion
-dotnet_style_parentheses_in_other_operators = always_for_clarity:suggestion
-dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:suggestion
+dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity
+dotnet_style_parentheses_in_other_operators = always_for_clarity
+dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity
+
+
 
 # Modifier preferences
-dotnet_style_require_accessibility_modifiers = for_non_interface_members:silent
+dotnet_style_require_accessibility_modifiers = for_non_interface_members
 
 # Expression-level preferences
 dotnet_style_coalesce_expression = true:suggestion
 dotnet_style_collection_initializer = true:suggestion
 dotnet_style_explicit_tuple_names = true:suggestion
 dotnet_style_null_propagation = true:suggestion
-dotnet_style_object_initializer = true:suggestion
+dotnet_style_object_initializer = true:none
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 dotnet_style_prefer_auto_properties = true:silent
 dotnet_style_prefer_compound_assignment = true:suggestion
@@ -59,10 +61,10 @@ dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
 dotnet_style_prefer_simplified_interpolation = true:suggestion
 
 # Field preferences
-dotnet_style_readonly_field = true:suggestion
+dotnet_style_readonly_field = false:silent
 
 # Parameter preferences
-dotnet_code_quality_unused_parameters = all:suggestion
+dotnet_code_quality_unused_parameters = all:silent
 
 # Suppression preferences
 dotnet_remove_unnecessary_suppression_exclusions = none
@@ -75,20 +77,21 @@ csharp_style_var_for_built_in_types = true:suggestion
 csharp_style_var_when_type_is_apparent = true:suggestion
 
 # Expression-bodied members
-csharp_style_expression_bodied_accessors = when_on_single_line:suggestion
-csharp_style_expression_bodied_constructors = when_on_single_line:suggestion
+csharp_style_expression_bodied_accessors = when_on_single_line:silent
+csharp_style_expression_bodied_constructors = false:suggestion
 csharp_style_expression_bodied_indexers = when_on_single_line:suggestion
-csharp_style_expression_bodied_lambdas = when_on_single_line:suggestion
+csharp_style_expression_bodied_lambdas = true:silent
 csharp_style_expression_bodied_local_functions = false:silent
-csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_methods = false:silent
 csharp_style_expression_bodied_operators = when_on_single_line:suggestion
 csharp_style_expression_bodied_properties = when_on_single_line:suggestion
 
 # Pattern matching preferences
-csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
-csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
-csharp_style_prefer_pattern_matching = false:silent
-csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true
+csharp_style_pattern_matching_over_is_with_cast_check = true
+csharp_style_prefer_not_pattern = true
+csharp_style_prefer_pattern_matching = false
+csharp_style_prefer_switch_expression = true
 
 # Null-checking preferences
 csharp_style_conditional_delegate_call = true:suggestion
@@ -98,18 +101,18 @@ csharp_prefer_static_local_function = true:suggestion
 csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:silent
 
 # Code-block preferences
-csharp_prefer_braces = when_multiline:suggestion
-csharp_prefer_simple_using_statement = true:suggestion
+csharp_prefer_braces = when_multiline
+csharp_prefer_simple_using_statement =false:suggestion
 
 # Expression-level preferences
 csharp_prefer_simple_default_expression = true:suggestion
-csharp_style_deconstructed_variable_declaration = true:suggestion
-csharp_style_inlined_variable_declaration = true:suggestion
-csharp_style_pattern_local_over_anonymous_function = true:suggestion
+csharp_style_deconstructed_variable_declaration = false:suggestion
+csharp_style_inlined_variable_declaration = false:suggestion
+csharp_style_pattern_local_over_anonymous_function = false:suggestion
 csharp_style_prefer_index_operator = false:suggestion
 csharp_style_prefer_range_operator = false:suggestion
 csharp_style_throw_expression = true:suggestion
-csharp_style_unused_value_assignment_preference = discard_variable:suggestion
+csharp_style_unused_value_assignment_preference = discard_variable:none
 csharp_style_unused_value_expression_statement_preference = discard_variable:silent
 
 # 'using' directive preferences
@@ -129,9 +132,9 @@ csharp_new_line_between_query_expression_clauses = true
 # Indentation preferences
 csharp_indent_block_contents = true
 csharp_indent_braces = false
-csharp_indent_case_contents = true
+csharp_indent_case_contents = false
 csharp_indent_case_contents_when_block = false
-csharp_indent_labels = one_less_than_current
+csharp_indent_labels = no_change
 csharp_indent_switch_labels = true
 
 # Space preferences
@@ -166,47 +169,47 @@ csharp_preserve_single_line_statements = true
 
 # Naming rules
 
-dotnet_naming_rule.rozhraní_should_be_začíná_na_i.severity = suggestion
-dotnet_naming_rule.rozhraní_should_be_začíná_na_i.symbols = rozhraní
-dotnet_naming_rule.rozhraní_should_be_začíná_na_i.style = začíná_na_i
+dotnet_naming_rule.interface_should_be_interface.severity = suggestion
+dotnet_naming_rule.interface_should_be_interface.symbols = interface
+dotnet_naming_rule.interface_should_be_interface.style = interface
 
-dotnet_naming_rule.typy_should_be_pascalcase.severity = suggestion
-dotnet_naming_rule.typy_should_be_pascalcase.symbols = typy
-dotnet_naming_rule.typy_should_be_pascalcase.style = pascalcase
+dotnet_naming_rule.types_should_be_pascalcase.severity = suggestion
+dotnet_naming_rule.types_should_be_pascalcase.symbols = types
+dotnet_naming_rule.types_should_be_pascalcase.style = pascalcase
 
-dotnet_naming_rule.členové_bez_pole_should_be_pascalcase.severity = suggestion
-dotnet_naming_rule.členové_bez_pole_should_be_pascalcase.symbols = členové_bez_pole
-dotnet_naming_rule.členové_bez_pole_should_be_pascalcase.style = pascalcase
+dotnet_naming_rule.members_without_variables_should_be_snake_case.severity = suggestion
+dotnet_naming_rule.members_without_variables_should_be_snake_case.symbols = members_without_variables
+dotnet_naming_rule.members_without_variables_should_be_snake_case.style = pascalcase
 
-dotnet_naming_rule.veřejné_nebo_chráněné_pole_should_be_snake_case.severity = suggestion
-dotnet_naming_rule.veřejné_nebo_chráněné_pole_should_be_snake_case.symbols = veřejné_nebo_chráněné_pole
-dotnet_naming_rule.veřejné_nebo_chráněné_pole_should_be_snake_case.style = snake_case
+dotnet_naming_rule.public_or_protected_fields_should_be_snake_case.severity = suggestion
+dotnet_naming_rule.public_or_protected_fields_should_be_snake_case.symbols = public_or_protected_fields
+dotnet_naming_rule.public_or_protected_fields_should_be_snake_case.style = snake_case
 
-dotnet_naming_rule.privátní_nebo_interní_pole_should_be_snake_case.severity = suggestion
-dotnet_naming_rule.privátní_nebo_interní_pole_should_be_snake_case.symbols = privátní_nebo_interní_pole
-dotnet_naming_rule.privátní_nebo_interní_pole_should_be_snake_case.style = snake_case
+dotnet_naming_rule.private_or_internal_fields_should_be_snake_case.severity = suggestion
+dotnet_naming_rule.private_or_internal_fields_should_be_snake_case.symbols = private_or_internal_fields
+dotnet_naming_rule.private_or_internal_fields_should_be_snake_case.style = snake_case
 
 # Symbol specifications
 
-dotnet_naming_symbols.rozhraní.applicable_kinds = interface
-dotnet_naming_symbols.rozhraní.applicable_accessibilities = public, internal, private, protected, protected_internal
-dotnet_naming_symbols.rozhraní.required_modifiers = 
+dotnet_naming_symbols.interface.applicable_kinds = interface
+dotnet_naming_symbols.interface.applicable_accessibilities = public, internal, private, protected, protected_internal
+dotnet_naming_symbols.interface.required_modifiers = 
 
-dotnet_naming_symbols.veřejné_nebo_chráněné_pole.applicable_kinds = field
-dotnet_naming_symbols.veřejné_nebo_chráněné_pole.applicable_accessibilities = public, protected
-dotnet_naming_symbols.veřejné_nebo_chráněné_pole.required_modifiers = 
+dotnet_naming_symbols.public_or_protected_fields.applicable_kinds = field
+dotnet_naming_symbols.public_or_protected_fields.applicable_accessibilities = public, protected
+dotnet_naming_symbols.public_or_protected_fields.required_modifiers = 
 
-dotnet_naming_symbols.privátní_nebo_interní_pole.applicable_kinds = field
-dotnet_naming_symbols.privátní_nebo_interní_pole.applicable_accessibilities = internal, private
-dotnet_naming_symbols.privátní_nebo_interní_pole.required_modifiers = 
+dotnet_naming_symbols.private_or_internal_fields.applicable_kinds = field
+dotnet_naming_symbols.private_or_internal_fields.applicable_accessibilities = internal, private
+dotnet_naming_symbols.private_or_internal_fields.required_modifiers = 
 
-dotnet_naming_symbols.typy.applicable_kinds = class, struct, interface, enum
-dotnet_naming_symbols.typy.applicable_accessibilities = public, internal, private, protected, protected_internal
-dotnet_naming_symbols.typy.required_modifiers = 
+dotnet_naming_symbols.types.applicable_kinds = class, struct, interface, enum
+dotnet_naming_symbols.types.applicable_accessibilities = public, internal, private, protected, protected_internal
+dotnet_naming_symbols.types.required_modifiers = 
 
-dotnet_naming_symbols.členové_bez_pole.applicable_kinds = property, event, method
-dotnet_naming_symbols.členové_bez_pole.applicable_accessibilities = public, internal, private, protected, protected_internal
-dotnet_naming_symbols.členové_bez_pole.required_modifiers = 
+dotnet_naming_symbols.members_without_variables.applicable_kinds = property, event, method
+dotnet_naming_symbols.members_without_variables.applicable_accessibilities = public, internal, private, protected, protected_internal
+dotnet_naming_symbols.members_without_variables.required_modifiers = 
 
 # Naming styles
 
@@ -215,16 +218,37 @@ dotnet_naming_style.pascalcase.required_suffix =
 dotnet_naming_style.pascalcase.word_separator = 
 dotnet_naming_style.pascalcase.capitalization = pascal_case
 
-dotnet_naming_style.začíná_na_i.required_prefix = I
-dotnet_naming_style.začíná_na_i.required_suffix = 
-dotnet_naming_style.začíná_na_i.word_separator = 
-dotnet_naming_style.začíná_na_i.capitalization = pascal_case
+dotnet_naming_style.interface.required_prefix = I
+dotnet_naming_style.interface.required_suffix = 
+dotnet_naming_style.interface.word_separator = 
+dotnet_naming_style.interface.capitalization = pascal_case
 
 dotnet_naming_style.snake_case.required_prefix = 
 dotnet_naming_style.snake_case.required_suffix = 
 dotnet_naming_style.snake_case.word_separator = _
 dotnet_naming_style.snake_case.capitalization = all_lower
 
-dotnet_diagnostic.CS1998.severity = silent;
-dotnet_diagnostic.CS4014.severity = silent;
-dotnet_diagnostic.CA2014.severity = silent;
+dotnet_diagnostic.IDE0001.severity = none;
+dotnet_diagnostic.IDE0002.severity = none;
+dotnet_diagnostic.CS1998.severity = none;
+dotnet_diagnostic.CS4014.severity = none;
+dotnet_diagnostic.CS0169.severity = none;
+dotnet_diagnostic.CS8632.severity = none;
+dotnet_diagnostic.CS0649.severity = none;
+dotnet_diagnostic.CA2014.severity = none;
+
+# CA2211: Non-constant fields should not be visible
+dotnet_diagnostic.CA2211.severity = none
+
+# IDE0059: Unnecessary assignment of a value
+dotnet_diagnostic.IDE0059.severity = none
+
+# CS0162: Unreachable code detected
+dotnet_diagnostic.CS0162.severity = none
+
+
+# IDE0017: Simplify object initialization
+dotnet_diagnostic.IDE0017.severity = none
+
+# IDE0005: Using directive is unnecessary.
+dotnet_diagnostic.IDE0005.severity = suggestion

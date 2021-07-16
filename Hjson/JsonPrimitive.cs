@@ -1,6 +1,5 @@
 using System;
 using System.Globalization;
-using System.Numerics;
 
 namespace Hjson
 {
@@ -75,9 +74,9 @@ namespace Hjson
 			this.value = (long)value;
 		}
 
-		private JsonPrimitive() 
-		{ 
-		
+		private JsonPrimitive()
+		{
+
 		}
 
 		public static new JsonPrimitive FromObject(object value)
@@ -95,8 +94,14 @@ namespace Hjson
 				if (this.value == null) return JsonType.String;
 
 				var type = this.value.GetType();
-				if (type == typeof(bool)) return JsonType.Boolean;
-				else if (type == typeof(string)) return JsonType.String;
+				if (type == typeof(bool))
+				{
+					return JsonType.Boolean;
+				}
+				else if (type == typeof(string))
+				{
+					return JsonType.String;
+				}
 				else if (type == typeof(byte) ||
 				  type == typeof(sbyte) ||
 				  type == typeof(short) ||
@@ -121,12 +126,12 @@ namespace Hjson
 			switch (this.JsonType)
 			{
 				case JsonType.String:
-					return ((string)this.value) ?? "";
+				return ((string)this.value) ?? "";
 				case JsonType.Number:
-					// use ToLowerInvariant() to convert E to e
-					return ((IFormattable)this.value).ToString("G", NumberFormatInfo.InvariantInfo).ToLowerInvariant();
+				// use ToLowerInvariant() to convert E to e
+				return ((IFormattable)this.value).ToString("G", NumberFormatInfo.InvariantInfo).ToLowerInvariant();
 				default:
-					throw new InvalidOperationException();
+				throw new InvalidOperationException();
 			}
 		}
 	}

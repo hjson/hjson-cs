@@ -32,21 +32,21 @@ namespace Hjson
 			{
 				case '[':
 				case '{':
-					return this.checkTrailing(this.ReadCore());
+				return this.checkTrailing(this.ReadCore());
 				default:
-					try
-					{
-						// assume we have a root object without braces
-						return this.checkTrailing(this.ReadCore(true));
-					}
-					catch (Exception)
-					{
-						// test if we are dealing with a single JSON value instead (true/false/null/num/"")
-						this.Reset();
-						try { return this.checkTrailing(this.ReadCore()); }
-						catch (Exception) { }
-						throw; // throw original error
-					}
+				try
+				{
+					// assume we have a root object without braces
+					return this.checkTrailing(this.ReadCore(true));
+				}
+				catch (Exception)
+				{
+					// test if we are dealing with a single JSON value instead (true/false/null/num/"")
+					this.Reset();
+					try { return this.checkTrailing(this.ReadCore()); }
+					catch (Exception) { }
+					throw; // throw original error
+				}
 			}
 		}
 
@@ -120,55 +120,55 @@ namespace Hjson
 			switch (c)
 			{
 				case '[':
-					JsonArray list;
-					WscJsonArray wscL = null;
+				JsonArray list;
+				WscJsonArray wscL = null;
+				this.ReadChar();
+				this.ResetWhite();
+				if (this.ReadWsc) list = wscL = new WscJsonArray();
+				else list = new JsonArray();
+				this.SkipPeekChar();
+				if (this.ReadWsc) wscL.Comments.Add(this.GetWhite());
+				for (var i = 0; ; i++)
+				{
+					if (this.SkipPeekChar() == ']') { this.ReadChar(); break; }
+					if (this.HasReader) this.Reader.Index(i);
+					var value = this.ReadCore();
+					if (this.HasReader) this.Reader.Value(value);
+					list.Add(value);
+					this.ResetWhite();
+					if (this.SkipPeekChar() == ',') { this.ReadChar(); this.ResetWhite(); this.SkipPeekChar(); }
+					if (this.ReadWsc) wscL.Comments.Add(this.GetWhite());
+				}
+				return list;
+				case '{':
+				JsonObject obj;
+				WscJsonObject wsc = null;
+				if (!objectWithoutBraces)
+				{
 					this.ReadChar();
 					this.ResetWhite();
-					if (this.ReadWsc) list = wscL = new WscJsonArray();
-					else list = new JsonArray();
-					this.SkipPeekChar();
-					if (this.ReadWsc) wscL.Comments.Add(this.GetWhite());
-					for (var i = 0; ; i++)
-					{
-						if (this.SkipPeekChar() == ']') { this.ReadChar(); break; }
-						if (this.HasReader) this.Reader.Index(i);
-						var value = this.ReadCore();
-						if (this.HasReader) this.Reader.Value(value);
-						list.Add(value);
-						this.ResetWhite();
-						if (this.SkipPeekChar() == ',') { this.ReadChar(); this.ResetWhite(); this.SkipPeekChar(); }
-						if (this.ReadWsc) wscL.Comments.Add(this.GetWhite());
-					}
-					return list;
-				case '{':
-					JsonObject obj;
-					WscJsonObject wsc = null;
-					if (!objectWithoutBraces)
-					{
-						this.ReadChar();
-						this.ResetWhite();
-					}
-					if (this.ReadWsc) obj = wsc = new WscJsonObject() { RootBraces = !objectWithoutBraces };
-					else obj = new JsonObject();
-					this.SkipPeekChar();
-					if (this.ReadWsc) wsc.Comments[""] = this.GetWhite();
-					for (; ; )
-					{
-						if (objectWithoutBraces) { if (this.SkipPeekChar() < 0) break; }
-						else if (this.SkipPeekChar() == '}') { this.ReadChar(); break; }
-						var name = this.readKeyName();
-						this.skipWhite2();
-						this.Expect(':');
-						this.skipWhite2();
-						if (this.HasReader) this.Reader.Key(name);
-						var value = this.ReadCore();
-						if (this.HasReader) this.Reader.Value(value);
-						obj.Add(new JsonPair(name, value));
-						this.ResetWhite();
-						if (this.SkipPeekChar() == ',') { this.ReadChar(); this.ResetWhite(); this.SkipPeekChar(); }
-						if (this.ReadWsc) { wsc.Comments[name] = this.GetWhite(); wsc.Order.Add(name); }
-					}
-					return obj;
+				}
+				if (this.ReadWsc) obj = wsc = new WscJsonObject() { RootBraces = !objectWithoutBraces };
+				else obj = new JsonObject();
+				this.SkipPeekChar();
+				if (this.ReadWsc) wsc.Comments[""] = this.GetWhite();
+				for (; ; )
+				{
+					if (objectWithoutBraces) { if (this.SkipPeekChar() < 0) break; }
+					else if (this.SkipPeekChar() == '}') { this.ReadChar(); break; }
+					var name = this.readKeyName();
+					this.skipWhite2();
+					this.Expect(':');
+					this.skipWhite2();
+					if (this.HasReader) this.Reader.Key(name);
+					var value = this.ReadCore();
+					if (this.HasReader) this.Reader.Value(value);
+					obj.Add(new JsonPair(name, value));
+					this.ResetWhite();
+					if (this.SkipPeekChar() == ',') { this.ReadChar(); this.ResetWhite(); this.SkipPeekChar(); }
+					if (this.ReadWsc) { wsc.Comments[name] = this.GetWhite(); wsc.Order.Add(name); }
+				}
+				return obj;
 				case '\'':
 				case '"': return this.ReadStringLiteral(this.readMlString);
 				default: return this.readTfnns(c);
@@ -453,11 +453,11 @@ namespace Hjson
 							case 'n': if (this.sb.ToString().Trim() == "null") return null; break;
 							case 't': if (this.sb.ToString().Trim() == "true") return true; break;
 							default:
-								if ((ch == '-' || ch == '+') || (ch >= '0' && ch <= '9'))
-								{
-									if (TryParseNumericLiteral(this.sb.ToString(), false, out var res)) return res;
-								}
-								break;
+							if ((ch == '-' || ch == '+') || (ch >= '0' && ch <= '9'))
+							{
+								if (TryParseNumericLiteral(this.sb.ToString(), false, out var res)) return res;
+							}
+							break;
 						}
 					}
 					if (isEol)

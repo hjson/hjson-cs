@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -25,56 +24,56 @@ namespace Hjson
 			switch (value.JsonType)
 			{
 				case JsonType.Object:
-					if (level > 0) this.nl(tw, level);
-					tw.Write('{');
-					foreach (var pair in ((JsonObject)value))
-					{
-						if (following) tw.Write(",");
-						this.nl(tw, level + 1);
-						tw.Write('\"');
-						tw.Write(EscapeString(pair.Key));
-						tw.Write("\":");
-						var nextType = pair.Value != null ? (JsonType?)pair.Value.JsonType : null;
-						if (this.format && nextType != JsonType.Array && nextType != JsonType.Object) tw.Write(" ");
-						if (pair.Value == null) tw.Write("null");
-						else this.Save(pair.Value, tw, level + 1);
-						following = true;
-					}
-					if (following) this.nl(tw, level);
-					tw.Write('}');
-					break;
+				if (level > 0) this.nl(tw, level);
+				tw.Write('{');
+				foreach (var pair in ((JsonObject)value))
+				{
+					if (following) tw.Write(",");
+					this.nl(tw, level + 1);
+					tw.Write('\"');
+					tw.Write(EscapeString(pair.Key));
+					tw.Write("\":");
+					var nextType = pair.Value != null ? (JsonType?)pair.Value.JsonType : null;
+					if (this.format && nextType != JsonType.Array && nextType != JsonType.Object) tw.Write(" ");
+					if (pair.Value == null) tw.Write("null");
+					else this.Save(pair.Value, tw, level + 1);
+					following = true;
+				}
+				if (following) this.nl(tw, level);
+				tw.Write('}');
+				break;
 				case JsonType.Array:
-					if (level > 0) this.nl(tw, level);
-					tw.Write('[');
-					foreach (var v in ((JsonArray)value))
+				if (level > 0) this.nl(tw, level);
+				tw.Write('[');
+				foreach (var v in ((JsonArray)value))
+				{
+					if (following) tw.Write(",");
+					if (v != null)
 					{
-						if (following) tw.Write(",");
-						if (v != null)
-						{
-							if (v.JsonType != JsonType.Array && v.JsonType != JsonType.Object) this.nl(tw, level + 1);
-							this.Save(v, tw, level + 1);
-						}
-						else
-						{
-							this.nl(tw, level + 1);
-							tw.Write("null");
-						}
-						following = true;
+						if (v.JsonType != JsonType.Array && v.JsonType != JsonType.Object) this.nl(tw, level + 1);
+						this.Save(v, tw, level + 1);
 					}
-					if (following) this.nl(tw, level);
-					tw.Write(']');
-					break;
+					else
+					{
+						this.nl(tw, level + 1);
+						tw.Write("null");
+					}
+					following = true;
+				}
+				if (following) this.nl(tw, level);
+				tw.Write(']');
+				break;
 				case JsonType.Boolean:
-					tw.Write(value ? "true" : "false");
-					break;
+				tw.Write(value ? "true" : "false");
+				break;
 				case JsonType.String:
-					tw.Write('"');
-					tw.Write(EscapeString(((JsonPrimitive)value).GetRawString()));
-					tw.Write('"');
-					break;
+				tw.Write('"');
+				tw.Write(EscapeString(((JsonPrimitive)value).GetRawString()));
+				tw.Write('"');
+				break;
 				default:
-					tw.Write(((JsonPrimitive)value).GetRawString());
-					break;
+				tw.Write(((JsonPrimitive)value).GetRawString());
+				break;
 			}
 		}
 

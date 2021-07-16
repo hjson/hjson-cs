@@ -121,19 +121,19 @@ namespace Hjson
 				int c, leadingZeros = 0;
 				double val = 0;
 				bool negative = false, testLeading = true;
-				bool has_digit = false;
+				var has_digit = false;
 
 				if (this.PeekChar() == '-')
 				{
 					negative = true;
-					sb.Append(this.ReadChar());
+					this.sb.Append(this.ReadChar());
 					if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra negation");
 				}
 
 				if (this.PeekChar() == '+')
 				{
 					negative = false;
-					sb.Append(this.ReadChar());
+					this.sb.Append(this.ReadChar());
 					if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra negation");
 				}
 
@@ -147,7 +147,7 @@ namespace Hjson
 						else testLeading = false;
 					}
 					val = val * 10 + (c - '0');
-					sb.Append(this.ReadChar());
+					this.sb.Append(this.ReadChar());
 				}
 				if (testLeading) leadingZeros--; // single 0 is allowed
 				if (leadingZeros > 0) throw this.ParseError("leading multiple zeros are not allowed");
@@ -159,14 +159,14 @@ namespace Hjson
 
 					var fdigits = 0;
 					double frac = 0;
-					sb.Append(this.ReadChar());
+					this.sb.Append(this.ReadChar());
 					if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra dot");
 					double d = 10;
 					for (; ; )
 					{
 						c = this.PeekChar();
 						if (c < '0' || '9' < c) break;
-						sb.Append(this.ReadChar());
+						this.sb.Append(this.ReadChar());
 						frac += (c - '0') / d;
 						d *= 10;
 						fdigits++;
@@ -181,18 +181,18 @@ namespace Hjson
 					// exponent
 					int exp = 0, expSign = 1;
 
-					sb.Append(this.ReadChar());
+					this.sb.Append(this.ReadChar());
 					if (this.PeekChar() < 0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
 
 					c = this.PeekChar();
 					if (c == '-')
 					{
-						sb.Append(this.ReadChar());
+						this.sb.Append(this.ReadChar());
 						expSign = -1;
 					}
 					else if (c == '+')
 					{
-						sb.Append(this.ReadChar());
+						this.sb.Append(this.ReadChar());
 					}
 
 					if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; incomplete exponent");
@@ -202,14 +202,14 @@ namespace Hjson
 						c = this.PeekChar();
 						if (c < '0' || c > '9') break;
 						exp = exp * 10 + (c - '0');
-						sb.Append(this.ReadChar());
+						this.sb.Append(this.ReadChar());
 					}
 
 					if (exp != 0)
 						val *= Math.Pow(10, exp * expSign);
 				}
 
-				var str = sb.ToString();
+				var str = this.sb.ToString();
 
 				if (has_digit)
 				{
@@ -226,111 +226,6 @@ namespace Hjson
 						return ulong.Parse(str, System.Globalization.NumberStyles.Integer);
 					}
 				}
-
-				//if (negative) val *= -1;
-				//var lval = (ulong)val;
-				//if (lval == val) return lval;
-				//else return val;
-
-
-
-
-
-
-
-
-				//int c, leadingZeros = 0;
-				//double val = 0;
-				//bool negative = false, testLeading = true;
-
-				//if (this.PeekChar() == '-')
-				//{
-				//	negative = true;
-				//	this.ReadChar();
-				//	if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra negation");
-				//}
-
-				//if (this.PeekChar() == '+')
-				//{
-				//	negative = false;
-				//	this.ReadChar();
-				//	if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra negation");
-				//}
-
-				//for (var x = 0; ; x++)
-				//{
-				//	c = this.PeekChar();
-				//	if (c < '0' || c > '9') break;
-				//	if (testLeading)
-				//	{
-				//		if (c == '0') leadingZeros++;
-				//		else testLeading = false;
-				//	}
-				//	val = val * 10 + (c - '0');
-				//	this.ReadChar();
-				//}
-				//if (testLeading) leadingZeros--; // single 0 is allowed
-				//if (leadingZeros > 0) throw this.ParseError("leading multiple zeros are not allowed");
-
-				//// fraction
-				//if (this.PeekChar() == '.')
-				//{
-				//	var fdigits = 0;
-				//	double frac = 0;
-				//	this.ReadChar();
-				//	if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; extra dot");
-				//	double d = 10;
-				//	for (; ; )
-				//	{
-				//		c = this.PeekChar();
-				//		if (c < '0' || '9' < c) break;
-				//		this.ReadChar();
-				//		frac += (c - '0') / d;
-				//		d *= 10;
-				//		fdigits++;
-				//	}
-				//	if (fdigits == 0) throw this.ParseError("Invalid JSON numeric literal; extra dot");
-				//	val += frac;
-				//}
-
-				//c = this.PeekChar();
-				//if (c == 'e' || c == 'E')
-				//{
-				//	// exponent
-				//	int exp = 0, expSign = 1;
-
-				//	this.ReadChar();
-				//	if (this.PeekChar() < 0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
-
-				//	c = this.PeekChar();
-				//	if (c == '-')
-				//	{
-				//		this.ReadChar();
-				//		expSign = -1;
-				//	}
-				//	else if (c == '+')
-				//	{
-				//		this.ReadChar();
-				//	}
-
-				//	if (this.PeekChar() < 0) throw this.ParseError("Invalid JSON numeric literal; incomplete exponent");
-
-				//	for (; ; )
-				//	{
-				//		c = this.PeekChar();
-				//		if (c < '0' || c > '9') break;
-				//		exp = exp * 10 + (c - '0');
-				//		this.ReadChar();
-				//	}
-
-				//	if (exp != 0)
-				//		val *= Math.Pow(10, exp * expSign);
-				//}
-
-				//if (negative) val *= -1;
-				//var lval = (ulong)val;
-				//if (lval == val) return lval;
-				//else return val;
 			}
 		}
 
@@ -383,21 +278,21 @@ namespace Hjson
 					case 'r': this.sb.Append('\r'); break;
 					case 't': this.sb.Append('\t'); break;
 					case 'u':
-						ushort cp = 0;
-						for (var i = 0; i < 4; i++)
-						{
-							cp <<= 4;
-							if ((c = this.ReadChar()) < 0)
-								throw this.ParseError("Incomplete unicode character escape literal");
-							if (c >= '0' && c <= '9') cp += (ushort)(c - '0');
-							else if (c >= 'A' && c <= 'F') cp += (ushort)(c - 'A' + 10);
-							else if (c >= 'a' && c <= 'f') cp += (ushort)(c - 'a' + 10);
-							else throw this.ParseError("Bad \\u char " + (char)c);
-						}
-						this.sb.Append((char)cp);
-						break;
+					ushort cp = 0;
+					for (var i = 0; i < 4; i++)
+					{
+						cp <<= 4;
+						if ((c = this.ReadChar()) < 0)
+							throw this.ParseError("Incomplete unicode character escape literal");
+						if (c >= '0' && c <= '9') cp += (ushort)(c - '0');
+						else if (c >= 'A' && c <= 'F') cp += (ushort)(c - 'A' + 10);
+						else if (c >= 'a' && c <= 'f') cp += (ushort)(c - 'a' + 10);
+						else throw this.ParseError("Bad \\u char " + (char)c);
+					}
+					this.sb.Append((char)cp);
+					break;
 					default:
-						throw this.ParseError("Invalid JSON string literal; unexpected escape character");
+					throw this.ParseError("Invalid JSON string literal; unexpected escape character");
 				}
 			}
 		}
