@@ -19,7 +19,7 @@ dotnet build cli -c Release
 dotnet build test -c Release
 
 # test
-dotnet run -p test/test.csproj -- test/assets
+dotnet run --project test/test.csproj -- test/assets
 
 echo ------------------
 echo pkg

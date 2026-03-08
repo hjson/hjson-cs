@@ -1,9 +1,9 @@
-namespace Hjson
+namespace Hjson;
+
+/// <summary>Defines the known json types.</summary>
+/// <remarks>There is no null type as the primitive will be null instead of the JsonPrimitive containing null.</remarks>
+public enum JsonType
 {
-  /// <summary>Defines the known json types.</summary>
-  /// <remarks>There is no null type as the primitive will be null instead of the JsonPrimitive containing null.</remarks>
-  public enum JsonType
-  {
     /// <summary>Json value of type string.</summary>
     String,
     /// <summary>Json value of type number.</summary>
@@ -16,5 +16,4 @@ namespace Hjson
     Boolean,
     /// <summary>Json value of an unknown type.</summary>
     Unknown,
-  }
 }

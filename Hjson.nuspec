@@ -7,9 +7,9 @@
     <authors>Christian Zangl</authors>
     <owners>Christian Zangl</owners>
     <licenseUrl>https://github.com/laktak/hjson-cs/blob/master/LICENSE</licenseUrl>
-    <projectUrl>http://hjson.org</projectUrl>
+    <projectUrl>http://hjson.github.io</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Hjson, a user interface for JSON. Relaxed syntax, fewer mistakes, more comments. Supports .NET Core, .NET 4.x and Mono. For details go to http://hjson.org. </description>
+    <description>Hjson, a user interface for JSON. Relaxed syntax, fewer mistakes, more comments. Supports .NET Core, .NET 4.x and Mono. For details go to http://hjson.github.io. </description>
     <copyright>Copyright Christian Zangl</copyright>
     <tags>JSON comments config hjson parser serializer</tags>
   </metadata>
