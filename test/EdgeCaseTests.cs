@@ -336,4 +336,41 @@ public class EdgeCaseTests
         long value = config["Value"];
         Assert.Equal(long.Parse(numStr), value);
     }
+
+    // ── Issue: Empty multiline string DoS (IndexOutOfRangeException) ──
+
+    [Fact]
+    public void Parse_EmptyMultilineString_DoesNotThrow()
+    {
+        // Six single quotes = open + close of an empty multiline string
+        string hjson = "{ value: '''''' }";
+
+        var config = HjsonValue.Parse(hjson);
+
+        string value = config["value"];
+        Assert.Equal("", value);
+    }
+
+    [Fact]
+    public void Parse_EmptyMultilineString_Quoteless_DoesNotThrow()
+    {
+        string hjson = "value: ''''''";
+
+        var options = new HjsonOptions { EmitRootBraces = false };
+        var config = HjsonValue.Parse(hjson, options);
+
+        string value = config["value"];
+        Assert.Equal("", value);
+    }
+
+    [Fact]
+    public void Parse_MultilineString_WithContent_StillWorks()
+    {
+        string hjson = "{ value: '''\nhello\nworld\n''' }";
+
+        var config = HjsonValue.Parse(hjson);
+
+        string value = config["value"];
+        Assert.Equal("hello\nworld", value);
+    }
 }

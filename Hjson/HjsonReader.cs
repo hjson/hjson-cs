@@ -248,7 +248,7 @@ internal class HjsonReader : BaseReader
                 ReadChar();
                 if (triple == 3)
                 {
-                    if (sb[sb.Length - 1] == '\n') sb.Length--;
+                    if (sb.Length > 0 && sb[sb.Length - 1] == '\n') sb.Length--;
                     return sb.ToString();
                 }
                 else continue;
