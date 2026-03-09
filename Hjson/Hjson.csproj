@@ -1,17 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>3.0.1</VersionPrefix>
     <TargetFramework>net10.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AssemblyName>Hjson</AssemblyName>
+
+    <!-- NuGet package metadata -->
     <PackageId>Hjson</PackageId>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <Version>4.0.0</Version>
+    <Authors>Christian Zangl;V</Authors>
+    <Description>Hjson, a user interface for JSON. Relaxed syntax, fewer mistakes, more comments. For details go to http://hjson.github.io.</Description>
+    <Copyright>Copyright Christian Zangl</Copyright>
+    <PackageTags>JSON;comments;config;hjson;parser;serializer</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://hjson.github.io</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/hjson/hjson-cs</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
 
 </Project>
