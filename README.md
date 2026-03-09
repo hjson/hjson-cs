@@ -1,12 +1,11 @@
 # hjson-cs
 
-[![Build Status](https://img.shields.io/travis/hjson/hjson-cs.svg?style=flat-square)](http://travis-ci.org/hjson/hjson-cs)
 [![nuget version](https://img.shields.io/nuget/v/Hjson.svg?style=flat-square)](https://www.nuget.org/packages/Hjson/)
 [![License](https://img.shields.io/github/license/hjson/hjson-cs.svg?style=flat-square)](https://github.com/hjson/hjson-cs/blob/master/LICENSE)
 
-[Hjson](http://hjson.org), a user interface for JSON
+[Hjson](http://hjson.github.io), a user interface for JSON
 
-![Hjson Intro](http://hjson.org/hjson1.gif)
+![Hjson Intro](http://hjson.github.io/hjson1.gif)
 
 JSON is easy for humans to read and write... in theory. In practice JSON gives us plenty of opportunities to make mistakes without even realizing it.
 
@@ -38,7 +37,7 @@ This library includes two readers/writers that fully conform to the respective s
 - JSON
 - Hjson
 
-The C# implementation of Hjson is based on [System.Json](https://github.com/mono/mono). For other platforms see [hjson.org](http://hjson.org).
+The C# implementation of Hjson is based on [System.Json](https://github.com/mono/mono). For other platforms see [hjson.github.io](http://hjson.github.io).
 
 # Install from nuget
 
@@ -158,7 +157,7 @@ See [api.md](api.md).
 
 A commandline tool to convert from/to Hjson is available in the cli folder.
 
-For other tools see [hjson.org](http://hjson.org).
+For other tools see [hjson.github.io](http://hjson.github.io).
 
 # Source/Projects
 

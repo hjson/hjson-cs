@@ -1,287 +1,310 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 
-namespace Hjson
+namespace Hjson;
+
+internal abstract class BaseReader
 {
-  internal abstract class BaseReader
-  {
-    string buffer;
-    TextReader r;
-    StringBuilder sb=new StringBuilder();
-    StringBuilder white=new StringBuilder();
-    // peek could be removed since we now use a buffer
-    List<int> peek=new List<int>();
+    readonly string buffer;
+    int pos;
+    readonly StringBuilder sb = new();
+    readonly StringBuilder white = new();
     bool prevLf;
 
     public int Line { get; private set; }
     public int Column { get; private set; }
 
     protected IJsonReader Reader { get; private set; }
-    protected bool HasReader { get { return Reader!=null; } }
+    protected bool HasReader => Reader != null;
 
     public bool ReadWsc { get; set; }
 
+    public BaseReader(string input, IJsonReader jsonReader)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        Reader = jsonReader;
+        buffer = input;
+        Reset();
+    }
+
     public BaseReader(TextReader reader, IJsonReader jsonReader)
     {
-      if (reader==null) throw new ArgumentNullException("reader");
-      // use a buffer so we can support reset
-      this.Reader=jsonReader;
-      buffer=reader.ReadToEnd();
-      Reset();
+        ArgumentNullException.ThrowIfNull(reader);
+        Reader = jsonReader;
+        buffer = reader.ReadToEnd();
+        Reset();
     }
 
     public void Reset()
     {
-      Line=1;
-      this.r=new StringReader(buffer);
-      peek.Clear();
-      white.Length=sb.Length=0;
-      prevLf=false;
+        Line = 1;
+        pos = 0;
+        white.Length = sb.Length = 0;
+        prevLf = false;
     }
 
-    public int PeekChar(int idx=0)
+    public int PeekChar(int idx = 0)
     {
-      if (idx<0) throw new ArgumentOutOfRangeException();
-      while (idx>=peek.Count)
-      {
-        int c=r.Read();
-        if (c<0) return c;
-        peek.Add(c);
-      }
-      return peek[idx];
+        if (idx < 0) throw new ArgumentOutOfRangeException(nameof(idx));
+        int p = pos + idx;
+        return (uint)p < (uint)buffer.Length ? buffer[p] : -1;
     }
+
+    public bool RemainingContains(char c) => buffer.AsSpan(pos).Contains(c);
 
     public virtual int SkipPeekChar()
     {
-      SkipWhite();
-      return PeekChar();
+        SkipWhite();
+        return PeekChar();
     }
 
     public int ReadChar()
     {
-      int v;
-      if (peek.Count>0)
-      {
-        // normally peek will only hold not more than one character so this should not matter for performance
-        v=peek[0];
-        peek.RemoveAt(0);
-      }
-      else v=r.Read();
+        if ((uint)pos >= (uint)buffer.Length) return -1;
 
-      if (ReadWsc && v!='\r') white.Append((char)v);
+        char v = buffer[pos++];
 
-      if (prevLf)
-      {
-        Line++;
-        Column=0;
-        prevLf=false;
-      }
+        if (ReadWsc && v != '\r') white.Append(v);
 
-      if (v=='\n') prevLf=true;
-      Column++;
+        if (prevLf)
+        {
+            Line++;
+            Column = 0;
+            prevLf = false;
+        }
 
-      return v;
+        if (v == '\n') prevLf = true;
+        Column++;
+
+        return v;
     }
 
     protected void ResetWhite()
     {
-      if (ReadWsc) white.Length=0;
+        if (ReadWsc) white.Length = 0;
     }
 
     protected virtual string GetWhite()
     {
-      if (!ReadWsc) throw new InvalidOperationException();
-      return white.ToString();
+        if (!ReadWsc) throw new InvalidOperationException();
+        return white.ToString();
     }
 
     public static bool IsWhite(char c)
     {
-      return c==' ' || c=='\t' || c=='\r' || c=='\n';
+        return c == ' ' || c == '\t' || c == '\r' || c == '\n';
     }
 
     public void SkipWhite()
     {
-      for (; ; )
-      {
-        if (IsWhite((char)PeekChar())) ReadChar();
-        else break;
-      }
+        while (IsWhite((char)PeekChar())) ReadChar();
     }
 
-    // It could return either long or double, depending on the parsed value.
+    // Returns either long or double, depending on the parsed value.
     public JsonValue ReadNumericLiteral()
     {
-      int c, leadingZeros=0;
-      double val=0;
-      bool negative=false, testLeading=true;
+        int c, leadingZeros = 0;
+        bool testLeading = true;
+        Span<char> numBuf = stackalloc char[64];
+        int numLen = 0;
 
-      if (PeekChar()=='-')
-      {
-        negative=true;
-        ReadChar();
-        if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; extra negation");
-      }
-
-      for (int x=0; ; x++)
-      {
-        c=PeekChar();
-        if (c<'0' || c>'9') break;
-        if (testLeading)
+        if (PeekChar() == '-')
         {
-          if (c=='0') leadingZeros++;
-          else testLeading = false;
+            numBuf[numLen++] = '-';
+            ReadChar();
+            if (PeekChar() < 0) throw ParseError("Invalid JSON numeric literal; extra negation");
         }
-        val=val*10+(c-'0');
-        ReadChar();
-      }
-      if (testLeading) leadingZeros--; // single 0 is allowed
-      if (leadingZeros>0) throw ParseError("leading multiple zeros are not allowed");
-
-      // fraction
-      if (PeekChar()=='.')
-      {
-        int fdigits=0;
-        double frac=0;
-        ReadChar();
-        if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; extra dot");
-        double d=10;
-        for (; ; )
-        {
-          c=PeekChar();
-          if (c<'0' || '9'<c) break;
-          ReadChar();
-          frac+=(c-'0')/d;
-          d*=10;
-          fdigits++;
-        }
-        if (fdigits==0) throw ParseError("Invalid JSON numeric literal; extra dot");
-        val+=frac;
-      }
-
-      c=PeekChar();
-      if (c=='e' || c=='E')
-      {
-        // exponent
-        int exp=0, expSign=1;
-
-        ReadChar();
-        if (PeekChar()<0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
-
-        c=PeekChar();
-        if (c=='-')
-        {
-          ReadChar();
-          expSign=-1;
-        }
-        else if (c=='+') ReadChar();
-
-        if (PeekChar()<0) throw ParseError("Invalid JSON numeric literal; incomplete exponent");
 
         for (; ; )
         {
-          c=PeekChar();
-          if (c<'0' || c>'9') break;
-          exp=exp*10+(c-'0');
-          ReadChar();
+            c = PeekChar();
+            if (c < '0' || c > '9') break;
+            if (testLeading)
+            {
+                if (c == '0') leadingZeros++;
+                else testLeading = false;
+            }
+            numBuf[numLen++] = (char)c;
+            ReadChar();
+        }
+        if (testLeading) leadingZeros--; // single 0 is allowed
+        if (leadingZeros > 0) throw ParseError("leading multiple zeros are not allowed");
+
+        bool hasFracOrExp = false;
+
+        // fraction
+        if (PeekChar() == '.')
+        {
+            hasFracOrExp = true;
+            int fdigits = 0;
+            numBuf[numLen++] = '.';
+            ReadChar();
+            if (PeekChar() < 0) throw ParseError("Invalid JSON numeric literal; extra dot");
+            for (; ; )
+            {
+                c = PeekChar();
+                if (c < '0' || '9' < c) break;
+                numBuf[numLen++] = (char)c;
+                ReadChar();
+                fdigits++;
+            }
+            if (fdigits == 0) throw ParseError("Invalid JSON numeric literal; extra dot");
         }
 
-        if (exp!=0)
-          val*=Math.Pow(10, exp*expSign);
-      }
+        c = PeekChar();
+        if (c == 'e' || c == 'E')
+        {
+            hasFracOrExp = true;
+            numBuf[numLen++] = (char)c;
+            ReadChar();
+            if (PeekChar() < 0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
 
-      if (negative) val*=-1;
-      long lval=(long)val;
-      if (lval==val) return lval;
-      else return val;
+            c = PeekChar();
+            if (c == '-')
+            {
+                numBuf[numLen++] = '-';
+                ReadChar();
+            }
+            else if (c == '+')
+            {
+                numBuf[numLen++] = '+';
+                ReadChar();
+            }
+
+            if (PeekChar() < 0) throw ParseError("Invalid JSON numeric literal; incomplete exponent");
+
+            for (; ; )
+            {
+                c = PeekChar();
+                if (c < '0' || c > '9') break;
+                numBuf[numLen++] = (char)c;
+                ReadChar();
+            }
+        }
+
+        var numSpan = numBuf[..numLen];
+
+        // Try parsing as long first to preserve precision for large integers
+        if (!hasFracOrExp && long.TryParse(numSpan, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out long lval))
+        {
+            // Preserve negative zero as double (-0 as long is just 0)
+            if (lval == 0 && numSpan[0] == '-') return -0.0;
+            return lval;
+        }
+
+        double val = double.Parse(numSpan, NumberStyles.Float, NumberFormatInfo.InvariantInfo);
+        if (val == 0.0 && double.IsNegative(val)) return -0.0;
+
+        return val;
     }
 
     public string ReadStringLiteral(Func<string> allowML)
     {
-      // callers make sure that (exitCh == '"' || exitCh == "'")
+        // callers make sure that (exitCh == '"' || exitCh == "'")
+        int exitCh = ReadChar();
 
-      int exitCh=ReadChar();
-      sb.Length=0;
-      for (; ; )
-      {
-        int c=ReadChar();
-        if (c<0) throw ParseError("JSON string is not closed");
-        if (c==exitCh)
+        // Check for multiline ''' string
+        if (allowML != null && exitCh == '\''
+            && (uint)pos < (uint)buffer.Length && buffer[pos] == '\''
+            && (uint)(pos + 1) < (uint)buffer.Length && buffer[pos + 1] == '\'')
         {
-          if (allowML!=null && exitCh=='\'' && PeekChar()=='\'' && sb.Length==0)
-          {
-            // ''' indicates a multiline string
-            ReadChar();
+            ReadChar(); ReadChar();
             return allowML();
-          }
-          else return sb.ToString();
-        }
-        else if (c=='\n' || c=='\r')
-        {
-          throw ParseError("Bad string containing newline");
-        }
-        else if (c!='\\')
-        {
-          sb.Append((char)c);
-          continue;
         }
 
-        // escaped expression
-        c=ReadChar();
-        if (c<0)
-          throw ParseError("Invalid JSON string literal; incomplete escape sequence");
-        switch (c)
+        // Scan to find closing quote and detect escapes
+        int start = pos;
+        bool hasEscapes = false;
+        int i = start;
+        int bufLen = buffer.Length;
+        while (i < bufLen)
         {
-          case '"':
-          case '\'':
-          case '\\':
-          case '/': sb.Append((char)c); break;
-          case 'b': sb.Append('\x8'); break;
-          case 'f': sb.Append('\f'); break;
-          case 'n': sb.Append('\n'); break;
-          case 'r': sb.Append('\r'); break;
-          case 't': sb.Append('\t'); break;
-          case 'u':
-            ushort cp=0;
-            for (int i=0; i<4; i++)
-            {
-              cp <<= 4;
-              if ((c=ReadChar())<0)
-                throw ParseError("Incomplete unicode character escape literal");
-              if (c>='0' && c<='9') cp+=(ushort)(c-'0');
-              else if (c>='A' && c<='F') cp+=(ushort)(c-'A'+10);
-              else if (c>='a' && c<='f') cp+=(ushort)(c-'a'+10);
-              else throw ParseError("Bad \\u char "+(char)c);
-            }
-            sb.Append((char)cp);
-            break;
-          default:
-            throw ParseError("Invalid JSON string literal; unexpected escape character");
+            char c = buffer[i];
+            if (c == exitCh) break;
+            if (c == '\\') { hasEscapes = true; i++; } // skip escaped char
+            else if (c == '\n' || c == '\r') break;
+            i++;
         }
-      }
+        if (i >= bufLen) throw ParseError("JSON string is not closed");
+        if (buffer[i] != exitCh) throw ParseError("Bad string containing newline");
+
+        int end = i; // position of closing quote
+
+        string result;
+        if (!hasEscapes)
+        {
+            result = buffer.Substring(start, end - start);
+        }
+        else
+        {
+            sb.Length = 0;
+            for (i = start; i < end; i++)
+            {
+                char c = buffer[i];
+                if (c != '\\') { sb.Append(c); continue; }
+
+                if (++i >= end)
+                    throw ParseError("Invalid JSON string literal; incomplete escape sequence");
+                c = buffer[i];
+                switch (c)
+                {
+                    case '"':
+                    case '\'':
+                    case '\\':
+                    case '/': sb.Append(c); break;
+                    case 'b': sb.Append('\x8'); break;
+                    case 'f': sb.Append('\f'); break;
+                    case 'n': sb.Append('\n'); break;
+                    case 'r': sb.Append('\r'); break;
+                    case 't': sb.Append('\t'); break;
+                    case 'u':
+                        ushort cp = 0;
+                        for (int j = 0; j < 4; j++)
+                        {
+                            if (++i >= end)
+                                throw ParseError("Incomplete unicode character escape literal");
+                            cp <<= 4;
+                            c = buffer[i];
+                            if (c >= '0' && c <= '9') cp += (ushort)(c - '0');
+                            else if (c >= 'A' && c <= 'F') cp += (ushort)(c - 'A' + 10);
+                            else if (c >= 'a' && c <= 'f') cp += (ushort)(c - 'a' + 10);
+                            else throw ParseError("Bad \\u char " + c);
+                        }
+                        sb.Append((char)cp);
+                        break;
+                    default:
+                        throw ParseError("Invalid JSON string literal; unexpected escape character");
+                }
+            }
+            result = sb.ToString();
+        }
+
+        // Update reader state (no newlines in valid strings)
+        if (ReadWsc) white.Append(buffer, start, end + 1 - start);
+        pos = end + 1;
+        Column += end - start + 1;
+
+        return result;
     }
 
     public void Expect(char expected)
     {
-      int c;
-      if ((c=ReadChar())!=expected)
-        throw ParseError(String.Format("Expected '{0}', got '{1}'", expected, (char)c));
+        int c;
+        if ((c = ReadChar()) != expected)
+            throw ParseError($"Expected '{expected}', got '{(char)c}'");
     }
 
     public void Expect(string expected)
     {
-      for (int i=0; i<expected.Length; i++)
-        if (ReadChar()!=expected[i])
-          throw ParseError(String.Format("Expected '{0}', differed at {1}", expected, i));
+        for (int i = 0; i < expected.Length; i++)
+            if (ReadChar() != expected[i])
+                throw ParseError($"Expected '{expected}', differed at {i}");
     }
 
     public Exception ParseError(string msg)
     {
-      return new ArgumentException(String.Format("{0}. At line {1}, column {2}", msg, Line, Column));
+        return new ArgumentException($"{msg}. At line {Line}, column {Column}");
     }
-  }
 }

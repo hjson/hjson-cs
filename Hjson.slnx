@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Hjson/Hjson.csproj" />
+  <Project Path="cli/cli.csproj" />
+  <Project Path="test/test.csproj" Type="8bb2217d-0f2d-49d1-97bc-3654ed321f3b" />
+</Solution>

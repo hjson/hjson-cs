@@ -1,5 +1,9 @@
 # hjson-cs History
 
+- v4.0.0
+  - Updated to .NET 10 and latest C# features
+  - Performance tuning
+  - Added HjsonConvert with attribute support
 - v3.0.0
   - add support for single quoted strings
 - v2.1.3
