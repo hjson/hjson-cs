@@ -13,6 +13,18 @@ internal class HjsonReader : BaseReader
 {
     readonly StringBuilder sb = new();
     readonly IEnumerable<IHjsonDsfProvider> dsfProviders = [];
+    readonly bool hasDsfProviders;
+
+    public HjsonReader(string input, IJsonReader jsonReader, HjsonOptions options)
+      : base(input, jsonReader)
+    {
+        if (options != null)
+        {
+            ReadWsc = options.KeepWsc;
+            dsfProviders = options.DsfProviders;
+        }
+        hasDsfProviders = dsfProviders.Any();
+    }
 
     public HjsonReader(TextReader reader, IJsonReader jsonReader, HjsonOptions options)
       : base(reader, jsonReader)
@@ -22,6 +34,7 @@ internal class HjsonReader : BaseReader
             ReadWsc = options.KeepWsc;
             dsfProviders = options.DsfProviders;
         }
+        hasDsfProviders = dsfProviders.Any();
     }
 
     public JsonValue Read()
@@ -35,18 +48,25 @@ internal class HjsonReader : BaseReader
             case '{':
                 return checkTrailing(ReadCore());
             default:
-                try
+                if (RemainingContains(':'))
                 {
-                    // assume we have a root object without braces
-                    return checkTrailing(ReadCore(true));
+                    try
+                    {
+                        // assume we have a root object without braces
+                        return checkTrailing(ReadCore(true));
+                    }
+                    catch (Exception)
+                    {
+                        // test if we are dealing with a single JSON value instead (true/false/null/num/"")
+                        Reset();
+                        try { return checkTrailing(ReadCore()); }
+                        catch (Exception) { }
+                        throw; // throw original error
+                    }
                 }
-                catch (Exception)
+                else
                 {
-                    // test if we are dealing with a single JSON value instead (true/false/null/num/"")
-                    Reset();
-                    try { return checkTrailing(ReadCore()); }
-                    catch (Exception) { }
-                    throw; // throw original error
+                    return checkTrailing(ReadCore());
                 }
         }
     }
@@ -276,6 +296,18 @@ internal class HjsonReader : BaseReader
     }
 
     internal static bool TryParseNumericLiteral(string text, bool stopAtNext, out JsonValue value)
+        => TryParseNumericLiteral(text.AsSpan(), stopAtNext, out value);
+
+    internal static bool TryParseNumericLiteral(StringBuilder sb, bool stopAtNext, out JsonValue value)
+    {
+        int len = sb.Length;
+        if (len == 0) { value = null; return false; }
+        Span<char> buf = len <= 64 ? stackalloc char[len] : new char[len];
+        for (int i = 0; i < len; i++) buf[i] = sb[i];
+        return TryParseNumericLiteral(buf, stopAtNext, out value);
+    }
+
+    internal static bool TryParseNumericLiteral(ReadOnlySpan<char> text, bool stopAtNext, out JsonValue value)
     {
         int c, leadingZeros = 0, p = 0;
         bool testLeading = true;
@@ -305,9 +337,11 @@ internal class HjsonReader : BaseReader
         if (testLeading) leadingZeros--; // single 0 is allowed
         if (leadingZeros > 0) return false;
 
-        // fraction
+        bool hasFracOrExp = false;
+
         if (p < len && text[p] == '.')
         {
+            hasFracOrExp = true;
             if (leadingZeros < 0) return false;
             int fdigits = 0;
             p++;
@@ -328,6 +362,7 @@ internal class HjsonReader : BaseReader
             c = text[p];
             if (c == 'e' || c == 'E')
             {
+                hasFracOrExp = true;
                 p++;
                 if (p >= len) return false;
 
@@ -362,10 +397,9 @@ internal class HjsonReader : BaseReader
 
         if (p != len && !foundStop) return false;
 
-        var numSpan = text.AsSpan(0, numEnd);
+        var numSpan = text[..numEnd];
 
-        // Try parsing as long first to preserve precision for large integers
-        if (long.TryParse(numSpan, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out long lval))
+        if (!hasFracOrExp && long.TryParse(numSpan, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out long lval))
         {
             // Preserve negative zero as double (-0 as long is just 0)
             if (lval == 0 && numSpan[0] == '-') { value = -0.0; return true; }
@@ -409,7 +443,7 @@ internal class HjsonReader : BaseReader
                         default:
                             if (ch is '-' || (ch is >= '0' and <= '9'))
                             {
-                                if (TryParseNumericLiteral(sb.ToString(), false, out var res)) return res;
+                                if (TryParseNumericLiteral(sb, false, out var res)) return res;
                             }
                             break;
                     }
@@ -417,13 +451,25 @@ internal class HjsonReader : BaseReader
                 if (isEol)
                 {
                     // remove any whitespace at the end (ignored in quoteless strings)
-                    return HjsonDsf.Parse(dsfProviders, sb.ToString().Trim());
+                    var str = SbTrimEnd(sb);
+                    if (!hasDsfProviders) return str;
+                    return HjsonDsf.Parse(dsfProviders, str);
                 }
             }
             ReadChar();
             if (c != '\r') sb.Append((char)c);
             c = PeekChar();
         }
+    }
+
+    /// <summary>Returns the content of the StringBuilder with trailing whitespace removed, without allocating extra.</summary>
+    static string SbTrimEnd(StringBuilder sb)
+    {
+        int end = sb.Length - 1;
+        while (end >= 0 && sb[end] <= ' ') end--;
+        if (end < 0) return "";
+        if (end == sb.Length - 1) return sb.ToString();
+        return sb.ToString(0, end + 1);
     }
 
     /// <summary>Checks if the trimmed content of a StringBuilder equals a target string, without allocating.</summary>

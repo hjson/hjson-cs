@@ -14,13 +14,13 @@ public static class HjsonValue
     /// <summary>Loads Hjson/JSON from a file.</summary>
     public static JsonValue Load(string path)
     {
-        return load(path, null, null);
+        return loadFile(path, null, null);
     }
 
     /// <summary>Loads Hjson/JSON from a file, optionally preserving whitespace and comments.</summary>
     public static JsonValue Load(string path, HjsonOptions options)
     {
-        return load(path, null, options);
+        return loadFile(path, null, options);
     }
 
     /// <summary>Loads Hjson/JSON from a stream.</summary>
@@ -54,7 +54,7 @@ public static class HjsonValue
         return load(textReader, null, new HjsonOptions { KeepWsc = true });
     }
 
-    static JsonValue load(string path, IJsonReader jsonReader, HjsonOptions options)
+    static JsonValue loadFile(string path, IJsonReader jsonReader, HjsonOptions options)
     {
         if (Path.GetExtension(path).ToLower() == ".json") return JsonValue.Load(path);
         try
@@ -77,18 +77,24 @@ public static class HjsonValue
         return new HjsonReader(textReader, jsonReader, options).Read();
     }
 
+    static JsonValue load(string input, IJsonReader jsonReader, HjsonOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        return new HjsonReader(input, jsonReader, options).Read();
+    }
+
     /// <summary>Parses the specified Hjson/JSON string.</summary>
     public static JsonValue Parse(string hjsonString)
     {
         ArgumentNullException.ThrowIfNull(hjsonString);
-        return Load(new StringReader(hjsonString));
+        return load(hjsonString, null, null);
     }
 
     /// <summary>Parses the specified Hjson/JSON string, optionally preserving whitespace and comments.</summary>
     public static JsonValue Parse(string hjsonString, HjsonOptions options)
     {
         ArgumentNullException.ThrowIfNull(hjsonString);
-        return Load(new StringReader(hjsonString), options);
+        return load(hjsonString, null, options);
     }
 
     /// <summary>Saves Hjson to a file.</summary>
@@ -125,7 +131,7 @@ public static class HjsonValue
     [Obsolete("Use HjsonOptions for preserveComments")]
     public static JsonValue Load(string path, bool preserveComments)
     {
-        return load(path, null, new HjsonOptions { KeepWsc = preserveComments });
+        return loadFile(path, null, new HjsonOptions { KeepWsc = preserveComments });
     }
 
     /// <summary>Loads Hjson/JSON from a stream, optionally preserving whitespace and comments.</summary>

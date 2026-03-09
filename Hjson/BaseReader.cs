@@ -21,6 +21,14 @@ internal abstract class BaseReader
 
     public bool ReadWsc { get; set; }
 
+    public BaseReader(string input, IJsonReader jsonReader)
+    {
+        ArgumentNullException.ThrowIfNull(input);
+        Reader = jsonReader;
+        buffer = input;
+        Reset();
+    }
+
     public BaseReader(TextReader reader, IJsonReader jsonReader)
     {
         ArgumentNullException.ThrowIfNull(reader);
@@ -43,6 +51,8 @@ internal abstract class BaseReader
         int p = pos + idx;
         return (uint)p < (uint)buffer.Length ? buffer[p] : -1;
     }
+
+    public bool RemainingContains(char c) => buffer.AsSpan(pos).Contains(c);
 
     public virtual int SkipPeekChar()
     {
@@ -193,66 +203,90 @@ internal abstract class BaseReader
     public string ReadStringLiteral(Func<string> allowML)
     {
         // callers make sure that (exitCh == '"' || exitCh == "'")
-
         int exitCh = ReadChar();
-        sb.Length = 0;
-        for (; ; )
-        {
-            int c = ReadChar();
-            if (c < 0) throw ParseError("JSON string is not closed");
-            if (c == exitCh)
-            {
-                if (allowML != null && exitCh == '\'' && PeekChar() == '\'' && sb.Length == 0)
-                {
-                    // ''' indicates a multiline string
-                    ReadChar();
-                    return allowML();
-                }
-                else return sb.ToString();
-            }
-            else if (c == '\n' || c == '\r')
-            {
-                throw ParseError("Bad string containing newline");
-            }
-            else if (c != '\\')
-            {
-                sb.Append((char)c);
-                continue;
-            }
 
-            // escaped expression
-            c = ReadChar();
-            if (c < 0)
-                throw ParseError("Invalid JSON string literal; incomplete escape sequence");
-            switch (c)
-            {
-                case '"':
-                case '\'':
-                case '\\':
-                case '/': sb.Append((char)c); break;
-                case 'b': sb.Append('\x8'); break;
-                case 'f': sb.Append('\f'); break;
-                case 'n': sb.Append('\n'); break;
-                case 'r': sb.Append('\r'); break;
-                case 't': sb.Append('\t'); break;
-                case 'u':
-                    ushort cp = 0;
-                    for (int i = 0; i < 4; i++)
-                    {
-                        cp <<= 4;
-                        if ((c = ReadChar()) < 0)
-                            throw ParseError("Incomplete unicode character escape literal");
-                        if (c >= '0' && c <= '9') cp += (ushort)(c - '0');
-                        else if (c >= 'A' && c <= 'F') cp += (ushort)(c - 'A' + 10);
-                        else if (c >= 'a' && c <= 'f') cp += (ushort)(c - 'a' + 10);
-                        else throw ParseError("Bad \\u char " + (char)c);
-                    }
-                    sb.Append((char)cp);
-                    break;
-                default:
-                    throw ParseError("Invalid JSON string literal; unexpected escape character");
-            }
+        // Check for multiline ''' string
+        if (allowML != null && exitCh == '\''
+            && (uint)pos < (uint)buffer.Length && buffer[pos] == '\''
+            && (uint)(pos + 1) < (uint)buffer.Length && buffer[pos + 1] == '\'')
+        {
+            ReadChar(); ReadChar();
+            return allowML();
         }
+
+        // Scan to find closing quote and detect escapes
+        int start = pos;
+        bool hasEscapes = false;
+        int i = start;
+        int bufLen = buffer.Length;
+        while (i < bufLen)
+        {
+            char c = buffer[i];
+            if (c == exitCh) break;
+            if (c == '\\') { hasEscapes = true; i++; } // skip escaped char
+            else if (c == '\n' || c == '\r') break;
+            i++;
+        }
+        if (i >= bufLen) throw ParseError("JSON string is not closed");
+        if (buffer[i] != exitCh) throw ParseError("Bad string containing newline");
+
+        int end = i; // position of closing quote
+
+        string result;
+        if (!hasEscapes)
+        {
+            result = buffer.Substring(start, end - start);
+        }
+        else
+        {
+            sb.Length = 0;
+            for (i = start; i < end; i++)
+            {
+                char c = buffer[i];
+                if (c != '\\') { sb.Append(c); continue; }
+
+                if (++i >= end)
+                    throw ParseError("Invalid JSON string literal; incomplete escape sequence");
+                c = buffer[i];
+                switch (c)
+                {
+                    case '"':
+                    case '\'':
+                    case '\\':
+                    case '/': sb.Append(c); break;
+                    case 'b': sb.Append('\x8'); break;
+                    case 'f': sb.Append('\f'); break;
+                    case 'n': sb.Append('\n'); break;
+                    case 'r': sb.Append('\r'); break;
+                    case 't': sb.Append('\t'); break;
+                    case 'u':
+                        ushort cp = 0;
+                        for (int j = 0; j < 4; j++)
+                        {
+                            if (++i >= end)
+                                throw ParseError("Incomplete unicode character escape literal");
+                            cp <<= 4;
+                            c = buffer[i];
+                            if (c >= '0' && c <= '9') cp += (ushort)(c - '0');
+                            else if (c >= 'A' && c <= 'F') cp += (ushort)(c - 'A' + 10);
+                            else if (c >= 'a' && c <= 'f') cp += (ushort)(c - 'a' + 10);
+                            else throw ParseError("Bad \\u char " + c);
+                        }
+                        sb.Append((char)cp);
+                        break;
+                    default:
+                        throw ParseError("Invalid JSON string literal; unexpected escape character");
+                }
+            }
+            result = sb.ToString();
+        }
+
+        // Update reader state (no newlines in valid strings)
+        if (ReadWsc) white.Append(buffer, start, end + 1 - start);
+        pos = end + 1;
+        Column += end - start + 1;
+
+        return result;
     }
 
     public void Expect(char expected)
