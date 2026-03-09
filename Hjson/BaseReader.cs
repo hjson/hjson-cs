@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 namespace Hjson;
@@ -11,11 +8,9 @@ namespace Hjson;
 internal abstract class BaseReader
 {
     readonly string buffer;
-    TextReader r;
+    int pos;
     readonly StringBuilder sb = new();
     readonly StringBuilder white = new();
-    // peek could be removed since we now use a buffer
-    readonly List<int> peek = [];
     bool prevLf;
 
     public int Line { get; private set; }
@@ -29,7 +24,6 @@ internal abstract class BaseReader
     public BaseReader(TextReader reader, IJsonReader jsonReader)
     {
         ArgumentNullException.ThrowIfNull(reader);
-        // use a buffer so we can support reset
         Reader = jsonReader;
         buffer = reader.ReadToEnd();
         Reset();
@@ -38,22 +32,16 @@ internal abstract class BaseReader
     public void Reset()
     {
         Line = 1;
-        this.r = new StringReader(buffer);
-        peek.Clear();
+        pos = 0;
         white.Length = sb.Length = 0;
         prevLf = false;
     }
 
     public int PeekChar(int idx = 0)
     {
-        if (idx < 0) throw new ArgumentOutOfRangeException();
-        while (idx >= peek.Count)
-        {
-            int c = r.Read();
-            if (c < 0) return c;
-            peek.Add(c);
-        }
-        return peek[idx];
+        if (idx < 0) throw new ArgumentOutOfRangeException(nameof(idx));
+        int p = pos + idx;
+        return (uint)p < (uint)buffer.Length ? buffer[p] : -1;
     }
 
     public virtual int SkipPeekChar()
@@ -64,16 +52,11 @@ internal abstract class BaseReader
 
     public int ReadChar()
     {
-        int v;
-        if (peek.Count > 0)
-        {
-            // normally peek will only hold not more than one character so this should not matter for performance
-            v = peek[0];
-            peek.RemoveAt(0);
-        }
-        else v = r.Read();
+        if ((uint)pos >= (uint)buffer.Length) return -1;
 
-        if (ReadWsc && v != '\r') white.Append((char)v);
+        char v = buffer[pos++];
+
+        if (ReadWsc && v != '\r') white.Append(v);
 
         if (prevLf)
         {
@@ -106,28 +89,25 @@ internal abstract class BaseReader
 
     public void SkipWhite()
     {
-        for (; ; )
-        {
-            if (IsWhite((char)PeekChar())) ReadChar();
-            else break;
-        }
+        while (IsWhite((char)PeekChar())) ReadChar();
     }
 
-    // It could return either long or double, depending on the parsed value.
+    // Returns either long or double, depending on the parsed value.
     public JsonValue ReadNumericLiteral()
     {
         int c, leadingZeros = 0;
         bool testLeading = true;
-        var numStr = new StringBuilder();
+        Span<char> numBuf = stackalloc char[64];
+        int numLen = 0;
 
         if (PeekChar() == '-')
         {
-            numStr.Append('-');
+            numBuf[numLen++] = '-';
             ReadChar();
             if (PeekChar() < 0) throw ParseError("Invalid JSON numeric literal; extra negation");
         }
 
-        for (int x = 0; ; x++)
+        for (; ; )
         {
             c = PeekChar();
             if (c < '0' || c > '9') break;
@@ -136,7 +116,7 @@ internal abstract class BaseReader
                 if (c == '0') leadingZeros++;
                 else testLeading = false;
             }
-            numStr.Append((char)c);
+            numBuf[numLen++] = (char)c;
             ReadChar();
         }
         if (testLeading) leadingZeros--; // single 0 is allowed
@@ -149,14 +129,14 @@ internal abstract class BaseReader
         {
             hasFracOrExp = true;
             int fdigits = 0;
-            numStr.Append('.');
+            numBuf[numLen++] = '.';
             ReadChar();
             if (PeekChar() < 0) throw ParseError("Invalid JSON numeric literal; extra dot");
             for (; ; )
             {
                 c = PeekChar();
                 if (c < '0' || '9' < c) break;
-                numStr.Append((char)c);
+                numBuf[numLen++] = (char)c;
                 ReadChar();
                 fdigits++;
             }
@@ -167,19 +147,19 @@ internal abstract class BaseReader
         if (c == 'e' || c == 'E')
         {
             hasFracOrExp = true;
-            numStr.Append((char)c);
+            numBuf[numLen++] = (char)c;
             ReadChar();
             if (PeekChar() < 0) throw new ArgumentException("Invalid JSON numeric literal; incomplete exponent");
 
             c = PeekChar();
             if (c == '-')
             {
-                numStr.Append('-');
+                numBuf[numLen++] = '-';
                 ReadChar();
             }
             else if (c == '+')
             {
-                numStr.Append('+');
+                numBuf[numLen++] = '+';
                 ReadChar();
             }
 
@@ -189,20 +169,24 @@ internal abstract class BaseReader
             {
                 c = PeekChar();
                 if (c < '0' || c > '9') break;
-                numStr.Append((char)c);
+                numBuf[numLen++] = (char)c;
                 ReadChar();
             }
         }
 
-        double val = double.Parse(numStr.ToString(), NumberStyles.Float, NumberFormatInfo.InvariantInfo);
+        var numSpan = numBuf[..numLen];
 
+        // Try parsing as long first to preserve precision for large integers
+        if (!hasFracOrExp && long.TryParse(numSpan, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out long lval))
+        {
+            // Preserve negative zero as double (-0 as long is just 0)
+            if (lval == 0 && numSpan[0] == '-') return -0.0;
+            return lval;
+        }
+
+        double val = double.Parse(numSpan, NumberStyles.Float, NumberFormatInfo.InvariantInfo);
         if (val == 0.0 && double.IsNegative(val)) return -0.0;
 
-        if (!hasFracOrExp)
-        {
-            long lval = (long)val;
-            if (lval == val) return lval;
-        }
         return val;
     }
 

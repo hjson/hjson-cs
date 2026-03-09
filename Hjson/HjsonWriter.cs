@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -46,12 +44,38 @@ internal class HjsonWriter
               c == '/' && i + 1 < str.Length && (str[i + 1] == '/' || str[i + 1] == '*')) break;
             if (c > ' ') return $" # {str}";
         }
-        return str;
+        return normalizeEol(str);
     }
 
     string getWsc(Dictionary<string, string> white, string key) => white.TryGetValue(key, out string value) ? getWsc(value) : "";
     string getWsc(List<string> white, int index) => white.Count > index ? getWsc(white[index]) : "";
     bool testWsc(string str) => str.Length > 0 && str[str[0] == '\r' && str.Length > 1 ? 1 : 0] != '\n';
+
+    static string normalizeEol(string str)
+    {
+        if (string.IsNullOrEmpty(str) || JsonValue.eol == "\n") return str;
+        // Quick scan: if no newline chars exist, return as-is
+        bool hasNewline = false;
+        foreach (char ch in str)
+        {
+            if (ch == '\n' || ch == '\r') { hasNewline = true; break; }
+        }
+        if (!hasNewline) return str;
+        // WSC strings from the reader contain bare \n; normalize to the current eol
+        var sb = new StringBuilder(str.Length);
+        for (int i = 0; i < str.Length; i++)
+        {
+            char c = str[i];
+            if (c == '\r')
+            {
+                sb.Append(JsonValue.eol);
+                if (i + 1 < str.Length && str[i + 1] == '\n') i++;
+            }
+            else if (c == '\n') sb.Append(JsonValue.eol);
+            else sb.Append(c);
+        }
+        return sb.ToString();
+    }
 
     public void Save(JsonValue value, TextWriter tw, int level, bool hasComment, string separator, bool noIndent = false, bool isRootObject = false)
     {

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -280,17 +279,20 @@ internal class HjsonReader : BaseReader
     {
         int c, leadingZeros = 0, p = 0;
         bool testLeading = true;
-        text += '\0';
+        int len = text.Length;
         value = null;
+
+        if (len == 0) return false;
 
         if (text[p] == '-')
         {
             p++;
-            if (text[p] == 0) return false;
+            if (p >= len) return false;
         }
 
-        for (int x = 0; ; x++)
+        for (; ; )
         {
+            if (p >= len) break;
             c = text[p];
             if (c < '0' || c > '9') break;
             if (testLeading)
@@ -304,14 +306,15 @@ internal class HjsonReader : BaseReader
         if (leadingZeros > 0) return false;
 
         // fraction
-        if (text[p] == '.')
+        if (p < len && text[p] == '.')
         {
             if (leadingZeros < 0) return false;
             int fdigits = 0;
             p++;
-            if (text[p] == 0) return false;
+            if (p >= len) return false;
             for (; ; )
             {
+                if (p >= len) break;
                 c = text[p];
                 if (c < '0' || '9' < c) break;
                 p++;
@@ -320,51 +323,58 @@ internal class HjsonReader : BaseReader
             if (fdigits == 0) return false;
         }
 
-        c = text[p];
-        if (c == 'e' || c == 'E')
+        if (p < len)
         {
-            p++;
-            if (text[p] == 0) return false;
-
             c = text[p];
-            if (c == '-')
+            if (c == 'e' || c == 'E')
             {
                 p++;
-            }
-            else if (c == '+') p++;
+                if (p >= len) return false;
 
-            if (text[p] == 0) return false;
-
-            for (; ; )
-            {
                 c = text[p];
-                if (c < '0' || c > '9') break;
-                p++;
+                if (c == '-') p++;
+                else if (c == '+') p++;
+
+                if (p >= len) return false;
+
+                for (; ; )
+                {
+                    if (p >= len) break;
+                    c = text[p];
+                    if (c < '0' || c > '9') break;
+                    p++;
+                }
             }
         }
 
         int numEnd = p;
 
-        while (p < text.Length && IsWhite(text[p])) p++;
+        while (p < len && IsWhite(text[p])) p++;
 
         bool foundStop = false;
-        if (p < text.Length && stopAtNext)
+        if (p < len && stopAtNext)
         {
             // end scan if we find a control character like ,}] or a comment
             char ch = text[p];
-            if (ch == ',' || ch == '}' || ch == ']' || ch == '#' || ch == '/' && (text.Length > p + 1 && (text[p + 1] == '/' || text[p + 1] == '*')))
+            if (ch == ',' || ch == '}' || ch == ']' || ch == '#' || ch == '/' && (len > p + 1 && (text[p + 1] == '/' || text[p + 1] == '*')))
                 foundStop = true;
         }
 
-        if (p + 1 != text.Length && !foundStop) return false;
+        if (p != len && !foundStop) return false;
 
-        string numStr = text.Substring(0, numEnd);
-        double val = double.Parse(numStr, NumberStyles.Float, NumberFormatInfo.InvariantInfo);
+        var numSpan = text.AsSpan(0, numEnd);
 
-        if (val == 0.0 && double.IsNegative(val)) { value = -0.0; return true; }
+        // Try parsing as long first to preserve precision for large integers
+        if (long.TryParse(numSpan, NumberStyles.Integer, NumberFormatInfo.InvariantInfo, out long lval))
+        {
+            // Preserve negative zero as double (-0 as long is just 0)
+            if (lval == 0 && numSpan[0] == '-') { value = -0.0; return true; }
+            value = lval;
+            return true;
+        }
 
-        long lval = (long)val;
-        value = lval == val ? lval : val;
+        double val = double.Parse(numSpan, NumberStyles.Float, NumberFormatInfo.InvariantInfo);
+        value = val;
         return true;
     }
 
@@ -387,9 +397,15 @@ internal class HjsonReader : BaseReader
                     char ch = sb[0];
                     switch (ch)
                     {
-                        case 'f': if (sb.ToString().Trim() == "false") return false; break;
-                        case 'n': if (sb.ToString().Trim() == "null") return null; break;
-                        case 't': if (sb.ToString().Trim() == "true") return true; break;
+                        case 'f':
+                            if (SbTrimEquals(sb, "false")) return false;
+                            break;
+                        case 'n':
+                            if (SbTrimEquals(sb, "null")) return null;
+                            break;
+                        case 't':
+                            if (SbTrimEquals(sb, "true")) return true;
+                            break;
                         default:
                             if (ch is '-' || (ch is >= '0' and <= '9'))
                             {
@@ -408,5 +424,18 @@ internal class HjsonReader : BaseReader
             if (c != '\r') sb.Append((char)c);
             c = PeekChar();
         }
+    }
+
+    /// <summary>Checks if the trimmed content of a StringBuilder equals a target string, without allocating.</summary>
+    static bool SbTrimEquals(StringBuilder sb, string target)
+    {
+        int start = 0, end = sb.Length - 1;
+        while (start <= end && sb[start] <= ' ') start++;
+        while (end >= start && sb[end] <= ' ') end--;
+        int len = end - start + 1;
+        if (len != target.Length) return false;
+        for (int i = 0; i < len; i++)
+            if (sb[start + i] != target[i]) return false;
+        return true;
     }
 }

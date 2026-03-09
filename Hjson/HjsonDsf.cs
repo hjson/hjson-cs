@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Hjson;
@@ -65,8 +63,13 @@ public static class HjsonDsf
                 var text = dsf.Stringify(value);
                 if (text != null)
                 {
-                    if (text.Length == 0 || text.FirstOrDefault() == '"' || text.Any(c => isInvalidDsfChar(c)))
-                        throw new Exception("value may not be empty, start with a quote or contain a punctuator character except colon: " + text);
+                    if (text.Length == 0 || text[0] == '"')
+                        throw new Exception("value may not be empty or start with a quote: " + text);
+                    foreach (char c in text)
+                    {
+                        if (isInvalidDsfChar(c))
+                            throw new Exception("value may not contain a punctuator character except colon: " + text);
+                    }
                     return text;
                 }
             }
@@ -134,7 +137,7 @@ class DsfHex(bool stringify) : IHjsonDsfProvider
     public JsonValue Parse(string text)
     {
         if (isHex.IsMatch(text))
-            return long.Parse(text.Substring(2), NumberStyles.HexNumber);
+            return long.Parse(text.AsSpan(2), NumberStyles.HexNumber);
         else
             return null;
     }

@@ -10,6 +10,7 @@ using Xunit;
 
 namespace Hjson.Tests;
 
+[Collection("EolTests")]
 public class ParserTests
 {
     static readonly string AssetsDir = Path.Combine(AppContext.BaseDirectory, "assets");
