@@ -373,4 +373,32 @@ public class EdgeCaseTests
         string value = config["value"];
         Assert.Equal("hello\nworld", value);
     }
+
+    // ── Numbers without digits are quoteless strings, not a crash ────
+
+    [Theory]
+    [InlineData("1e ")]
+    [InlineData("1E+ ")]
+    [InlineData("1.5e- ")]
+    [InlineData("- ")]
+    public void Parse_NumberWithoutDigits_IsQuotelessString(string text)
+    {
+        Assert.Equal(text.Trim(), (string)HjsonValue.Parse(text));
+
+        var config = HjsonValue.Parse("a: " + text + "\nb: 1");
+        Assert.Equal(text.Trim(), (string)config["a"]);
+        Assert.Equal(1, (int)config["b"]);
+    }
+
+    [Theory]
+    [InlineData("-,")]
+    [InlineData("1e,")]
+    [InlineData("1e+ #")]
+    [InlineData("- }")]
+    public void Save_StringLikeNumberWithoutDigits_RoundTrips(string text)
+    {
+        var obj = new JsonObject { { "a", text } };
+        string hjson = obj.ToString(Stringify.Hjson);
+        Assert.Equal(text, (string)HjsonValue.Parse(hjson)["a"]);
+    }
 }

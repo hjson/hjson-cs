@@ -322,6 +322,7 @@ internal class HjsonReader : BaseReader
             if (p >= len) return false;
         }
 
+        int intStart = p;
         for (; ; )
         {
             if (p >= len) break;
@@ -334,6 +335,7 @@ internal class HjsonReader : BaseReader
             }
             p++;
         }
+        if (p == intStart) return false; // a number needs at least one digit
         if (testLeading) leadingZeros--; // single 0 is allowed
         if (leadingZeros > 0) return false;
 
@@ -372,6 +374,7 @@ internal class HjsonReader : BaseReader
 
                 if (p >= len) return false;
 
+                int expStart = p;
                 for (; ; )
                 {
                     if (p >= len) break;
@@ -379,6 +382,7 @@ internal class HjsonReader : BaseReader
                     if (c < '0' || c > '9') break;
                     p++;
                 }
+                if (p == expStart) return false; // an exponent needs at least one digit
             }
         }
 
